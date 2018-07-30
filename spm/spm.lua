@@ -24,7 +24,7 @@ local PACKAGES_F = "packages.cfg"
 local SETTINGS = "/etc/spm.cfg"
 
 local function printUsage()
-    print("__Simple Package Manager (spm)__")
+    print("Simple Package Manager (spm) \n")
     print("List of commands and parameters (<> = required, [] = optional):")
     print("addrepo <url> = Add repository")
     print("removerepo <url> = Remove repository")
@@ -38,7 +38,7 @@ end
 
 local function __getContent(url)
     local result, response = pcall(internet.request, url)
-    if result and response then
+    if result then
         local content = ""
         for chunk in response do
             content = content..chunk
@@ -56,7 +56,7 @@ end
 local function __readCfg(filepath)
     local file, emsg = io.open(filepath, "rb")
     if not file then
-        io.stderr:write("spm-error: cannot read file at path " .. filepath .. ": " .. emsg)
+        io.stderr:write("spm-error: Cannot read file at path " .. filepath .. ": " .. emsg)
         return nil
     end
     local sdata = file:read("*a")
@@ -70,7 +70,7 @@ local function __writeCfg(filepath, data)
     end
     local file, emsg = io.open(filepath, "wb")
     if not file then
-        io.stderr:write("spm-error: cannot write file at path " .. filepath .. ": " .. emsg)
+        io.stderr:write("spm-error: Cannot write file to path " .. filepath .. ": " .. emsg)
         return
     end
     local sdata = serialization.serialize(data)
@@ -79,7 +79,7 @@ local function __writeCfg(filepath, data)
 end
 
 local function __tryFindRepo(repositoryUrl, packageName)
-    local content = __getContent(repositoryUrl.."/"..PACKAGES_F)
+    local content = __getContent(fs.concat(repositoryUrl, PACKAGES_F))
     if content then
         if packageName == nil then
             return content
@@ -110,7 +110,7 @@ end
 
 local function addRepository(repositoryUrl)
     -- Look for packages.cfg in given url, if found write it to settings
-    local content = __getContent(repositoryUrl.."/"..PACKAGES_F)
+    local content = __getContent(fs.concat(repositoryUrl, PACKAGES_F))
     if content then
         local settings = __readCfg(SETTINGS) or {}
         if settings then
@@ -223,9 +223,9 @@ local function installPackage(packageName, force)
                 print("spm: Installing '"..packageName.."'...")
                 settings["packages"][packageName] = {}
                 for dpath,installDir in pairs(package.files) do
-                    local rpath = repo.."/"..dpath
-                    local filename = dpath:match("^.+/(.+)$")
-                    local filepath = installDir.."/"..filename
+                    local rpath = fs.concat(repo,dpath)
+                    local filename = fs.name(dpath)
+                    local filepath = fs.concat(installDir, filename)
                     local success, response = pcall(__downloadFile(rpath, filepath))
                     if success and response then
                         table.insert(settings["packages"][packageName].files, filepath)
