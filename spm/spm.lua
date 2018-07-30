@@ -248,12 +248,12 @@ local function installPackage(packageName, force)
                     local rpath = __concatUrl(repo,dpath)
                     local filename = fs.name(dpath)
                     local filepath = fs.concat(installDir, filename)
+                    print("spm: Copying '"..rpath.."' to '"..filepath.."'...")
                     local success, response = pcall(__downloadFile, rpath, filepath)
-                    if success and response then
+                    if success then
                         table.insert(settings["packages"][packageName].files, filepath)
-                        print("spm: "..rpath.." copied to "..filepath)
                     else
-                        io.stderr:write("spm-error: Error installing '"..packageName.."': "..response)
+                        io.stderr:write("spm-error: Error installing '"..packageName.."', file '"..dpath.."'. Aborting...")
                         return
                     end
                 end
