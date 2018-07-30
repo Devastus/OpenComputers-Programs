@@ -18,6 +18,7 @@ local internet = require("internet")
 wget = loadfile("/bin/wget.lua")
 local serialization = require("serialization")
 local fs = require("filesystem")
+local text = require("text")
 local shell = require("shell")
 
 local PACKAGES_F = "packages.cfg"
@@ -305,33 +306,33 @@ if args[1] == "addrepo" then
         printUsage()
         return
     end
-    addRepository(args[2])
+    addRepository(text.trim(args[2]))
 elseif args[1] == "removerepo" then
     if args[2] == nil then
         printUsage()
         return
     end
-    removeRepository(args[2])
+    removeRepository(text.trim(args[2]))
 elseif args[1] == "listrepo" then
     listRepositories()
 elseif args[1] == "search" then
-    searchPackage(args[2])
+    searchPackage(text.trim(args[2]))
 elseif args[1] == "query" then
-    queryPackage(args[2])
+    queryPackage(text.trim(args[2]))
 elseif args[1] == "update" then
-    updatePackage(args[2])
+    updatePackage(text.trim(args[2]))
 elseif args[1] == "install" then
     if args[2] == nil then
         printUsage()
         return
     end
-    installPackage(args[2], options["f"])
+    installPackage(text.trim(args[2]), options["f"])
 elseif args[1] == "remove" then
     if args[2] == nil then
         printUsage()
         return
     end
-    removePackage(args[2])
+    removePackage(text.trim(args[2]))
 else
     printUsage()
     return
