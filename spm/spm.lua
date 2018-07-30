@@ -93,8 +93,12 @@ end
 
 local function __tryFindRepo(repositoryUrl, packageName)
     local url = __concatUrl(repositoryUrl, PACKAGES_F)
-    local success, content = pcall(__getContent, url)
-    if not success or not content then
+    -- local success, content = pcall(__getContent, url)
+    -- if not success or not content then
+    --     return nil
+    -- end
+    local content = __getContent(url)
+    if not content then
         return nil
     end
     if packageName == nil then
