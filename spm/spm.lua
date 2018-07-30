@@ -328,23 +328,23 @@ elseif args[1] == "removerepo" then
 elseif args[1] == "listrepo" then
     listRepositories()
 elseif args[1] == "search" then
-    searchPackage(text.trim(args[2]))
+    searchPackage(args[2])
 elseif args[1] == "query" then
-    queryPackage(text.trim(args[2]))
+    queryPackage(args[2])
 elseif args[1] == "update" then
-    updatePackage(text.trim(args[2]))
+    updatePackage(args[2])
 elseif args[1] == "install" then
     if args[2] == nil then
         printUsage()
         return
     end
-    installPackage(text.trim(args[2]), options["f"])
+    installPackage(args[2], options["f"])
 elseif args[1] == "remove" then
     if args[2] == nil then
         printUsage()
         return
     end
-    removePackage(text.trim(args[2]))
+    removePackage(args[2])
 else
     printUsage()
     return
