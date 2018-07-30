@@ -225,7 +225,11 @@ local function queryPackage(packageName)
             end
         end
         if not found then 
-            print("spm: No packages found with name '"..packageName.."'")
+            if packageName == nil then
+                print("spm: No packages installed")
+            else
+                print("spm: No packages installed with name '"..packageName.."'")
+            end
         end
     end
 end
