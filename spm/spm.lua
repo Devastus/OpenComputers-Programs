@@ -54,7 +54,7 @@ local function __getContent(url)
         for chunk in response do
             content = content..chunk
         end
-        return serialization.unserialize(content)
+        return serialization.unserialize(text.trim(content))
     end
     return nil
 end
