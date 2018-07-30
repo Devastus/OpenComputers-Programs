@@ -114,7 +114,7 @@ end
 
 local function __tryFindFile(packageName)
     local settings = __readCfg(SETTINGS, nil)
-    if settings then
+    if settings and settings["packages"] then
         if packageName == nil then
             return settings["packages"]
         end
@@ -133,7 +133,7 @@ local function addRepository(repositoryUrl)
     print(url)
     local success, content = pcall(__getContent, url)
     if content then
-        local settings = __readCfg(SETTINGS, {["repos"]={}})
+        local settings = __readCfg(SETTINGS, {["repos"]={}, ["packages"]={}})
         if settings["repos"] ~= nil then
             for i = 1, #settings["repos"], 1 do
                 if repositoryUrl == settings["repos"][i] then
