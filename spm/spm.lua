@@ -37,12 +37,14 @@ local function printUsage()
     print("remove <packageName> = Remove package")
 end
 
-local function __concatUrl(url, file)
-    if file[1] == '/' then
-        return text.trim(url..file)
-    else
-        return text.trim(url.."/"..file)
+local function __concatUrl(repo, file)
+    if repo[#repo] ~= '/' then
+        repo = repo.."/"
     end
+    if file[1] == '/' then
+        file = string.sub(file, 2)
+    end
+    return text.trim(repo..file)
 end
 
 local function __getContent(url)
@@ -93,12 +95,8 @@ end
 
 local function __tryFindRepo(repositoryUrl, packageName)
     local url = __concatUrl(repositoryUrl, PACKAGES_F)
-    -- local success, content = pcall(__getContent, url)
-    -- if not success or not content then
-    --     return nil
-    -- end
-    local content = __getContent(url)
-    if not content then
+    local success, content = pcall(__getContent, url)
+    if not success or not content then
         return nil
     end
     if packageName == nil then
@@ -131,9 +129,8 @@ local function addRepository(repositoryUrl)
     -- Look for packages.cfg in given url, if found write it to settings
     local url = __concatUrl(repositoryUrl, PACKAGES_F)
     print(url)
-    --local success, content = pcall(__getContent, url)
-    local content = __getContent(url)
-    if content then
+    local success, content = pcall(__getContent, url)
+    if success then
         local settings = __readCfg(SETTINGS, {["repos"]={}, ["packages"]={}})
         if settings["repos"] ~= nil then
             for i = 1, #settings["repos"], 1 do
