@@ -318,13 +318,13 @@ if args[1] == "addrepo" then
         printUsage()
         return
     end
-    addRepository(text.trim(args[2]))
+    addRepository(args[2])
 elseif args[1] == "removerepo" then
     if args[2] == nil then
         printUsage()
         return
     end
-    removeRepository(text.trim(args[2]))
+    removeRepository(args[2])
 elseif args[1] == "listrepo" then
     listRepositories()
 elseif args[1] == "search" then
