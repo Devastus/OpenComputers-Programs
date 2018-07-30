@@ -93,9 +93,8 @@ end
 
 local function __tryFindRepo(repositoryUrl, packageName)
     local url = __concatUrl(repositoryUrl, PACKAGES_F)
-    local success, content = pcall(__getContent(url))
-    if content then
-        print(content)
+    local success, content = pcall(__getContent, url)
+    if success then
         if packageName == nil then
             return content
         end
@@ -127,7 +126,7 @@ local function addRepository(repositoryUrl)
     -- Look for packages.cfg in given url, if found write it to settings
     local url = __concatUrl(repositoryUrl, PACKAGES_F)
     print(url)
-    local success, content = pcall(__getContent(url))
+    local success, content = pcall(__getContent, url)
     if content then
         local settings = __readCfg(SETTINGS, {["repos"]={}})
         if settings["repos"] ~= nil then
@@ -242,7 +241,7 @@ local function installPackage(packageName, force)
                     local rpath = __concatUrl(repo,dpath)
                     local filename = fs.name(dpath)
                     local filepath = fs.concat(installDir, filename)
-                    local success, response = pcall(__downloadFile(rpath, filepath))
+                    local success, response = pcall(__downloadFile, rpath, filepath)
                     if success and response then
                         table.insert(settings["packages"][packageName].files, filepath)
                         print("spm: "..rpath.." copied to "..filepath)
