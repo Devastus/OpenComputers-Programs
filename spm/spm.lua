@@ -94,17 +94,18 @@ end
 local function __tryFindRepo(repositoryUrl, packageName)
     local url = __concatUrl(repositoryUrl, PACKAGES_F)
     local success, content = pcall(__getContent, url)
-    if success then
-        if packageName == nil then
-            return content
-        end
+    if not success or not content then
+        return nil
+    end
+    if packageName == nil then
+        return content
+    else
         for k,p in pairs(content) do
             if k == packageName then
                 return p
             end
         end
     end
-    return nil
 end
 
 local function __tryFindFile(packageName)
@@ -190,8 +191,12 @@ local function searchPackage(packageName)
                 end
             end
         end
-        if not found then 
-            print("spm: No packages found with name '"..packageName.."'")
+        if not found then
+            if packageName == nil then
+                print("spm: No packages found")
+            else
+                print("spm: No packages found with name '"..packageName.."'")
+            end
         end
     end
 end
