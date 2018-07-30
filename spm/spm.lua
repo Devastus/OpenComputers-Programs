@@ -37,6 +37,14 @@ local function printUsage()
     print("remove <packageName> = Remove package")
 end
 
+local function __concatUrl(url, file)
+    if file[1] == '/' then
+        return text.trim(url..file)
+    else
+        return text.trim(url.."/"..file)
+    end
+end
+
 local function __getContent(url)
     local result, response = pcall(internet.request, url)
     if result then
@@ -80,8 +88,7 @@ local function __writeCfg(filepath, data)
 end
 
 local function __tryFindRepo(repositoryUrl, packageName)
-    local url = text.trim(fs.concat(repositoryUrl, PACKAGES_F))
-    print(url)
+    local url = __concatUrl(repositoryUrl, PACKAGES_F)
     local success, content = pcall(__getContent(url))
     if success then
         if packageName == nil then
@@ -113,7 +120,7 @@ end
 
 local function addRepository(repositoryUrl)
     -- Look for packages.cfg in given url, if found write it to settings
-    local url = text.trim(fs.concat(repositoryUrl, PACKAGES_F))
+    local url = __concatUrl(repositoryUrl, PACKAGES_F)
     print(url)
     local success, content = pcall(__getContent(url))
     if success then
@@ -228,7 +235,7 @@ local function installPackage(packageName, force)
                 print("spm: Installing '"..packageName.."'...")
                 settings["packages"][packageName] = {}
                 for dpath,installDir in pairs(package.files) do
-                    local rpath = fs.concat(repo,dpath)
+                    local rpath = __concatUrl(repo,dpath)
                     local filename = fs.name(dpath)
                     local filepath = fs.concat(installDir, filename)
                     local success, response = pcall(__downloadFile(rpath, filepath))
