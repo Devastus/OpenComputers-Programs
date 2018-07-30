@@ -243,15 +243,15 @@ local function installPackage(packageName, force)
             package = __tryFindRepo(repo, packageName)
             if package then
                 print("spm: Installing '"..packageName.."'...")
-                settings["packages"][packageName] = {}
-                for dpath,installDir in pairs(package.files) do
+                settings["packages"][packageName] = {["files"]={}}
+                for dpath,installDir in pairs(package["files"]) do
                     local rpath = __concatUrl(repo,dpath)
                     local filename = fs.name(dpath)
                     local filepath = fs.concat(installDir, filename)
                     print("spm: Copying '"..rpath.."' to '"..filepath.."'...")
                     local success, response = pcall(__downloadFile, rpath, filepath)
                     if success then
-                        table.insert(settings["packages"][packageName].files, filepath)
+                        table.insert(settings["packages"][packageName]["files"], filepath)
                     else
                         io.stderr:write("spm-error: Error installing '"..packageName.."', file '"..dpath.."'. Aborting...")
                         return
