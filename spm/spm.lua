@@ -123,7 +123,7 @@ local function addRepository(repositoryUrl)
     local url = __concatUrl(repositoryUrl, PACKAGES_F)
     print(url)
     local success, content = pcall(__getContent(url))
-    if success then
+    if content then
         local settings = __readCfg(SETTINGS) or {}
         if settings then
             for i,v in ipairs(settings["repos"]) do
@@ -139,8 +139,9 @@ local function addRepository(repositoryUrl)
         print("spm: Added repository '"..repositoryUrl.."'")
         __writeCfg(SETTINGS, settings)
         return
+    else
+        io.stderr:write("spm-error: Repository '"..repositoryUrl.."' is invalid")
     end
-    io.stderr:write("spm-error: Repository '"..repositoryUrl.."' is invalid")
 end
 
 local function removeRepository(repositoryUrl)
