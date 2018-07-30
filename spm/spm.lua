@@ -62,11 +62,15 @@ local function __downloadFile(url, path)
     return wget("-fq",url,path)
 end
 
-local function __readCfg(filepath)
+local function __readCfg(filepath, default)
     local file, emsg = io.open(filepath, "rb")
     if not file then
-        io.stderr:write("spm-error: Cannot read file at path " .. filepath .. ": " .. emsg)
-        return nil
+        if default ~= nil then
+            return default
+        else
+            io.stderr:write("spm-error: Cannot read file at path " .. filepath .. ": " .. emsg)
+            return nil
+        end
     end
     local sdata = file:read("*a")
     file:close()
@@ -91,6 +95,7 @@ local function __tryFindRepo(repositoryUrl, packageName)
     local url = __concatUrl(repositoryUrl, PACKAGES_F)
     local success, content = pcall(__getContent(url))
     if content then
+        print(content)
         if packageName == nil then
             return content
         end
@@ -104,7 +109,7 @@ local function __tryFindRepo(repositoryUrl, packageName)
 end
 
 local function __tryFindFile(packageName)
-    local settings = __readCfg(SETTINGS)
+    local settings = __readCfg(SETTINGS, nil)
     if settings then
         if packageName == nil then
             return settings["packages"]
@@ -124,7 +129,7 @@ local function addRepository(repositoryUrl)
     print(url)
     local success, content = pcall(__getContent(url))
     if content then
-        local settings = __readCfg(SETTINGS) or {}
+        local settings = __readCfg(SETTINGS, {["repos"]={}})
         if settings["repos"] ~= nil then
             for i = 1, #settings["repos"], 1 do
                 if repositoryUrl == settings["repos"][i] then
@@ -132,8 +137,6 @@ local function addRepository(repositoryUrl)
                     return
                 end
             end
-        else
-            settings["repos"] = {}
         end
         table.insert(settings["repos"], repositoryUrl)
         print("spm: Added repository '"..repositoryUrl.."'")
@@ -146,7 +149,7 @@ end
 
 local function removeRepository(repositoryUrl)
     -- Look for url in settings, if found delete it
-    local settings = __readCfg(SETTINGS)
+    local settings = __readCfg(SETTINGS, nil)
     if settings then
         for i,v in ipairs(settings["repos"]) do
             if repositoryUrl == v then
@@ -162,7 +165,7 @@ local function removeRepository(repositoryUrl)
 end
 
 local function listRepositories()
-    local settings = __readCfg(SETTINGS)
+    local settings = __readCfg(SETTINGS, nil)
     if settings then
         for i,v in ipairs(settings["repos"]) do
             print(i..". "..v)
@@ -171,7 +174,7 @@ local function listRepositories()
 end
 
 local function searchPackage(packageName)
-    local settings = __readCfg(SETTINGS)
+    local settings = __readCfg(SETTINGS, nil)
     if settings then
         local found = false
         for i,r in ipairs(settings["repos"]) do
@@ -195,7 +198,7 @@ local function searchPackage(packageName)
 end
 
 local function queryPackage(packageName)
-    local settings = __readCfg(SETTINGS)
+    local settings = __readCfg(SETTINGS, nil)
     if settings then
         local found = false
         for k,p in pairs(settings["packages"]) do
@@ -223,7 +226,7 @@ end
 
 local function installPackage(packageName, force)
     -- Look for packageName in repositories, if found install to hard drive and write to installed packages
-    local settings = __readCfg(SETTINGS)
+    local settings = __readCfg(SETTINGS, nil)
     if settings then
         local package = __tryFindFile(packageName)
         if package and not force then
@@ -260,7 +263,7 @@ end
 
 local function removePackage(packageName)
     -- Look for packageName in installed packages, if found remove it from the hard drive and the settings
-    local settings = __readCfg(SETTINGS)
+    local settings = __readCfg(SETTINGS, nil)
     if settings then
         local package = __tryFindFile(packageName)
         if package then
@@ -278,7 +281,7 @@ end
 
 local function updatePackage(packageName)
     -- Uninstall and re-download
-    local settings = __readCfg(SETTINGS)
+    local settings = __readCfg(SETTINGS, nil)
     if settings then
         local package = __tryFindFile(packageName)
         if package then
