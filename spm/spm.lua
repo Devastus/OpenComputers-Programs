@@ -125,9 +125,9 @@ local function addRepository(repositoryUrl)
     local success, content = pcall(__getContent(url))
     if content then
         local settings = __readCfg(SETTINGS) or {}
-        if settings and settings["repos"] then
-            for i,v in ipairs(settings["repos"]) do
-                if repositoryUrl == v then
+        if settings["repos"] ~= nil then
+            for i = 1, #settings["repos"], 1 do
+                if repositoryUrl == settings["repos"][i] then
                     print("spm: Repository '"..repositoryUrl.."' already exists")
                     return
                 end
