@@ -20,7 +20,7 @@ local serialization = require("serialization")
 local fs = require("filesystem")
 local shell = require("shell")
 
-local PACKAGES_F = {"packages.cfg", "master/packages.cfg", "programs.cfg", "master/programs.cfg" }
+local PACKAGES_F = "packages.cfg"
 local SETTINGS = "/etc/spm.cfg"
 
 local function printUsage()
@@ -38,12 +38,14 @@ end
 
 local function __getContent(url)
     local result, response = pcall(internet.request, url)
-    if not result then return nil end
-    local content = ""
-    for chunk in response do
-        content = content..chunk
+    if result and response then
+        local content = ""
+        for chunk in response do
+            content = content..chunk
+        end
+        return serialization.unserialize(content)
     end
-    return serialization.unserialize(content)
+    return nil
 end
 
 local function __downloadFile(url, path)
@@ -77,16 +79,14 @@ local function __writeCfg(filepath, data)
 end
 
 local function __tryFindRepo(repositoryUrl, packageName)
-    for i,cfg in ipairs(PACKAGES_F) do
-        local content = __getContent(repositoryUrl.."/"..cfg)
-        if content then
-            if packageName == nil then
-                return content
-            end
-            for k,p in pairs(content) do
-                if k == packageName then
-                    return p
-                end
+    local content = __getContent(repositoryUrl.."/"..PACKAGES_F)
+    if content then
+        if packageName == nil then
+            return content
+        end
+        for k,p in pairs(content) do
+            if k == packageName then
+                return p
             end
         end
     end
@@ -110,31 +110,25 @@ end
 
 local function addRepository(repositoryUrl)
     -- Look for packages.cfg in given url, if found write it to settings
-    local found = false
-    for i,cfg in ipairs(PACKAGES_F) do
-        local content = __getContent(repositoryUrl.."/"..cfg)
-        if content then
-            found = true
-            local settings = __readCfg(SETTINGS) or {}
-            if settings then
-                for i,v in ipairs(settings["repos"]) do
-                    if repositoryUrl == v then
-                        print("spm: Repository '"..repositoryUrl.."' already exists")
-                        return
-                    end
+    local content = __getContent(repositoryUrl.."/"..PACKAGES_F)
+    if content then
+        local settings = __readCfg(SETTINGS) or {}
+        if settings then
+            for i,v in ipairs(settings["repos"]) do
+                if repositoryUrl == v then
+                    print("spm: Repository '"..repositoryUrl.."' already exists")
+                    return
                 end
-            else
-                settings["repos"] = {}
             end
-            table.insert(settings["repos"], repositoryUrl)
-            print("spm: Added repository '"..repositoryUrl.."'")
-            __writeCfg(SETTINGS, settings)
-            return
+        else
+            settings["repos"] = {}
         end
+        table.insert(settings["repos"], repositoryUrl)
+        print("spm: Added repository '"..repositoryUrl.."'")
+        __writeCfg(SETTINGS, settings)
+        return
     end
-    if not found then
-        io.stderr:write("spm-error: Repository '"..repositoryUrl.."' is invalid")
-    end
+    io.stderr:write("spm-error: Repository '"..repositoryUrl.."' is invalid")
 end
 
 local function removeRepository(repositoryUrl)
