@@ -90,7 +90,7 @@ end
 local function __tryFindRepo(repositoryUrl, packageName)
     local url = __concatUrl(repositoryUrl, PACKAGES_F)
     local success, content = pcall(__getContent(url))
-    if success then
+    if content then
         if packageName == nil then
             return content
         end
@@ -178,7 +178,7 @@ local function searchPackage(packageName)
             local content = __tryFindRepo(r, packageName)
             if content then
                 found = true
-                if packageName == nil or packageName == "" then
+                if packageName == nil then
                     for k,f in pairs(content) do
                         print(k)
                     end
