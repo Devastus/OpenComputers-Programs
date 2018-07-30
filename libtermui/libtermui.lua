@@ -14,11 +14,11 @@ end
 
 function API.write(x, y, msg, highlighted)
     if highlighted == true then
-        gpu.SetForeground(colors.highlight[1])
-        gpu.SetBackground(colors.highlight[2])
+        gpu.setForeground(colors.highlight[1])
+        gpu.setBackground(colors.highlight[2])
     else
-        gpu.SetForeground(colors.normal[1])
-        gpu.SetBackground(colors.normal[2])
+        gpu.setForeground(colors.normal[1])
+        gpu.setBackground(colors.normal[2])
     end
     term.setCursor(x, y)
     term.write(msg)
@@ -36,11 +36,11 @@ end
 function __drawOptions(x, y, options, selected)
     for i = 1, #options, 1 do
         if i == selected then
-            gpu.SetForeground(colors.highlight[1])
-            gpu.SetBackground(colors.highlight[2])
+            gpu.setForeground(colors.highlight[1])
+            gpu.setBackground(colors.highlight[2])
         else
-            gpu.SetForeground(colors.normal[1])
-            gpu.SetBackground(colors.normal[2])
+            gpu.setForeground(colors.normal[1])
+            gpu.setBackground(colors.normal[2])
         end
         term.setCursor(x, y+i-1)
         term.write(options[i])
@@ -50,11 +50,11 @@ end
 function __drawToggles(x, y, options, selected, highlighted)
     for i = 1, #options, 1 do
         if i == highlighted then
-            gpu.SetForeground(colors.highlight[1])
-            gpu.SetBackground(colors.highlight[2])
+            gpu.setForeground(colors.highlight[1])
+            gpu.setBackground(colors.highlight[2])
         else
-            gpu.SetForeground(colors.normal[1])
-            gpu.SetBackground(colors.normal[2])
+            gpu.setForeground(colors.normal[1])
+            gpu.setBackground(colors.normal[2])
         end
         term.setCursor(x, y+i-1)
         if i < #options then
