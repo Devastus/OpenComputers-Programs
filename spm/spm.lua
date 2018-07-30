@@ -273,12 +273,14 @@ local function removePackage(packageName)
     if settings then
         local package = __tryFindFile(packageName)
         if package then
-            for i,v in ipairs(package.files) do
+            print("spm: Removing '"..packageName.."'...")
+            for i,v in ipairs(package["files"]) do
+                print("spm: Removing file '"..v.."...")
                 fs.remove(v)
             end
             settings["packages"][packageName] = nil
             __writeCfg(SETTINGS, settings)
-            print("spm: Package '"..packageName"' removed")
+            print("spm: Package '"..packageName.."' removed succesfully.")
             return
         end
         io.stderr:write("spm-error: No packages found with name '"..packageName.."'")
