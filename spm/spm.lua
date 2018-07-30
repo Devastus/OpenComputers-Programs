@@ -80,7 +80,9 @@ local function __writeCfg(filepath, data)
 end
 
 local function __tryFindRepo(repositoryUrl, packageName)
-    local success, content = pcall(__getContent(fs.concat(repositoryUrl, PACKAGES_F)))
+    local url = text.trim(fs.concat(repositoryUrl, PACKAGES_F))
+    print(url)
+    local success, content = pcall(__getContent(url))
     if success then
         if packageName == nil then
             return content
@@ -111,7 +113,9 @@ end
 
 local function addRepository(repositoryUrl)
     -- Look for packages.cfg in given url, if found write it to settings
-    local success, content = pcall(__getContent(fs.concat(repositoryUrl, PACKAGES_F)))
+    local url = text.trim(fs.concat(repositoryUrl, PACKAGES_F))
+    print(url)
+    local success, content = pcall(__getContent(url))
     if success then
         local settings = __readCfg(SETTINGS) or {}
         if settings then
