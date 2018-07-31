@@ -84,20 +84,18 @@ local function setupServer()
     if not componentList or #componentList == 0 then
         termUI.clear()
         termUI.write(1, 1, "ReactorNet Server | Setup - Available Components (2/6)")
-        termUI.write(1, 2, "Error: no available components found! Aborting...")
+        termUI.write(1, 2, "Error: no available components found! Aborting...", "error")
         os.exit()
     end
     local selected = {}
     for i = 1, #componentList, 1 do selected[i] = false end
-    while event.pull(0.05, "interrupted") == nil do
-        termUI.clear()
-        termUI.write(1, 1, "ReactorNet Server | Setup - Available Components (2/6)")
-        termUI.write(1, 2, "Select components to connect to:")
-        componentList = termUI.selectToggles(2, 3, componentList, selected)
-        for i=1, #selected, 1 do
-            if selected[i] == true then
-                connectComponent(componentList[i])
-            end
+    termUI.clear()
+    termUI.write(1, 1, "ReactorNet Server | Setup - Available Components (2/6)")
+    termUI.write(1, 2, "Select components to connect to:")
+    componentList = termUI.selectToggles(2, 3, componentList, selected)
+    for i=1, #selected, 1 do
+        if selected[i] == true then
+            connectComponent(componentList[i])
         end
     end
 
@@ -111,7 +109,7 @@ local function setupServer()
         if #id_postfix > 0 and #id_postfix <= 12 then 
             validID = true
         else
-            termUI.write(1, 2, "Error: Invalid ID")
+            termUI.write(1, 2, "Error: Invalid ID", "error")
             os.sleep(2)
         end
     end
@@ -119,12 +117,12 @@ local function setupServer()
 
     termUI.clear()
     termUI.write(1, 1, "ReactorNet Server | Setup - Turbine Rotor Speed (4/6)")
-    termUI.write(1, 2, "Select target Turbine Rotor Speed (900/1800 RPM): \n")
+    termUI.write(1, 2, "Select target Turbine Rotor Speed (900/1800 RPM):")
     settings.targetRotorSpeed = __TARGET_ROTOR_SPEED[termUI.selectOptions(2, 3,__TARGET_ROTOR_SPEED)]
 
     termUI.clear()
     termUI.write(1, 1, "ReactorNet Server | Setup - Steam per Turbine (5/6)")
-    termUI.write(1, 2, "Specify target Steam per Turbine (0-2000 mb/t): \n")
+    termUI.write(1, 2, "Specify target Steam per Turbine (0-2000 mb/t):")
     local steamValue = termUI.read(1,3,false)
     settings.steamPerTurbine = clamp(steamValue, 0, 2000)
     setTurbines("setFluidFlowRateMax", settings.steamPerTurbine)

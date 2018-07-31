@@ -4,7 +4,10 @@ local keyboard = require("keyboard")
 local gpu = term.gpu()
 local colors = {
     normal = {0xFFFFFF, 0x000000},
-    highlight = {0x000000, 0xFFFFFF}
+    highlight = {0x000000, 0xFFFFFF},
+    warning = {0x00FFFF, 0x000000},
+    error = {0xFF0000, 0x000000},
+    affirmation = {0x00FF00, 0x000000}
 }
 
 local API = {}
@@ -53,14 +56,10 @@ function API.isAvailable()
     return term.isAvailable()
 end
 
-function API.write(x, y, msg, highlighted)
-    if highlighted == true then
-        gpu.setForeground(colors.highlight[1])
-        gpu.setBackground(colors.highlight[2])
-    else
-        gpu.setForeground(colors.normal[1])
-        gpu.setBackground(colors.normal[2])
-    end
+function API.write(x, y, msg, msgtype)
+    msgtype = msgtype or "normal"
+    gpu.setForeground(colors[msgtype][1])
+    gpu.setBackground(colors[msgtype][2])
     term.setCursor(x, y)
     term.write(msg)
 end
