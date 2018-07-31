@@ -76,7 +76,7 @@ end
 
 function API.selectOptions(x, y, options)
     local selected = 0
-    local length = #options-1
+    local length = #options
     __drawOptions(x, y, options, selected)
     while true do
         local _,_,_,k = event.pull(0.5, "key_down")
