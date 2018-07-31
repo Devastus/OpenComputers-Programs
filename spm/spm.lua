@@ -125,6 +125,7 @@ local function __tryFindDependencies(packageName, settings)
                     if pack["dependencies"][i] == packageName then
                         found = true
                         table.insert(result, name)
+                        print("dependency: " .. name)
                     end
                 end
             end
@@ -202,7 +203,6 @@ local function __deletePack(packageName, settings, force)
                         __deletePack(package["dependencies"][i], settings, false)
                     else
                         local deps = __tryFindDependencies(package["dependencies"][i], settings)
-                        print(deps)
                         if not deps or #deps == 0 then
                             __deletePack(package["dependencies"][i], settings, false)
                         end
