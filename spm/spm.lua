@@ -138,7 +138,7 @@ local function __tryFindDependencies(packageName, settings)
     return nil
 end
 
-local function __getPack(packageName, settings, force)
+local function __getPack(packageName, settings, force, ignoreDependencies)
     if packageName then
         local package = __tryFindFile(packageName, settings)
         if package and not force then
@@ -164,7 +164,7 @@ local function __getPack(packageName, settings, force)
                         return false
                     end
                 end
-                if package["dependencies"] then
+                if package["dependencies"] and not ignoreDependencies then
                     print("spm: Installing dependencies...")
                     settings["packages"][packageName]["dependencies"] = {}
                     for i = 1, #package["dependencies"], 1 do
@@ -181,7 +181,7 @@ local function __getPack(packageName, settings, force)
     end
 end
 
-local function __deletePack(packageName, settings, force)
+local function __deletePack(packageName, settings, force, ignoreDependencies)
     if packageName then
         local package = __tryFindFile(packageName, settings)
         if package then
@@ -191,7 +191,7 @@ local function __deletePack(packageName, settings, force)
                 fs.remove(v)
             end
             settings["packages"][packageName] = nil
-            if package["dependencies"] then
+            if package["dependencies"] and not ignoreDependencies then
                 if force then
                     print("spm: Removing all '"..packageName.."' dependencies...")
                 else
@@ -324,9 +324,10 @@ local function queryPackage(packageName)
 end
 
 local function installPackage(packageName, force, reboot)
+    -- Find and install package and it's dependencies
     local settings = __readCfg(SETTINGS, nil)
     if settings then
-        local success = __getPack(packageName, settings, force)
+        local success = __getPack(packageName, settings, force, false)
         if success then
             __writeCfg(SETTINGS, settings)
             if reboot then
@@ -339,9 +340,10 @@ local function installPackage(packageName, force, reboot)
 end
 
 local function removePackage(packageName, force)
+    -- Find and remove package and it's dependencies
     local settings = __readCfg(SETTINGS, nil)
     if settings then
-        local success = __deletePack(packageName, settings, force)
+        local success = __deletePack(packageName, settings, force, false)
         if success then
             __writeCfg(SETTINGS, settings)
             return
@@ -350,7 +352,7 @@ local function removePackage(packageName, force)
 end
 
 local function updatePackage(packageName, reboot)
-    -- Uninstall and re-download
+    -- Uninstall and re-download (ignores dependencies)
     local settings = __readCfg(SETTINGS, nil)
     if settings then
         local package = __tryFindFile(packageName, settings)
@@ -358,9 +360,12 @@ local function updatePackage(packageName, reboot)
             if packageName == nil then
                 print("spm: Updating all packages...")
                 for k,v in pairs(package) do
-                    removePackage(k, false)
-                    installPackage(k, true, false)
+                    local success = __deletePack(k, settings, false, true)
+                    if success then
+                        success = __getPack(k, settings, true, true)
+                    end
                 end
+                __writeCfg(SETTINGS, settings)
                 print("spm: Updating packages succesful")
                 if reboot then
                     print("spm: Rebooting...")
@@ -369,8 +374,11 @@ local function updatePackage(packageName, reboot)
                 end
             else
                 print("spm: Updating package '"..packageName.."'...")
-                removePackage(packageName, false)
-                installPackage(packageName, true, false)
+                local success = __deletePack(packageName, settings, false, true)
+                if success then
+                    success = __getPack(packageName, settings, true, true)
+                end
+                __writeCfg(SETTINGS, settings)
                 print("spm: Updating package '"..packageName.."' succesful")
                 if reboot then
                     print("spm: Rebooting...")
