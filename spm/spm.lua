@@ -190,6 +190,7 @@ local function __deletePack(packageName, settings, force)
                 print("spm: Removing file '"..v.."'...")
                 fs.remove(v)
             end
+            settings["packages"][packageName] = nil
             if package["dependencies"] then
                 if force then
                     print("spm: Removing all '"..packageName.."' dependencies...")
@@ -207,8 +208,7 @@ local function __deletePack(packageName, settings, force)
                     end
                 end
             end
-            settings["packages"][packageName] = nil
-            print("spm: Package '"..packageName.."' removed succesfully.")
+            print("spm: Package '"..packageName.."' removed succesfully")
             return true
         end
         io.stderr:write("spm-error: No packages found with name '"..packageName.."'")
