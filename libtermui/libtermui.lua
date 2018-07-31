@@ -79,15 +79,19 @@ function API.selectOptions(x, y, options)
     local length = #options
     __drawOptions(x, y, options, selected)
     while true do
-        local _,_,_,k = event.pull(0.5, "key_down")
-        if k == keyboard.keys.down then
-            selected = mod(selected + 1, length)
-            __drawOptions(x, y, options, 1 + selected)
-        elseif k == keyboard.keys.up then
-            selected = mod(selected - 1, length)
-            __drawOptions(x, y, options, 1 + selected)
-        elseif k == keyboard.keys.enter then
-            return 1 + selected
+        local e,_,_,k = event.pull(0.5)
+        if e == "key_down" then
+            if k == keyboard.keys.down then
+                selected = mod(selected + 1, length)
+                __drawOptions(x, y, options, 1 + selected)
+            elseif k == keyboard.keys.up then
+                selected = mod(selected - 1, length)
+                __drawOptions(x, y, options, 1 + selected)
+            elseif k == keyboard.keys.enter then
+                return 1 + selected
+            end
+        elseif e == "interrupted" then
+            os.exit()
         end
     end
 
