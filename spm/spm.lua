@@ -137,77 +137,81 @@ local function __tryFindDependencies(packageName, settings)
 end
 
 local function __getPack(packageName, settings, force)
-    local package = __tryFindFile(packageName, settings)
-    if package and not force then
-        print("spm: Package '"..packageName.."' already installed")
+    if packageName then
+        local package = __tryFindFile(packageName, settings)
+        if package and not force then
+            print("spm: Package '"..packageName.."' already installed")
+            return false
+        end
+        for i,repo in ipairs(settings["repos"]) do
+            package = __tryFindRepo(repo, packageName)
+            if package then
+                print("spm: Installing '"..packageName.."'...")
+                settings["packages"][packageName] = {["files"]={}}
+                for dpath,installDir in pairs(package["files"]) do
+                    local rpath = __concatUrl(repo,dpath)
+                    local filename = fs.name(dpath)
+                    local filepath = fs.concat(installDir, filename)
+                    print("spm: Copying '"..rpath.."' to '"..filepath.."'...")
+                    local success, response = pcall(__downloadFile, rpath, filepath)
+                    if success then
+                        table.insert(settings["packages"][packageName]["files"], filepath)
+                    else
+                        io.stderr:write("spm-error: Error installing '"..packageName.."', file '"..dpath.."'. Aborting...")
+                        -- TODO: Revert changes
+                        return false
+                    end
+                end
+                if package["dependencies"] then
+                    print("spm: Installing dependencies...")
+                    settings["packages"][packageName]["dependencies"] = {}
+                    for i = 1, #package["dependencies"], 1 do
+                        table.insert(settings["packages"][packageName]["dependencies"], package["dependencies"][i])
+                        __getPack(package["dependencies"][i], settings, false)
+                    end
+                end
+                print("spm: Package '"..packageName.."' installed succesfully.")
+                return true
+            end
+        end
+        io.stderr:write("spm-error: No packages found with name '"..packageName.."'")
         return false
     end
-    for i,repo in ipairs(settings["repos"]) do
-        package = __tryFindRepo(repo, packageName)
-        if package then
-            print("spm: Installing '"..packageName.."'...")
-            settings["packages"][packageName] = {["files"]={}}
-            for dpath,installDir in pairs(package["files"]) do
-                local rpath = __concatUrl(repo,dpath)
-                local filename = fs.name(dpath)
-                local filepath = fs.concat(installDir, filename)
-                print("spm: Copying '"..rpath.."' to '"..filepath.."'...")
-                local success, response = pcall(__downloadFile, rpath, filepath)
-                if success then
-                    table.insert(settings["packages"][packageName]["files"], filepath)
-                else
-                    io.stderr:write("spm-error: Error installing '"..packageName.."', file '"..dpath.."'. Aborting...")
-                    -- TODO: Revert changes
-                    return false
-                end
-            end
-            if package["dependencies"] then
-                print("spm: Installing dependencies...")
-                settings["packages"][packageName]["dependencies"] = {}
-                for i = 1, #package["dependencies"], 1 do
-                    table.insert(settings["packages"][packageName]["dependencies"], package["dependencies"][i])
-                    __getPack(package["dependencies"][i], settings, false)
-                end
-            end
-            print("spm: Package '"..packageName.."' installed succesfully.")
-            return true
-        end
-    end
-    io.stderr:write("spm-error: No packages found with name '"..packageName.."'")
-    return false
 end
 
 local function __deletePack(packageName, settings, force)
-    local package = __tryFindFile(packageName, settings)
-    if package then
-        print("spm: Removing '"..packageName.."'...")
-        for i,v in ipairs(package["files"]) do
-            print("spm: Removing file '"..v.."'...")
-            fs.remove(v)
-        end
-        if package["dependencies"] then
-            if force then
-                print("spm: Removing all '"..packageName.."' dependencies...")
-            else
-                print("spm: Removing unused '"..packageName.."' dependencies...")
+    if packageName then
+        local package = __tryFindFile(packageName, settings)
+        if package then
+            print("spm: Removing '"..packageName.."'...")
+            for i,v in ipairs(package["files"]) do
+                print("spm: Removing file '"..v.."'...")
+                fs.remove(v)
             end
-            for i=0, #package["dependencies"], 1 do
+            if package["dependencies"] then
                 if force then
-                    __deletePack(package["dependencies"][i], settings, false)
+                    print("spm: Removing all '"..packageName.."' dependencies...")
                 else
-                    local result = __tryFindDependencies(package["dependencies"][i], settings)
-                    if #result == 0 then
+                    print("spm: Removing unused '"..packageName.."' dependencies...")
+                end
+                for i = 1, #package["dependencies"], 1 do
+                    if force then
                         __deletePack(package["dependencies"][i], settings, false)
+                    else
+                        local result = __tryFindDependencies(package["dependencies"][i], settings)
+                        if not result then
+                            __deletePack(package["dependencies"][i], settings, false)
+                        end
                     end
                 end
             end
+            settings["packages"][packageName] = nil
+            print("spm: Package '"..packageName.."' removed succesfully.")
+            return true
         end
-        settings["packages"][packageName] = nil
-        print("spm: Package '"..packageName.."' removed succesfully.")
-        return true
+        io.stderr:write("spm-error: No packages found with name '"..packageName.."'")
+        return false
     end
-    io.stderr:write("spm-error: No packages found with name '"..packageName.."'")
-    return false
 end
 
 local function addRepository(repositoryUrl)
