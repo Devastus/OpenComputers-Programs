@@ -3,11 +3,15 @@ local event = require("event")
 local keyboard = require("keyboard")
 local gpu = term.gpu()
 local colors = {
-    normal = {0xFFF, 0x000},
-    highlight = {0x000, 0xFFF}
+    normal = {0xFFFFFF, 0x000000},
+    highlight = {0x000000, 0xFFFFFF}
 }
 
 local API = {}
+
+local function mod(value, max)
+    return (value + max) % max
+end
 
 function API.isAvailable()
     return term.isAvailable()
@@ -72,15 +76,15 @@ end
 
 function API.selectOptions(x, y, options)
     local selected = 1
-    local length = #options+1
+    local length = #options
     __drawOptions(x, y, options, selected)
-    while event.pull(0.05, "interrupted") == nil do
+    while event.pull(0.5, "interrupted") == nil do
         if keyboard.isKeyDown(keyboard.keys.down) then
-            selected = ((selected + 1) % length) + 1
+            selected = 1 + mod(selected + 1, length)
             __drawOptions(x, y, options, selected)
         end
         if keyboard.isKeyDown(keyboard.keys.up) then
-            selected = (((selected - 1)+length) % length) + 1
+            selected = 1 + mod(selected - 1, length)
             __drawOptions(x, y, options, selected)
         end
         if keyboard.isKeyDown(keyboard.keys.enter) then
@@ -92,15 +96,15 @@ end
 function API.selectToggles(x, y, options, selected)
     options.insert("Continue")
     highlighted = 1
-    local length = #options+1
+    local length = #options
     __drawToggles(x, y, options, selected, highlighted)
-    while event.pull(0.05, "interrupted") == nil do
+    while event.pull(0.5, "interrupted") == nil do
         if keyboard.isKeyDown(keyboard.keys.down) then
-            highlighted = ((highlighted + 1) % length) + 1
+            highlighted = 1 + mod(highlighted + 1, length)
             __drawToggles(x, y, options, selected, highlighted)
         end
         if keyboard.isKeyDown(keyboard.keys.up) then
-            highlighted = (((highlighted - 1)+length) % length) + 1
+            highlighted = 1 + mod(highlighted - 1, length)
             __drawToggles(x, y, options, selected, highlighted)
         end
         if keyboard.isKeyDown(keyboard.keys.enter) then
