@@ -75,43 +75,43 @@ function __drawToggles(x, y, options, selected, highlighted)
 end
 
 function API.selectOptions(x, y, options)
-    local selected = 1
-    local length = #options
+    local selected = 0
+    local length = #options-1
     __drawOptions(x, y, options, selected)
     while event.pull(0.5, "interrupted") == nil do
         if keyboard.isKeyDown(keyboard.keys.down) then
-            selected = 1 + mod(selected + 1, length)
-            __drawOptions(x, y, options, selected)
+            selected = mod(selected + 1, length)
+            __drawOptions(x, y, options, 1 + selected)
         end
         if keyboard.isKeyDown(keyboard.keys.up) then
-            selected = 1 + mod(selected - 1, length)
-            __drawOptions(x, y, options, selected)
+            selected = mod(selected - 1, length)
+            __drawOptions(x, y, options, 1 + selected)
         end
         if keyboard.isKeyDown(keyboard.keys.enter) then
-            return selected
+            return 1 + selected
         end
     end
 end
 
 function API.selectToggles(x, y, options, selected)
     options.insert("Continue")
-    highlighted = 1
-    local length = #options
+    highlighted = 0
+    local length = #options-1
     __drawToggles(x, y, options, selected, highlighted)
     while event.pull(0.5, "interrupted") == nil do
         if keyboard.isKeyDown(keyboard.keys.down) then
-            highlighted = 1 + mod(highlighted + 1, length)
-            __drawToggles(x, y, options, selected, highlighted)
+            highlighted = mod(highlighted + 1, length)
+            __drawToggles(x, y, options, selected, 1 + highlighted)
         end
         if keyboard.isKeyDown(keyboard.keys.up) then
-            highlighted = 1 + mod(highlighted - 1, length)
-            __drawToggles(x, y, options, selected, highlighted)
+            highlighted = mod(highlighted - 1, length)
+            __drawToggles(x, y, options, selected, 1 + highlighted)
         end
         if keyboard.isKeyDown(keyboard.keys.enter) then
             --Either toggle highlighted option, or exit loop if it is the last one on the list
             if highlighted ~= length then
-                selected[highlighted] = not selected[highlighted]
-                __drawToggles(x, y, options, selected, highlighted)
+                selected[1 + highlighted] = not selected[1 + highlighted]
+                __drawToggles(x, y, options, selected, 1 + highlighted)
             else
                 return options
             end
