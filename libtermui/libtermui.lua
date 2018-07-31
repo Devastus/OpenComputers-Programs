@@ -1,4 +1,5 @@
 local term = require("term")
+local event = require("event")
 local gpu = term.gpu()
 local keyboard = term.keyboard()
 local colors = {
