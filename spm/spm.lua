@@ -23,9 +23,9 @@ local function printUsage()
     print("listrepo \t\t\t List all repositories")
     print("search [packageName] \t\t List all packages from repositories, or search a package")
     print("query [packageName] \t\t List all installed packages, or query for an installed package")
-    print("update [-r] [...] \t Update everything or the given packages (-r:reboot)")
-    print("install [-f, -r] <...> \t Install packages (-f:force installation, -r:reboot)")
-    print("remove [-f] <...> \t Remove packages (-f:force remove dependencies)")
+    print("update [-r] [...] \t\t Update everything or the given packages (-r:reboot)")
+    print("install [-f, -r] <...> \t\t Install packages (-f:force installation, -r:reboot)")
+    print("remove [-f] <...> \t\t Remove packages (-f:force remove dependencies)")
 end
 
 local function __getMultiPackNames(args)
