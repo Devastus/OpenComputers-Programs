@@ -13,6 +13,42 @@ local function mod(value, max)
     return (value + max) % max
 end
 
+local function __drawOptions(x, y, options, selected)
+    for i = 1, #options, 1 do
+        if i == selected then
+            gpu.setForeground(colors.highlight[1])
+            gpu.setBackground(colors.highlight[2])
+        else
+            gpu.setForeground(colors.normal[1])
+            gpu.setBackground(colors.normal[2])
+        end
+        term.setCursor(x, y+i-1)
+        term.write(options[i])
+    end
+end
+
+local function __drawToggles(x, y, options, selected, highlighted)
+    for i = 1, #options, 1 do
+        if i == highlighted then
+            gpu.setForeground(colors.highlight[1])
+            gpu.setBackground(colors.highlight[2])
+        else
+            gpu.setForeground(colors.normal[1])
+            gpu.setBackground(colors.normal[2])
+        end
+        term.setCursor(x, y+i-1)
+        if i < #options then
+            if selected[i] == true then
+                term.write("■ "..options[i])
+            else
+                term.write("□ "..options[i])
+            end
+        else
+            term.write(options[i])
+        end
+    end
+end
+
 function API.isAvailable()
     return term.isAvailable()
 end
@@ -36,42 +72,6 @@ end
 
 function API.clear()
     term.clear()
-end
-
-function __drawOptions(x, y, options, selected)
-    for i = 1, #options, 1 do
-        if i == selected then
-            gpu.setForeground(colors.highlight[1])
-            gpu.setBackground(colors.highlight[2])
-        else
-            gpu.setForeground(colors.normal[1])
-            gpu.setBackground(colors.normal[2])
-        end
-        term.setCursor(x, y+i-1)
-        term.write(options[i])
-    end
-end
-
-function __drawToggles(x, y, options, selected, highlighted)
-    for i = 1, #options, 1 do
-        if i == highlighted then
-            gpu.setForeground(colors.highlight[1])
-            gpu.setBackground(colors.highlight[2])
-        else
-            gpu.setForeground(colors.normal[1])
-            gpu.setBackground(colors.normal[2])
-        end
-        term.setCursor(x, y+i-1)
-        if i < #options then
-            if selected[i] == true then
-                term.write("■ "..options[i])
-            else
-                term.write("□ "..options[i])
-            end
-        else
-            term.write(options[i])
-        end
-    end
 end
 
 function API.selectOptions(x, y, options)
