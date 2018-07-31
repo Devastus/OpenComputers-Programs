@@ -279,7 +279,7 @@ local function removePackage(packageName)
         if package then
             print("spm: Removing '"..packageName.."'...")
             for i,v in ipairs(package["files"]) do
-                print("spm: Removing file '"..v.."...")
+                print("spm: Removing file '"..v.."'...")
                 fs.remove(v)
             end
             settings["packages"][packageName] = nil
@@ -297,32 +297,26 @@ local function updatePackage(packageName)
     if settings then
         local package = __tryFindFile(packageName)
         if package then
-            if packageName == nil or packageName == "" then
+            if packageName == nil then
+                print("spm: Updating all packages...")
                 for k,v in pairs(package) do
                     removePackage(k)
                     installPackage(k)
                 end
+                return
             else
-
-            end
-        end
-        if packageName == nil or packageName == "" then
-            -- Update all installed packages
-            print("spm: Updating all packages...")
-            for name,p in pairs(settings["packages"]) do
-                removePackage(name)
-                installPackage(name)
-            end
-        else
-            -- Update package
-            local package = __tryFindFile(packageName)
-            if package then
                 print("spm: Updating package '"..packageName.."'...")
                 removePackage(packageName)
                 installPackage(packageName)
                 return
             end
-            io.stderr:write("spm-error: No packages found with name '"..packageName.."'")
+            return
+        else
+            if packageName == nil then
+                io.stderr:write("spm-error: No packages found")
+            else
+                io.stderr:write("spm-error: No packages found with name '"..packageName.."'")
+            end
         end
     end
 end
