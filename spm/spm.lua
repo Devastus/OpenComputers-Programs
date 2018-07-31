@@ -207,21 +207,19 @@ local function queryPackage(packageName)
     local settings = __readCfg(SETTINGS, nil)
     if settings then
         local found = false
-        for k,p in pairs(settings["packages"]) do
-            local content = __tryFindFile(packageName)
-            if content then
-                found = true
-                if packageName == nil or packageName == "" then
-                    for k,f in pairs(content) do
-                        print(k)
-                    end
-                else
-                    print("spm: '"..packageName.."' found, files:")
-                    for i,v in ipairs(content) do
-                        print(v)
-                    end
-                    return
+        local content = __tryFindFile(packageName)
+        if content then
+            found = true
+            if packageName == nil then
+                for n,f in pairs(content) do
+                    print(n)
                 end
+            else
+                print("spm: '"..packageName.."' found, files:")
+                for i,f in ipairs(content) do
+                    print(f)
+                end
+                return
             end
         end
         if not found then 
