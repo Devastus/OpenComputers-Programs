@@ -125,7 +125,6 @@ local function __tryFindDependencies(packageName, settings)
                     if pack["dependencies"][i] == packageName then
                         found = true
                         table.insert(result, name)
-                        print("dependency: " .. name)
                     end
                 end
             end
@@ -332,6 +331,7 @@ local function installPackage(packageName, force, reboot)
             __writeCfg(SETTINGS, settings)
             if reboot then
                 print("spm: Rebooting...")
+                os.sleep(1)
                 os.execute("reboot")
             end
         end
@@ -364,6 +364,7 @@ local function updatePackage(packageName, reboot)
                 print("spm: Updating packages succesful")
                 if reboot then
                     print("spm: Rebooting...")
+                    os.sleep(1)
                     os.execute("reboot")
                 end
             else
@@ -373,6 +374,7 @@ local function updatePackage(packageName, reboot)
                 print("spm: Updating package '"..packageName.."' succesful")
                 if reboot then
                     print("spm: Rebooting...")
+                    os.sleep(1)
                     os.execute("reboot")
                 end
             end
