@@ -78,19 +78,32 @@ function API.selectOptions(x, y, options)
     local selected = 0
     local length = #options-1
     __drawOptions(x, y, options, selected)
-    while event.pull(0.5, "interrupted") == nil do
-        if keyboard.isKeyDown(keyboard.keys.down) then
+    while true do
+        local _,_,_,k = event.pull(0.5, "key_down")
+        if k == keyboard.keys.down then
             selected = mod(selected + 1, length)
             __drawOptions(x, y, options, 1 + selected)
-        end
-        if keyboard.isKeyDown(keyboard.keys.up) then
+        elseif k == keyboard.keys.up then
             selected = mod(selected - 1, length)
             __drawOptions(x, y, options, 1 + selected)
-        end
-        if keyboard.isKeyDown(keyboard.keys.enter) then
+        elseif k == keyboard.keys.enter then
             return 1 + selected
         end
     end
+
+    -- while event.pull(0.5, "interrupted") == nil do
+    --     if keyboard.isKeyDown(keyboard.keys.down) then
+    --         selected = mod(selected + 1, length)
+    --         __drawOptions(x, y, options, 1 + selected)
+    --     end
+    --     if keyboard.isKeyDown(keyboard.keys.up) then
+    --         selected = mod(selected - 1, length)
+    --         __drawOptions(x, y, options, 1 + selected)
+    --     end
+    --     if keyboard.isKeyDown(keyboard.keys.enter) then
+    --         return 1 + selected
+    --     end
+    -- end
 end
 
 function API.selectToggles(x, y, options, selected)

@@ -81,7 +81,7 @@ local function setupServer()
     -- Hook up all components loop
     settings.components = {}
     local componentList = listAvailableComponents()
-    if #componentList == 0 then
+    if not componentList or #componentList == 0 then
         termUI.clear()
         termUI.write(1, 1, "ReactorNet Server | Setup - Available Components (2/6)")
         termUI.write(1, 2, "Error: no available components found! Aborting...")
