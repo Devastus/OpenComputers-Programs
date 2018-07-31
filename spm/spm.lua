@@ -1,14 +1,3 @@
----------------------------------------------------
--- SIMPLE PACKAGE MANAGER (SPM)
--- Register Git repositories, search, install, update and remove packages
--- -ar, -addrepo [url] = Add repository
--- -rr, -removerepo [url] = Remove repository
--- -s, -search [?packageName?] = List all packages from repositories, or search a package
--- -u, -update [?packageName?] = Update all packages (or optionally a package)
--- -i, -install [packageName] = Install package
--- -r, -remove [packageName] = Remove package
----------------------------------------------------
-
 local component = require("component")
 if not component.isAvailable("internet") then
     io.stderr:write("spm-error: Internet card not available, internet access is required")
@@ -20,21 +9,23 @@ local serialization = require("serialization")
 local fs = require("filesystem")
 local text = require("text")
 local shell = require("shell")
+local term = require("term")
 
 local PACKAGES_F = "packages.cfg"
 local SETTINGS = "/etc/spm.cfg"
 
 local function printUsage()
-    print("Simple Package Manager (spm) \n")
+    print("Simple Package Manager (spm)")
     print("List of commands and parameters (<> = required, [] = optional):")
-    print("addrepo <url> = Add repository")
-    print("removerepo <url> = Remove repository")
-    print("listrepo = List all repositories")
-    print("search [packageName] = List all packages from repositories, or search a package")
-    print("query [packageName] = List all installed packages, or query for an installed package")
-    print("update [packageName] = Update everything or the given package")
-    print("install [-f] <packageName> = Install package (-f forces the installation)")
-    print("remove <packageName> = Remove package")
+    print("---------------------------------------------------------------")
+    print("addrepo <url> \t\t\t Add repository")
+    print("removerepo <url> \t\t\t Remove repository")
+    print("listrepo \t\t\t\t List all repositories")
+    print("search [packageName] \t\t List all packages from repositories, or search a package")
+    print("query [packageName] \t\t List all installed packages, or query for an installed package")
+    print("update [packageName] \t\t Update everything or the given package")
+    print("install [-f] <packageName> \t Install package (-f forces the installation)")
+    print("remove <packageName> \t\t Remove package")
 end
 
 local function __concatUrl(repo, file)
@@ -216,8 +207,8 @@ local function queryPackage(packageName)
                 end
             else
                 print("spm: '"..packageName.."' found, files:")
-                for i,f in ipairs(content) do
-                    print(f)
+                for i = 1, #content["files"], 1 do
+                    print(content["files"][i])
                 end
                 return
             end

@@ -2,7 +2,7 @@
 Applications 'n stuff made to be used in Minecraft mod "OpenComputers"
 
 ### spm/
-Simple Package Manager - for very simple package managing
+Simple Package Manager - for free repository-of-choice package managing
 
 ### tabgui/
 A hybrid GUI library specifically made for applications that separate pages in tabs
