@@ -202,6 +202,7 @@ local function __deletePack(packageName, settings, force)
                         __deletePack(package["dependencies"][i], settings, false)
                     else
                         local deps = __tryFindDependencies(package["dependencies"][i], settings)
+                        print(deps)
                         if not deps or #deps == 0 then
                             __deletePack(package["dependencies"][i], settings, false)
                         end
