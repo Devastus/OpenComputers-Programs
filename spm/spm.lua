@@ -23,8 +23,8 @@ local function printUsage()
     print("listrepo \t\t\t List all repositories")
     print("search [packageName] \t\t List all packages from repositories, or search a package")
     print("query [packageName] \t\t List all installed packages, or query for an installed package")
-    print("update [packageName] \t\t Update everything or the given package")
-    print("install [-f] <packageName> \t Install package (-f:force installation, -r:reboot)")
+    print("update [-r] [packageName] \t\t Update everything or the given package (-r:reboot)")
+    print("install [-f, -r] <packageName> \t Install package (-f:force installation, -r:reboot)")
     print("remove <packageName> \t\t Remove package")
 end
 
@@ -223,7 +223,7 @@ local function queryPackage(packageName)
     end
 end
 
-local function installPackage(packageName, force)
+local function installPackage(packageName, force, reboot)
     -- Look for packageName in repositories, if found install to hard drive and write to installed packages
     local settings = __readCfg(SETTINGS, nil)
     if settings then
@@ -252,6 +252,10 @@ local function installPackage(packageName, force)
                 end
                 __writeCfg(SETTINGS, settings)
                 print("spm: Package '"..packageName.."' installed succesfully.")
+                if reboot then
+                    print("spm: Rebooting...")
+                    os.execute("reboot")
+                end
                 return
             end
         end
@@ -280,7 +284,7 @@ local function removePackage(packageName)
     end
 end
 
-local function updatePackage(packageName)
+local function updatePackage(packageName, reboot)
     -- Uninstall and re-download
     local settings = __readCfg(SETTINGS, nil)
     if settings then
@@ -290,16 +294,25 @@ local function updatePackage(packageName)
                 print("spm: Updating all packages...")
                 for k,v in pairs(package) do
                     removePackage(k)
-                    installPackage(k)
+                    installPackage(k, true, false)
+                end
+                print("spm: Updating packages succesful")
+                if reboot then
+                    print("spm: Rebooting...")
+                    os.execute("reboot")
                 end
                 return
             else
                 print("spm: Updating package '"..packageName.."'...")
                 removePackage(packageName)
-                installPackage(packageName)
+                installPackage(packageName, true, false)
+                print("spm: Updating package '"..packageName.."' succesful")
+                if reboot then
+                    print("spm: Rebooting...")
+                    os.execute("reboot")
+                end
                 return
             end
-            return
         else
             if packageName == nil then
                 io.stderr:write("spm-error: No packages found")
@@ -330,13 +343,13 @@ elseif args[1] == "search" then
 elseif args[1] == "query" then
     queryPackage(args[2])
 elseif args[1] == "update" then
-    updatePackage(args[2])
+    updatePackage(args[2], options["r"])
 elseif args[1] == "install" then
     if args[2] == nil then
         printUsage()
         return
     end
-    installPackage(args[2], options["f"])
+    installPackage(args[2], options["f"], options["r"])
 elseif args[1] == "remove" then
     if args[2] == nil then
         printUsage()
