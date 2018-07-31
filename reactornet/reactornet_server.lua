@@ -76,7 +76,7 @@ local function setupServer()
     termUI.clear()
     termUI.write(1, 1, "ReactorNet Server | Setup - Server Type (1/6)")
     termUI.write(1, 2, "Select Server type: \n")
-    settings.server_type = termUI.selectOptions(2, 3,__SERVER_TYPES)
+    settings.server_type = __SERVER_TYPES[termUI.selectOptions(2, 3,__SERVER_TYPES)]
     
     -- Hook up all components loop
     settings.components = {}
