@@ -25,7 +25,7 @@ local function printUsage()
     print("query [packageName] \t\t List all installed packages, or query for an installed package")
     print("update [-r] [packageName] \t Update everything or the given package (-r:reboot)")
     print("install [-f, -r] <packageName> \t Install package (-f:force installation, -r:reboot)")
-    print("remove <packageName> \t\t Remove package")
+    print("remove [-f] <packageName> \t\t Remove package (-f:force remove dependencies")
 end
 
 local function __concatUrl(repo, file)
@@ -111,6 +111,28 @@ local function __tryFindFile(packageName)
             if k == packageName then
                 return p
             end
+        end
+    end
+    return nil
+end
+
+local function __tryFindDependencies(packageName)
+    local settings = __readCfg(SETTINGS, nil)
+    if settings and settings["packages"] and packageName then
+        local result = {}
+        local found = false
+        for name,pack in pairs(settings["packages"]) do
+            if pack["dependencies"] then
+                for i = 0, #pack["dependencies"], 1 do
+                    if pack["dependencies"][i] == packageName then
+                        found = true
+                        table.insert(result, name)
+                    end
+                end
+            end
+        end
+        if found then
+            return result
         end
     end
     return nil
@@ -250,6 +272,15 @@ local function installPackage(packageName, force, reboot)
                         return
                     end
                 end
+                if package["dependencies"] then
+                    print("spm: Installing dependencies...")
+                    settings["packages"][packageName]["dependencies"] = {}
+                    for i = 1, #package["dependencies"], 1 do
+                        table.insert(settings["packages"][packageName]["dependencies"], package["dependencies"][i])
+                        installPackage(package["dependencies"][i], false, false)
+                    end
+                end
+
                 __writeCfg(SETTINGS, settings)
                 print("spm: Package '"..packageName.."' installed succesfully.")
                 if reboot then
@@ -264,7 +295,7 @@ local function installPackage(packageName, force, reboot)
     end
 end
 
-local function removePackage(packageName)
+local function removePackage(packageName, force)
     -- Look for packageName in installed packages, if found remove it from the hard drive and the settings
     local settings = __readCfg(SETTINGS, nil)
     if settings then
@@ -275,6 +306,24 @@ local function removePackage(packageName)
                 print("spm: Removing file '"..v.."'...")
                 fs.remove(v)
             end
+            if package["dependencies"] then
+                if force then
+                    print("spm: Removing all '"..packageName.."' dependencies...")
+                else
+                    print("spm: Removing unused '"..packageName.."' dependencies...")
+                end
+                for i=0, #package["dependencies"], 1 do
+                    if force then
+                        removePackage(package["dependencies"][i], false)
+                    else
+                        local result = __tryFindDependencies(package["dependencies"][i])
+                        if #result == 0 then
+                            removePackage(package["dependencies"][i], false)
+                        end
+                    end
+                end
+            end
+
             settings["packages"][packageName] = nil
             __writeCfg(SETTINGS, settings)
             print("spm: Package '"..packageName.."' removed succesfully.")
@@ -293,7 +342,7 @@ local function updatePackage(packageName, reboot)
             if packageName == nil then
                 print("spm: Updating all packages...")
                 for k,v in pairs(package) do
-                    removePackage(k)
+                    removePackage(k, false)
                     installPackage(k, true, false)
                 end
                 print("spm: Updating packages succesful")
@@ -304,7 +353,7 @@ local function updatePackage(packageName, reboot)
                 return
             else
                 print("spm: Updating package '"..packageName.."'...")
-                removePackage(packageName)
+                removePackage(packageName, false)
                 installPackage(packageName, true, false)
                 print("spm: Updating package '"..packageName.."' succesful")
                 if reboot then
@@ -355,7 +404,7 @@ elseif args[1] == "remove" then
         printUsage()
         return
     end
-    removePackage(args[2])
+    removePackage(args[2], options["f"])
 else
     printUsage()
     return

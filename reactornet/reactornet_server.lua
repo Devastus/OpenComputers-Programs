@@ -1,7 +1,7 @@
 local component = require("component")
 local event = require("event")
 local termUI = require("libtermui")
-local cfg = require("libconfig")
+local fs = require("filesystem")
 
 local __SERVER_TYPES = {"controller", "monitor"}
 local __COMPONENT_TYPES = {
@@ -12,6 +12,7 @@ local __TARGET_ROTOR_SPEED = {
     900, 1800
 }
 
+local SETTINGS_PATH = "/etc/reactornet_server.cfg"
 local settings = {headless=false, targetRotorSpeed=1800, steamPerTurbine=2000}
 local reactorInfo = {}
 local turbinesInfo = {}
@@ -22,12 +23,30 @@ local updateTimerID = 0
 -----------------------------------------------
 
 local function loadSettings()
-    settings = cfg.readConfig("reactornet")
+    local file, emsg = io.open(SETTINGS_PATH, "rb")
+    if not file then
+        io.stderr:write("Error: Cannot read settings from path " .. SETTINGS_PATH .. ": " .. emsg)
+        settings = {headless=false, targetRotorSpeed=1800, steamPerTurbine=2000}
+        return false
+    end
+    local sdata = file:read("*a")
+    file:close()
+    settings = serialization.unserialize(sdata)
     return settings ~= nil
 end
 
 local function saveSettings()
-    cfg.writeConfig("reactornet", settings)
+    if not fs.exists(SETTINGS_PATH) then
+        fs.makeDirectory(fs.path(SETTINGS_PATH))
+    end
+    local file, emsg = io.open(SETTINGS_PATH, "wb")
+    if not file then
+        io.stderr:write("Error: Cannot save settings to path " .. SETTINGS_PATH .. ": " .. emsg)
+        return
+    end
+    local sdata = serialization.serialize(data)
+    file:write(sdata)
+    file:close()
 end
 
 local function listAvailableComponents()
