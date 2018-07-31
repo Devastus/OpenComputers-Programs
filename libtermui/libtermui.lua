@@ -64,7 +64,10 @@ function API.write(x, y, msg, msgtype)
     term.write(msg)
 end
 
-function API.read(x, y, wrap)
+function API.read(x, y, wrap, msgtype)
+    msgtype = msgtype or "normal"
+    gpu.setForeground(colors[msgtype][1])
+    gpu.setBackground(colors[msgtype][2])
     term.setCursor(x, y)
     return term.read({nowrap = not wrap})
 end
