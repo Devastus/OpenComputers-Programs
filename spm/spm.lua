@@ -121,7 +121,7 @@ local function __tryFindDependencies(packageName, settings)
         local found = false
         for name,pack in pairs(settings["packages"]) do
             if pack["dependencies"] then
-                for i = 0, #pack["dependencies"], 1 do
+                for i = 1, #pack["dependencies"], 1 do
                     if pack["dependencies"][i] == packageName then
                         found = true
                         table.insert(result, name)
