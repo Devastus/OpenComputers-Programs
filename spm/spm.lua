@@ -231,7 +231,6 @@ end
 local function addRepository(repositoryUrl)
     -- Look for packages.cfg in given url, if found write it to settings
     local url = __concatUrl(repositoryUrl, PACKAGES_F)
-    print(url)
     local success, content = pcall(__getContent, url)
     if success then
         local settings = __readCfg(SETTINGS, {["repos"]={}, ["packages"]={}})
