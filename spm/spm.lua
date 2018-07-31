@@ -73,7 +73,7 @@ local function __readCfg(filepath, default)
         if default ~= nil then
             return default
         else
-            io.stderr:write("spm-error: Cannot read file at path " .. filepath .. ": " .. emsg)
+            io.stderr:write("spm-error: Cannot read file at path " .. filepath .. ": " .. emsg .. "\n")
             return nil
         end
     end
@@ -88,7 +88,7 @@ local function __writeCfg(filepath, data)
     end
     local file, emsg = io.open(filepath, "wb")
     if not file then
-        io.stderr:write("spm-error: Cannot write file to path " .. filepath .. ": " .. emsg)
+        io.stderr:write("spm-error: Cannot write file to path " .. filepath .. ": " .. emsg .. "\n")
         return
     end
     local sdata = serialization.serialize(data)
@@ -171,7 +171,7 @@ local function __getPack(packageName, settings, force, ignoreDependencies)
                     if success then
                         table.insert(settings["packages"][packageName]["files"], filepath)
                     else
-                        io.stderr:write("spm-error: Error installing '"..packageName.."', file '"..dpath.."'. Aborting...")
+                        io.stderr:write("spm-error: Error installing '"..packageName.."', file '"..dpath.."'. Aborting...\n")
                         -- TODO: Revert changes
                         return false
                     end
@@ -188,7 +188,7 @@ local function __getPack(packageName, settings, force, ignoreDependencies)
                 return true
             end
         end
-        io.stderr:write("spm-error: No packages found with name '"..packageName.."'")
+        io.stderr:write("spm-error: No packages found with name '"..packageName.."'\n")
         return false
     end
 end
@@ -223,7 +223,7 @@ local function __deletePack(packageName, settings, force, ignoreDependencies)
             print("spm: Package '"..packageName.."' removed succesfully")
             return true
         end
-        io.stderr:write("spm-error: No packages found with name '"..packageName.."'")
+        io.stderr:write("spm-error: No packages found with name '"..packageName.."'\n")
         return false
     end
 end
@@ -248,7 +248,7 @@ local function addRepository(repositoryUrl)
         __writeCfg(SETTINGS, settings)
         return
     else
-        io.stderr:write("spm-error: Repository '"..repositoryUrl.."' is invalid")
+        io.stderr:write("spm-error: Repository '"..repositoryUrl.."' is invalid\n")
     end
 end
 
@@ -265,7 +265,7 @@ local function removeRepository(repositoryUrl)
                 return
             end
         end
-        io.stderr:write("spm-error: Repository '"..repositoryUrl.."' not found")
+        io.stderr:write("spm-error: Repository '"..repositoryUrl.."' not found\n")
     end
 end
 
@@ -376,7 +376,7 @@ local function updatePackage(packageNames, reboot)
                         success = __getPack(packageNames[i], settings, true, true)
                     end
                 else
-                    io.stderr:write("spm-error: No package found with name '"..name.."'")
+                    io.stderr:write("spm-error: No package found with name '"..name.."'\n")
                 end
             end
             __writeCfg(SETTINGS, settings)
