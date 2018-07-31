@@ -23,9 +23,21 @@ local function printUsage()
     print("listrepo \t\t\t List all repositories")
     print("search [packageName] \t\t List all packages from repositories, or search a package")
     print("query [packageName] \t\t List all installed packages, or query for an installed package")
-    print("update [-r] [packageName] \t Update everything or the given package (-r:reboot)")
-    print("install [-f, -r] <packageName> \t Install package (-f:force installation, -r:reboot)")
-    print("remove [-f] <packageName> \t Remove package (-f:force remove dependencies)")
+    print("update [-r] [...] \t Update everything or the given packages (-r:reboot)")
+    print("install [-f, -r] <...> \t Install packages (-f:force installation, -r:reboot)")
+    print("remove [-f] <...> \t Remove packages (-f:force remove dependencies)")
+end
+
+local function __getMultiPackNames(args)
+    if args[2] ~= nil then
+        local result = {}
+        for i = 2, #args, 1 do
+            result = args[i]
+        end
+        return result
+    else
+        return nil
+    end
 end
 
 local function __concatUrl(repo, file)
@@ -323,74 +335,68 @@ local function queryPackage(packageName)
     end
 end
 
-local function installPackage(packageName, force, reboot)
-    -- Find and install package and it's dependencies
+local function installPackage(packageNames, force, reboot)
+    -- Find and install packages and their dependencies
+    local settings = __readCfg(SETTINGS, nil)
+    if settings and packageNames then
+        for i=1, #packageNames, 1 do
+            __getPack(packageNames[i], settings, force, false)
+        end
+        __writeCfg(SETTINGS, settings)
+        if reboot then
+            print("spm: Rebooting...")
+            os.sleep(1)
+            os.execute("reboot")
+        end
+    end
+end
+
+local function removePackage(packageNames, force)
+    -- Find and remove packages and their dependencies
+    local settings = __readCfg(SETTINGS, nil)
+    if settings and packageNames then
+        for i=1, #packageNames, 1 do
+            __deletePack(packageNames[i], settings, force, false)
+        end
+        __writeCfg(SETTINGS, settings)
+    end
+end
+
+local function updatePackage(packageNames, reboot)
+    -- Uninstall and re-download (ignores dependencies)
     local settings = __readCfg(SETTINGS, nil)
     if settings then
-        local success = __getPack(packageName, settings, force, false)
-        if success then
+        if packageNames then
+            for i = 1, #packageNames, 1 do
+                local package = __tryFindFile(packageNames[i], settings)
+                if package then
+                    print("spm: Updating package '"..packageNames[i].."'...")
+                    local success = __deletePack(packageNames[i], settings, false, true)
+                    if success then
+                        success = __getPack(packageNames[i], settings, true, true)
+                    end
+                else
+                    io.stderr:write("spm-error: No package found with name '"..name.."'")
+                end
+            end
             __writeCfg(SETTINGS, settings)
             if reboot then
                 print("spm: Rebooting...")
                 os.sleep(1)
                 os.execute("reboot")
             end
-        end
-    end
-end
-
-local function removePackage(packageName, force)
-    -- Find and remove package and it's dependencies
-    local settings = __readCfg(SETTINGS, nil)
-    if settings then
-        local success = __deletePack(packageName, settings, force, false)
-        if success then
-            __writeCfg(SETTINGS, settings)
-            return
-        end
-    end
-end
-
-local function updatePackage(packageName, reboot)
-    -- Uninstall and re-download (ignores dependencies)
-    local settings = __readCfg(SETTINGS, nil)
-    if settings then
-        local package = __tryFindFile(packageName, settings)
-        if package then
-            if packageName == nil then
-                print("spm: Updating all packages...")
-                for k,v in pairs(package) do
-                    local success = __deletePack(k, settings, false, true)
-                    if success then
-                        success = __getPack(k, settings, true, true)
-                    end
-                end
-                __writeCfg(SETTINGS, settings)
-                print("spm: Updating packages succesful")
-                if reboot then
-                    print("spm: Rebooting...")
-                    os.sleep(1)
-                    os.execute("reboot")
-                end
-            else
-                print("spm: Updating package '"..packageName.."'...")
-                local success = __deletePack(packageName, settings, false, true)
+        else
+            for name, pack in pairs(settings["packages"]) do
+                local success = __deletePack(name, settings, false, true)
                 if success then
-                    success = __getPack(packageName, settings, true, true)
-                end
-                __writeCfg(SETTINGS, settings)
-                print("spm: Updating package '"..packageName.."' succesful")
-                if reboot then
-                    print("spm: Rebooting...")
-                    os.sleep(1)
-                    os.execute("reboot")
+                    success = __getPack(name, settings, true, true)
                 end
             end
-        else
-            if packageName == nil then
-                io.stderr:write("spm-error: No packages found")
-            else
-                io.stderr:write("spm-error: No packages found with name '"..packageName.."'")
+            __writeCfg(SETTINGS, settings)
+            if reboot then
+                print("spm: Rebooting...")
+                os.sleep(1)
+                os.execute("reboot")
             end
         end
     end
@@ -416,19 +422,19 @@ elseif args[1] == "search" then
 elseif args[1] == "query" then
     queryPackage(args[2])
 elseif args[1] == "update" then
-    updatePackage(args[2], options["r"])
+    updatePackage(__getMultiPackNames(args), options["r"])
 elseif args[1] == "install" then
     if args[2] == nil then
         printUsage()
         return
     end
-    installPackage(args[2], options["f"], options["r"])
+    installPackage(__getMultiPackNames(args), options["f"], options["r"])
 elseif args[1] == "remove" then
     if args[2] == nil then
         printUsage()
         return
     end
-    removePackage(args[2], options["f"])
+    removePackage(__getMultiPackNames(args), options["f"])
 else
     printUsage()
     return
