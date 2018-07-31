@@ -29,10 +29,10 @@ local function printUsage()
 end
 
 local function __getMultiPackNames(args)
-    if args[2] ~= nil then
+    if args[2] then
         local result = {}
         for i = 2, #args, 1 do
-            result = args[i]
+            table.insert(result, args[i])
         end
         return result
     else
