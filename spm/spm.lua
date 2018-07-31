@@ -131,6 +131,8 @@ local function __tryFindDependencies(packageName, settings)
         end
         if found then
             return result
+        else
+            return nil
         end
     end
     return nil
@@ -198,8 +200,8 @@ local function __deletePack(packageName, settings, force)
                     if force then
                         __deletePack(package["dependencies"][i], settings, false)
                     else
-                        local result = __tryFindDependencies(package["dependencies"][i], settings)
-                        if not result then
+                        local deps = __tryFindDependencies(package["dependencies"][i], settings)
+                        if not deps or #deps == 0 then
                             __deletePack(package["dependencies"][i], settings, false)
                         end
                     end
