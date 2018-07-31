@@ -24,7 +24,7 @@ local function printUsage()
     print("search [packageName] \t\t List all packages from repositories, or search a package")
     print("query [packageName] \t\t List all installed packages, or query for an installed package")
     print("update [packageName] \t\t Update everything or the given package")
-    print("install [-f] <packageName> \t Install package (-f forces the installation)")
+    print("install [-f] <packageName> \t Install package (-f:force installation, -r:reboot)")
     print("remove <packageName> \t\t Remove package")
 end
 
