@@ -77,7 +77,7 @@ end
 function API.selectOptions(x, y, options)
     local selected = 0
     local length = #options
-    __drawOptions(x, y, options, selected)
+    __drawOptions(x, y, options, 1 + selected)
     while true do
         local e,_,_,k = event.pull(0.5)
         if e == "key_down" then
@@ -91,47 +91,40 @@ function API.selectOptions(x, y, options)
                 return 1 + selected
             end
         elseif e == "interrupted" then
+            io.stderr:write("Error: interrupted\n")
             os.exit()
         end
     end
-
-    -- while event.pull(0.5, "interrupted") == nil do
-    --     if keyboard.isKeyDown(keyboard.keys.down) then
-    --         selected = mod(selected + 1, length)
-    --         __drawOptions(x, y, options, 1 + selected)
-    --     end
-    --     if keyboard.isKeyDown(keyboard.keys.up) then
-    --         selected = mod(selected - 1, length)
-    --         __drawOptions(x, y, options, 1 + selected)
-    --     end
-    --     if keyboard.isKeyDown(keyboard.keys.enter) then
-    --         return 1 + selected
-    --     end
-    -- end
 end
 
 function API.selectToggles(x, y, options, selected)
     options.insert("Continue")
     highlighted = 0
-    local length = #options-1
-    __drawToggles(x, y, options, selected, highlighted)
-    while event.pull(0.5, "interrupted") == nil do
-        if keyboard.isKeyDown(keyboard.keys.down) then
-            highlighted = mod(highlighted + 1, length)
-            __drawToggles(x, y, options, selected, 1 + highlighted)
-        end
-        if keyboard.isKeyDown(keyboard.keys.up) then
-            highlighted = mod(highlighted - 1, length)
-            __drawToggles(x, y, options, selected, 1 + highlighted)
-        end
-        if keyboard.isKeyDown(keyboard.keys.enter) then
-            --Either toggle highlighted option, or exit loop if it is the last one on the list
-            if highlighted ~= length then
-                selected[1 + highlighted] = not selected[1 + highlighted]
+    local length = #options
+    __drawToggles(x, y, options, selected, 1 + highlighted)
+    while true do
+        local e,_,_,k = event.pull(0.5)
+        if e == "key_down" then
+            if k == keyboard.keys.down then
+                highlighted = mod(highlighted + 1, length)
                 __drawToggles(x, y, options, selected, 1 + highlighted)
-            else
-                return options
             end
+            if k == keyboard.keys.up then
+                highlighted = mod(highlighted - 1, length)
+                __drawToggles(x, y, options, selected, 1 + highlighted)
+            end
+            if k == keyboard.keys.enter then
+                --Either toggle highlighted option, or exit loop if it is the last one on the list
+                if highlighted+1 < length then
+                    selected[1 + highlighted] = not selected[1 + highlighted]
+                    __drawToggles(x, y, options, selected, 1 + highlighted)
+                else
+                    return options
+                end
+            end
+        elseif e == "interrupted" then
+            io.stderr:write("Error: interrupted\n")
+            os.exit()
         end
     end
 end
