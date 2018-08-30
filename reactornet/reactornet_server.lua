@@ -61,11 +61,11 @@ local function listAvailableComponents()
     return componentList
 end
 
-function connectComponent(component)
+local function connectComponent(component)
     table.insert(settings.components[component[2]], component[1])
 end
 
-function setTurbines(functionName, ...)
+local function setTurbines(functionName, ...)
     for i,v in ipairs(settings.components["br_turbine"]) do
         component.invoke(v, functionName, unpack(arg))
     end

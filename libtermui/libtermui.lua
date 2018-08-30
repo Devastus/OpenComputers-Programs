@@ -100,7 +100,7 @@ function API.selectOptions(x, y, options)
 end
 
 function API.selectToggles(x, y, options, selected)
-    options.insert("Continue")
+    table.insert(options, "Continue")
     highlighted = 0
     local length = #options
     __drawToggles(x, y, options, selected, 1 + highlighted)

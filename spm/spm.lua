@@ -21,8 +21,8 @@ local function printUsage()
     print("addrepo <url> \t\t\t Add repository")
     print("removerepo <url> \t\t Remove repository")
     print("listrepo \t\t\t List all repositories")
-    print("search [packageName] \t\t List all packages from repositories, or search a package")
-    print("query [packageName] \t\t List all installed packages, or query for an installed package")
+    print("search [packageName] \t\t Search all packages or given package from repositories")
+    print("query [packageName] \t\t List all installed packages, or query for given package in the filesystem")
     print("update [-r] [...] \t\t Update everything or the given packages (-r:reboot)")
     print("install [-f, -r] <...> \t\t Install packages (-f:force installation, -r:reboot)")
     print("remove [-f] <...> \t\t Remove packages (-f:force remove dependencies)")
@@ -161,8 +161,11 @@ local function __getPack(packageName, settings, force, ignoreDependencies)
             package = __tryFindRepo(repo, packageName)
             if package then
                 print("spm: Installing '"..packageName.."'...")
+                local fileCount = #package["files"]
+                local curFileIndex = 0
                 settings["packages"][packageName] = {["files"]={}}
                 for dpath,installDir in pairs(package["files"]) do
+                    local perc = math.floor(curFileIndex / fileCount)
                     local rpath = __concatUrl(repo,dpath)
                     local filename = fs.name(dpath)
                     local filepath = fs.concat(installDir, filename)
@@ -170,6 +173,7 @@ local function __getPack(packageName, settings, force, ignoreDependencies)
                     local success, response = pcall(__downloadFile, rpath, filepath)
                     if success then
                         table.insert(settings["packages"][packageName]["files"], filepath)
+                        curFileIndex = curFileIndex + 1
                     else
                         io.stderr:write("spm-error: Error installing '"..packageName.."', file '"..dpath.."'. Aborting...\n")
                         -- TODO: Revert changes
@@ -184,7 +188,7 @@ local function __getPack(packageName, settings, force, ignoreDependencies)
                         __getPack(package["dependencies"][i], settings, false)
                     end
                 end
-                print("spm: Package '"..packageName.."' installed succesfully.")
+                print("spm: Package '"..packageName.."' installed succesfully")
                 return true
             end
         end
@@ -436,5 +440,4 @@ elseif args[1] == "remove" then
     removePackage(__getMultiPackNames(args), options["f"])
 else
     printUsage()
-    return
 end
