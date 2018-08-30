@@ -45,7 +45,7 @@ local function saveSettings()
         io.stderr:write("Error: Cannot save settings to path " .. SETTINGS_PATH .. ": " .. emsg)
         return
     end
-    local sdata = serialization.serialize(data)
+    local sdata = serialization.serialize(settings)
     file:write(sdata)
     file:close()
 end
