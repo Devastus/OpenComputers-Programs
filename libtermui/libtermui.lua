@@ -81,7 +81,7 @@ function API.selectOptions(x, y, options)
     local length = #options
     __drawOptions(x, y, options, 1 + selected)
     while true do
-        local e,_,_,k = event.pull(0.5)
+        local e,_,_,k = event.pull(0.1)
         if e == "key_down" then
             if k == keyboard.keys.down then
                 selected = mod(selected + 1, length)
@@ -105,7 +105,7 @@ function API.selectToggles(x, y, options, selected)
     local length = #options
     __drawToggles(x, y, options, selected, 1 + highlighted)
     while true do
-        local e,_,_,k = event.pull(0.5)
+        local e,_,_,k = event.pull(0.1)
         if e == "key_down" then
             if k == keyboard.keys.down then
                 highlighted = mod(highlighted + 1, length)
