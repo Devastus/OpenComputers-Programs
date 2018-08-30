@@ -62,6 +62,9 @@ local function listAvailableComponents()
 end
 
 local function connectComponent(component)
+    if settings.components[component[2]] == nil then
+        settings.components[component[2]] = {}
+    end
     table.insert(settings.components[component[2]], component[1])
 end
 
