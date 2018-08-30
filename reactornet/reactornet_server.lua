@@ -89,6 +89,7 @@ end
 
 local function setupServer()
     --Select server type
+    settings = {headless=false, targetRotorSpeed=1800, steamPerTurbine=2000}
     termUI.clear()
     termUI.write(1, 1, "ReactorNet Server | Setup - Server Type (1/6)")
     termUI.write(1, 2, "Select Server type: \n")
