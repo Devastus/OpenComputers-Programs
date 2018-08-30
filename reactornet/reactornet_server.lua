@@ -131,7 +131,7 @@ local function setupServer()
             os.sleep(2)
         end
     end
-    settings.network_id = "ReactorNet_" .. __SERVER_TYPES[settings.server_type] .. "_" .. id_postfix
+    settings.network_id = "RNet_" .. __SERVER_TYPES[settings.server_type] .. "_" .. id_postfix
 
     termUI.clear()
     termUI.write(1, 1, "ReactorNet Server | Setup - Turbine Rotor Speed (4/6)")
