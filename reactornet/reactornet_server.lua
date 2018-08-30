@@ -55,13 +55,16 @@ local function listAvailableComponents()
     for f = 1, #__COMPONENT_TYPES[settings.server_type], 1 do
         for address,type in component.list(__COMPONENT_TYPES[settings.server_type][f]) do
             i = i + 1
-            componentList[i] = {[1] = address, [2] = type}
+            componentList[i] = {address, type}
         end
     end
     return componentList
 end
 
 local function connectComponent(component)
+    if settings.components == nil then
+        settings.components = {}
+    end
     if component ~= nil then
         local address = component[1]
         local type = component[2]
