@@ -68,6 +68,7 @@ local function connectComponent(component)
     if component ~= nil then
         local address = component[1]
         local type = component[2]
+        print(type)
         if settings.components[type] == nil then
             settings.components[type] = {}
         end
