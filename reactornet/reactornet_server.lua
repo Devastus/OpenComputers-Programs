@@ -63,10 +63,12 @@ end
 
 local function connectComponent(component)
     if component ~= nil then
-        if settings.components[component[2]] == nil then
-            settings.components[component[2]] = {}
+        local address = component[1]
+        local type = component[2]
+        if settings.components[type] == nil then
+            settings.components[type] = {}
         end
-        table.insert(settings.components[component[2]], component[1])
+        table.insert(settings.components[type], address)
     else
         io.stderr:write("reactornet_server: Component does not exist!")
     end
