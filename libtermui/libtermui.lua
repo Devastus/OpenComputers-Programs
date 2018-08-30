@@ -27,6 +27,8 @@ local function __drawOptions(x, y, options, selected)
         end
         term.setCursor(x, y+i-1)
         term.write(options[i])
+        gpu.setForeground(colors.normal[1])
+        gpu.setBackground(colors.normal[2])
     end
 end
 
@@ -49,6 +51,8 @@ local function __drawToggles(x, y, options, selected, highlighted)
         else
             term.write(options[i])
         end
+        gpu.setForeground(colors.normal[1])
+        gpu.setBackground(colors.normal[2])
     end
 end
 
