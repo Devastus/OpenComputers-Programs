@@ -142,7 +142,7 @@ local function setupServer()
     termUI.write(1, 1, "ReactorNet Server | Setup - Steam per Turbine (5/6)")
     termUI.write(1, 2, "Specify target Steam per Turbine (0-2000 mb/t):\n")
     local steamValue = termUI.read(1, 3, false)
-    settings.steamPerTurbine = clamp(tonumber(steamValue), 0, 2000)
+    settings.steamPerTurbine = math.clamp(tonumber(steamValue), 0, 2000)
     setTurbines("setFluidFlowRateMax", settings.steamPerTurbine)
 
     saveSettings()
