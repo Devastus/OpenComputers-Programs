@@ -109,7 +109,7 @@ local function setupServer()
     termUI.clear()
     termUI.write(1, 1, "ReactorNet Server | Setup - Available Components (2/6)")
     termUI.write(1, 2, "Select components to connect to:")
-    selected = termUI.selectToggles(2, 3, componentLabels, selected)
+    termUI.selectToggles(2, 3, componentLabels, selected)
     for i=1, #selected, 1 do
         if selected[i] == true then
             connectComponent(componentList[i])

@@ -121,7 +121,7 @@ function API.selectToggles(x, y, options, selected)
                     selected[1 + highlighted] = not selected[1 + highlighted]
                     __drawToggles(x, y, options, selected, 1 + highlighted)
                 else
-                    return options
+                    return
                 end
             end
         elseif e == "interrupted" then
