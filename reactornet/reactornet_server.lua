@@ -55,17 +55,21 @@ local function listAvailableComponents()
     for f = 1, #__COMPONENT_TYPES[settings.server_type], 1 do
         for address,type in component.list(__COMPONENT_TYPES[settings.server_type][f]) do
             i = i + 1
-            componentList[i] = {address, type}
+            componentList[i] = {[1] = address, [2] = type}
         end
     end
     return componentList
 end
 
 local function connectComponent(component)
-    if settings.components[component[2]] == nil then
-        settings.components[component[2]] = {}
+    if component ~= nil then
+        if settings.components[component[2]] == nil then
+            settings.components[component[2]] = {}
+        end
+        table.insert(settings.components[component[2]], component[1])
+    else
+        io.stderr:write("reactornet_server: Component does not exist!")
     end
-    table.insert(settings.components[component[2]], component[1])
 end
 
 local function setTurbines(functionName, ...)
