@@ -120,9 +120,10 @@ local function setupServer()
     termUI.clear()
     termUI.write(1, 1, "ReactorNet Server | Setup - Network ID (3/6)")
     local validID = false
+    local id_postfix = ""
     while validID == false do
         termUI.write(1, 2, "Give a network ID (1-12 characters):")
-        local id_postfix = termUI.read(1, 3, false)
+        id_postfix = termUI.read(1, 3, false)
         if #id_postfix > 0 and #id_postfix <= 12 then 
             validID = true
         else
