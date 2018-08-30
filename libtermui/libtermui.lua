@@ -32,13 +32,13 @@ end
 
 local function __drawToggles(x, y, options, selected, highlighted)
     for i = 1, #options, 1 do
-        if i == highlighted then
-            gpu.setForeground(colors.highlight[1])
-            gpu.setBackground(colors.highlight[2])
-        else
-            gpu.setForeground(colors.normal[1])
-            gpu.setBackground(colors.normal[2])
-        end
+        -- if i == highlighted then
+        --     gpu.setForeground(colors.highlight[1])
+        --     gpu.setBackground(colors.highlight[2])
+        -- else
+        --     gpu.setForeground(colors.normal[1])
+        --     gpu.setBackground(colors.normal[2])
+        -- end
         term.setCursor(x, y+i-1)
         if i < #options then
             if selected[i] == true then
