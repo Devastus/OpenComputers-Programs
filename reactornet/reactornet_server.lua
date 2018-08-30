@@ -79,6 +79,7 @@ local function connectComponent(component)
 end
 
 local function setTurbines(functionName, ...)
+    for a in arg do print(a) end
     for i,v in ipairs(settings.components["br_turbine"]) do
         component.invoke(v, functionName, table.unpack(arg))
     end
