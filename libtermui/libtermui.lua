@@ -73,7 +73,7 @@ function API.read(x, y, wrap, msgtype)
     gpu.setForeground(colors[msgtype][1])
     gpu.setBackground(colors[msgtype][2])
     term.setCursor(x, y)
-    return term.read({nowrap = not wrap})
+    return io.read("*line")
 end
 
 function API.clear()

@@ -149,6 +149,12 @@ local function setupServer()
     settings.steamPerTurbine = math.max(math.min(tonumber(steamValue), 2000), 0)
     setTurbines("setFluidFlowRateMax", {settings.steamPerTurbine})
 
+    termUI.clear()
+    termUI.write(1, 1, "ReactorNet Server | Setup - Verbosity (6/6)")
+    termUI.write(1, 2, "Select server verbosity mode:\n")
+    local modenum = termUI.selectOptions(2, 3, {"normal", "headless"})
+    settings.headless = modenum == 2
+
     saveSettings()
 end
 
@@ -237,7 +243,7 @@ local function runServer()
         --do server stuff
         if not settings.headless then
             termUI.write(1,1,"ReactorNet Server | Running...")
-            termUI.write(1,2,"Reactor Steam: "..reactorInfo.hotFluidProduced)
+            --termUI.write(1,2,"Reactor Steam: "..reactorInfo.hotFluidProduced)
             termUI.write(1,3,"Reactor Fuel: "..reactorInfo.fuelAmount.."/"..reactorInfo.fuelAmountMax)
             termUI.write(1,4,"Reactor Control Rods: "..reactorInfo.controlRodLevel)
             termUI.write(1,5,"Turbines: "..turbineInfo.turbineCount)
