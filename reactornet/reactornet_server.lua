@@ -131,6 +131,8 @@ local function setupServer()
             os.sleep(2)
         end
     end
+    print("\nid_postfix: "..id_postfix)
+    print("\n"..__SERVER_TYPES[settings.server_type])
     settings.network_id = "RNet_" .. __SERVER_TYPES[settings.server_type] .. "_" .. id_postfix
 
     termUI.clear()
