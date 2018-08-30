@@ -78,11 +78,11 @@ local function connectComponent(component)
     end
 end
 
-local function setTurbines(functionName, ...)
-    print(arg)
-    for a in arg do print(a) end
+local function setTurbines(functionName, args)
+    -- print(arg)
+    -- for a in arg do print(a) end
     for i,v in ipairs(settings.components["br_turbine"]) do
-        component.invoke(v, functionName, table.unpack(arg))
+        component.invoke(v, functionName, table.unpack(args))
     end
 end
 
@@ -145,7 +145,7 @@ local function setupServer()
     termUI.write(1, 2, "Specify target Steam per Turbine (0-2000 mb/t):\n")
     local steamValue = termUI.read(1, 3, false)
     settings.steamPerTurbine = math.max(math.min(tonumber(steamValue), 2000), 0)
-    setTurbines("setFluidFlowRateMax", settings.steamPerTurbine)
+    setTurbines("setFluidFlowRateMax", {settings.steamPerTurbine})
 
     saveSettings()
 end
