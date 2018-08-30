@@ -123,7 +123,7 @@ local function setupServer()
     local id_postfix = ""
     while validID == false do
         termUI.write(1, 2, "Give a network ID (1-12 characters):\n")
-        id_postfix = io.read("*line")
+        id_postfix = termUI.read(1, 3, false)
         if #id_postfix > 0 and #id_postfix <= 12 then 
             validID = true
         else
@@ -141,7 +141,7 @@ local function setupServer()
     termUI.clear()
     termUI.write(1, 1, "ReactorNet Server | Setup - Steam per Turbine (5/6)")
     termUI.write(1, 2, "Specify target Steam per Turbine (0-2000 mb/t):\n")
-    local steamValue = io.read("*line")
+    local steamValue = termUI.read(1, 3, false)
     settings.steamPerTurbine = clamp(tonumber(steamValue), 0, 2000)
     setTurbines("setFluidFlowRateMax", settings.steamPerTurbine)
 
