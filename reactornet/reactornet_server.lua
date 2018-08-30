@@ -68,7 +68,7 @@ local function connectComponent(component)
     if component ~= nil then
         local address = component[1]
         local type = component[2]
-        print(type)
+        local type = component[2]
         if settings.components[type] == nil then
             settings.components[type] = {}
         end
@@ -80,7 +80,7 @@ end
 
 local function setTurbines(functionName, ...)
     for i,v in ipairs(settings.components["br_turbine"]) do
-        component.invoke(v, functionName, unpack(arg))
+        component.invoke(v, functionName, table.unpack(arg))
     end
 end
 
