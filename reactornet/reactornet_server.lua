@@ -88,7 +88,11 @@ local function setupServer()
         os.exit()
     end
     local selected = {}
-    for i = 1, #componentList, 1 do selected[i] = false end
+    local componentLabels = {}
+    for i = 1, #componentList, 1 do
+         selected[i] = false 
+         componentLabels[i] = componentList[i][2].."("..componentList[i][1]..")"
+    end
     termUI.clear()
     termUI.write(1, 1, "ReactorNet Server | Setup - Available Components (2/6)")
     termUI.write(1, 2, "Select components to connect to:")
