@@ -91,7 +91,7 @@ local function setupServer()
     local componentLabels = {}
     for i = 1, #componentList, 1 do
          selected[i] = false 
-         componentLabels[i] = componentList[i][2].."("..componentList[i][1]..")"
+         componentLabels[i] = componentList[i][2].."("..string.sub(componentList[i][1],1,8).."...)"
     end
     termUI.clear()
     termUI.write(1, 1, "ReactorNet Server | Setup - Available Components (2/6)")
