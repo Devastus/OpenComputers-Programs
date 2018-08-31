@@ -47,6 +47,7 @@ local function launchScreenGUI()
     gui.newButton(cX-8, cY-6, 16, 3, "Start", 0xCCCCCC, 0xFFFFFF, 0x2299CC, 0x44AAFF, "light", runClient)
     gui.newButton(cX-8, cY-2, 16, 3, "Setup", 0xCCCCCC, 0xFFFFFF, 0x2299CC, 0x44AAFF, "light", setupClient)
     gui.newButton(cX-8, cY+2, 16, 3, "Exit", 0xCCCCCC, 0xFFFFFF, 0x2299CC, 0x44AAFF, "light", function() os.exit() end)
+    gui.renderAll()
 end
 
 local function mainScreenGUI()
