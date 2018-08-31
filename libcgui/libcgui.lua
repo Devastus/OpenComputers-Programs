@@ -36,6 +36,7 @@ end
 
 function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, visible)
     local comp = {}
+    local id = #components+1
     comp.x = x
     comp.y = y
     comp.width = width
@@ -44,8 +45,8 @@ function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, 
     comp.render = renderFunc
     comp.callback = callbackFunc
     comp.visible = visible or true
-    table.insert(components, comp)
-    return #components
+    components[id] = comp
+    return id
 end
 
 function API.clear()
