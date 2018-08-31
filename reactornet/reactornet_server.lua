@@ -2,6 +2,7 @@ local component = require("component")
 local serialization = require("serialization")
 local event = require("event")
 local termUI = require("libtermui")
+local lmath = require("libmath")
 local fs = require("filesystem")
 
 local __SERVER_TYPES = {"controller", "monitor"}
@@ -146,7 +147,7 @@ local function setupServer()
     termUI.write(1, 1, "ReactorNet Server | Setup - Steam per Turbine (5/6)")
     termUI.write(1, 2, "Specify target Steam per Turbine (0-2000 mb/t):\n")
     local steamValue = termUI.read(1, 3, false)
-    settings.steamPerTurbine = math.max(math.min(tonumber(steamValue), 2000), 0)
+    settings.steamPerTurbine = lmath.clamp(tonumber(steamValue), 0, 2000)
     setTurbines("setFluidFlowRateMax", {settings.steamPerTurbine})
 
     termUI.clear()
@@ -208,8 +209,8 @@ local function updateControl()
         -- Every turbine connected should be getting a maximum of 2000mb/t steam
         local diff = settings.targetRotorSpeed - turbinesInfo.averageRotorSpeed
         if math.abs(diff) > 50 then
-            local sign = 2 * math.sign(diff)
-            reactorInfo.controlRodLevel = termUI.clamp(reactorInfo.controlRodLevel + sign, 0, 100)
+            local sign = 2 * lmath.sign(diff)
+            reactorInfo.controlRodLevel = lmath.clamp(reactorInfo.controlRodLevel + sign, 0, 100)
             reactorProxy.setAllControlRodLevels(reactorInfo.controlRodLevel)
         end
         -- local totalSteamPerTurbine = turbinesInfo.turbineCount * settings.steamPerTurbine

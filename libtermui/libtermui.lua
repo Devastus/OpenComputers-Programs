@@ -20,6 +20,14 @@ local function clamp(value, min, max)
     return math.max(math.min(value, max), min)
 end
 
+local function sign(value)
+    if value == math.abs(value) then
+        return 1
+    else
+        return -1
+    end
+end
+
 function round(num, numDecimalPlaces)
     local mult = 10^(numDecimalPlaces or 0)
     return math.floor(num * mult + 0.5) / mult
