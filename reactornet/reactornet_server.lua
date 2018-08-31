@@ -291,8 +291,8 @@ local function runServer()
             if not settings.headless then
                 termUI.write(1,1, settings.network_id.." | Running...")
                 termUI.write(1,2, "Total RF: "..tostring(monitorInfo.totalEnergy).."/"..tostring(monitorInfo.totalEnergyMax))
-                termUI.write(1,2, "RF/t Input: "..tostring(monitorInfo.input))
-                termUI.write(1,2, "RF/t Output: "..tostring(monitorInfo.output))
+                termUI.write(1,3, "RF/t Input: "..tostring(monitorInfo.input))
+                termUI.write(1,4, "RF/t Output: "..tostring(monitorInfo.output))
             end
         end
     end
