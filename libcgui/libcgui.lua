@@ -54,7 +54,13 @@ function API.clear()
     gpu.fill(1,1,w,h," ")
 end
 
+function API.cleanup()
+    API.clear()
+    components = nil
+end
+
 function API.renderAll()
+    API.clear()
     for c in components do
         c:render()
     end
@@ -183,7 +189,7 @@ function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
         os.sleep(0.2)
         self.state.active = false
         self:render()
-        if callbackFunc ~= nil then callbackFunc(self, x, y) end
+        if callbackFunc ~= nil then callbackFunc() end
     end
     API.newComponent(x, y, width, height, state, renderFunc, callback)
 end
@@ -235,7 +241,7 @@ function API.newValueBar(x, y, width, height, value, maxValue, fillColor, bgColo
     API.newComponent(x, y, width, height, state, renderFunc, nil)
 end
 
-function API.newChart(x, y, width, height, fillColor, bgColor values, maxValue, frame)
+function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue, frame)
     local state = {}
     state.fillColor = fillColor
     state.bgColor = bgColor
