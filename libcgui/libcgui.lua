@@ -73,14 +73,16 @@ function API.render(componentID)
 end
 
 function API.click(x, y)
-    local comp = context.components[id]
-    if comp.visible then
-        local xmax = comp.x + comp.width-1
-        local ymax = comp.y + comp.height-1
-        if x >= comp.x and x <= xmax then
-            if y >= comp.y and y <= ymax then
-                if comp.callback ~= nil then comp:callback(x, y) end
-                return id
+    for id = 1, #components, 1 do
+        local comp = components[id]
+        if comp.visible then
+            local xmax = comp.x + comp.width-1
+            local ymax = comp.y + comp.height-1
+            if x >= comp.x and x <= xmax then
+                if y >= comp.y and y <= ymax then
+                    if comp.callback ~= nil then comp:callback(x, y) end
+                    return id
+                end
             end
         end
     end
