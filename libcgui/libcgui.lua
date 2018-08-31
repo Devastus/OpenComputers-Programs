@@ -56,13 +56,13 @@ end
 
 function API.cleanup()
     API.clear()
-    components = nil
+    components = {}
 end
 
 function API.renderAll()
     API.clear()
-    for c in components do
-        c:render()
+    for i = 1, #components, 1 do
+        components[i]:render()
     end
 end
 
@@ -274,6 +274,7 @@ function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue,
         gpu.setForeground(oldFG, false)
         gpu.setBackground(oldBG, false)
     end
+    API.newComponent(x, y, width, height, state, renderFunc, nil)
 end
 
 return API

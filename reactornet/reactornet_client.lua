@@ -44,7 +44,7 @@ local function launchScreenGUI()
     -- Draw launch gui with Start, Setup and Exit
     local cX = gui.percentX(0.5)
     local cY = gui.percentY(0.5)
-    gui.clear()
+    gui.cleanup()
     gui.newButton(cX-8, cY-6, 16, 3, "Start", 0xCCCCCC, 0xFFFFFF, 0x2299CC, 0x44AAFF, "light", runClient)
     gui.newButton(cX-8, cY-2, 16, 3, "Setup", 0xCCCCCC, 0xFFFFFF, 0x2299CC, 0x44AAFF, "light", setupClient)
     gui.newButton(cX-8, cY+2, 16, 3, "Exit", 0xCCCCCC, 0xFFFFFF, 0x2299CC, 0x44AAFF, "light", function() os.exit() end)
