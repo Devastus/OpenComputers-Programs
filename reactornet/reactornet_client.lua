@@ -7,6 +7,7 @@ local gui = require("libcgui")
 
 local settings = {}
 local SETTINGS_PATH = "/etc/reactornet_client.cfg"
+local updateInterval = 0.1
 
 -----------------------------------------------
 -- METHODS --
