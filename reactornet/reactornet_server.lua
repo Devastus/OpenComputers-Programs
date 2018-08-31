@@ -254,9 +254,9 @@ local function runServer()
             termUI.write(1,3,"Reactor Fuel: "..tostring(reactorInfo.fuelAmount).."/"..tostring(reactorInfo.fuelAmountMax))
             termUI.write(1,4,"Reactor Control Rods: "..tostring(reactorInfo.controlRodLevel))
             if reactorInfo.isActivelyCooled then
-                termUI.write(1,5,"Turbines: "..tostring(turbineInfo.turbineCount))
-                termUI.write(1,6,"Turbine Rotor Speed: "..tostring(turbineInfo.averageRotorSpeed).."/"..tostring(settings.targetRotorSpeed))
-                termUI.write(1,7,"Turbine RF/tick: "..tostring(turbineInfo.totalEnergyProduced))
+                termUI.write(1,5,"Turbines: "..tostring(turbinesInfo.turbineCount))
+                termUI.write(1,6,"Turbine Rotor Speed: "..tostring(turbinesInfo.averageRotorSpeed).."/"..tostring(settings.targetRotorSpeed))
+                termUI.write(1,7,"Turbine RF/tick: "..tostring(turbinesInfo.totalEnergyProduced))
             end
         end
     end
