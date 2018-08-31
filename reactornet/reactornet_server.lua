@@ -3,6 +3,7 @@ local serialization = require("serialization")
 local event = require("event")
 local termUI = require("libtermui")
 local lmath = require("libmath")
+local net = require("libnet")
 local fs = require("filesystem")
 
 local __SERVER_TYPES = {"controller", "monitor"}
@@ -206,22 +207,12 @@ local function updateControl()
         turbinesInfo.averageRotorSpeed = turbinesInfo.averageRotorSpeed / turbinesInfo.turbineCount
 
         -- Reactor active (turbines) autocontrol
-        -- Every turbine connected should be getting a maximum of 2000mb/t steam
         local diff = settings.targetRotorSpeed - turbinesInfo.averageRotorSpeed
         if math.abs(diff) > 50 then
             local sign = 10 * lmath.sign(diff)
             reactorInfo.controlRodLevel = lmath.clamp(reactorInfo.controlRodLevel - sign, 0, 100)
             reactorProxy.setAllControlRodLevels(reactorInfo.controlRodLevel)
         end
-        -- local totalSteamPerTurbine = turbinesInfo.turbineCount * settings.steamPerTurbine
-        -- local steamDifference = totalSteamPerTurbine - reactorInfo.hotFluidProduced
-        -- if steamDifference < 50 then
-        --     reactorInfo.controlRodLevel = math.min(reactorInfo.controlRodLevel + 1, 100)
-        --     reactorProxy.setAllControlRodLevels(reactorInfo.controlRodLevel)
-        -- elseif steamDifference > 100 then
-        --     reactorInfo.controlRodLevel = math.max(reactorInfo.controlRodLevel - 1, 0)
-        --     reactorProxy.setAllControlRodLevels(reactorInfo.controlRodLevel)
-        -- end
     else
         -- Reactor passive autocontrol
         local energyPerc = reactorInfo.energyStored / reactorInfo.energyStoredMax

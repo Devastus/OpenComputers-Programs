@@ -15,3 +15,6 @@ A simple wrapper for some quick & dirty helper UI functions using 'term'
 
 ### libmath/
 Utility math functions
+
+### libnet/
+Simple event-driven network messaging wrapper library
