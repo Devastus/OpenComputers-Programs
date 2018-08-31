@@ -236,7 +236,7 @@ local function updateMonitor()
 
     -- Mekanism Induction Matrix
     for i = 1, #settings.components["induction_matrix"], 1 do
-        local proxy = component.proxy(settings.components[t][i])
+        local proxy = component.proxy(settings.components["induction_matrix"][i])
         monitorInfo.totalEnergy = monitorInfo.totalEnergy + (proxy.getEnergy() * JtoRFmult)
         monitorInfo.totalEnergyMax = monitorInfo.totalEnergyMax + (proxy.getEnergyMax() * JtoRFmult)
         monitorInfo.input = monitorInfo.input + (proxy.getInput() * JtoRFmult)
