@@ -177,10 +177,10 @@ function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
     local renderFunc = function(self)
         if self.state.active then
             API.drawRect(self.x, self.y, self.width, self.height, self.state.fgOn, self.state.bgOn, self.state.frame)
-            API.drawText(self.x, self.y, self.text, self.state.fgOn, self.state.bgOn, true, self.width, self.height)
+            API.drawText(self.x, self.y, self.state.text, self.state.fgOn, self.state.bgOn, true, self.width, self.height)
         else
             API.drawRect(self.x, self.y, self.width, self.height, self.state.fgOff, self.state.bgOff, self.state.frame)
-            API.drawText(self.x, self.y, self.text, self.state.fgOff, self.state.bgOff, true, self.width, self.height)
+            API.drawText(self.x, self.y, self.state.text, self.state.fgOff, self.state.bgOff, true, self.width, self.height)
         end
         
     end
@@ -207,10 +207,10 @@ function API.newToggle(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
     local renderFunc = function(self)
         if self.state.active then
             API.drawRect(self.x, self.y, self.width, self.height, self.state.fgOn, self.state.bgOn, self.state.frame)
-            API.drawText(self.x, self.y, self.text, self.state.fgOn, self.state.bgOn, true, self.width, self.height)
+            API.drawText(self.x, self.y, self.state.text, self.state.fgOn, self.state.bgOn, true, self.width, self.height)
         else
             API.drawRect(self.x, self.y, self.width, self.height, self.state.fgOff, self.state.bgOff, self.state.frame)
-            API.drawText(self.x, self.y, self.text, self.state.fgOff, self.state.bgOff, true, self.width, self.height)
+            API.drawText(self.x, self.y, self.state.text, self.state.fgOff, self.state.bgOff, true, self.width, self.height)
         end
     end
     local callback = function(self, x, y)
