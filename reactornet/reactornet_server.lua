@@ -209,7 +209,7 @@ local function updateControl()
         -- Every turbine connected should be getting a maximum of 2000mb/t steam
         local diff = settings.targetRotorSpeed - turbinesInfo.averageRotorSpeed
         if math.abs(diff) > 50 then
-            local sign = 2 * lmath.sign(diff)
+            local sign = 10 * lmath.sign(diff)
             reactorInfo.controlRodLevel = lmath.clamp(reactorInfo.controlRodLevel - sign, 0, 100)
             reactorProxy.setAllControlRodLevels(reactorInfo.controlRodLevel)
         end
@@ -264,8 +264,8 @@ local function runServer()
             termUI.write(1,4,"Reactor Control Rods: "..tostring(reactorInfo.controlRodLevel))
             if reactorInfo.isActivelyCooled then
                 termUI.write(1,5,"Turbines: "..tostring(turbinesInfo.turbineCount))
-                termUI.write(1,6,"Turbine Rotor Speed: "..tostring(turbinesInfo.averageRotorSpeed).."/"..tostring(settings.targetRotorSpeed))
-                termUI.write(1,7,"Turbine RF/tick: "..tostring(turbinesInfo.totalEnergyProduced))
+                termUI.write(1,6,"Turbine Rotor Speed: "..tostring(math.floor(turbinesInfo.averageRotorSpeed)).."/"..tostring(settings.targetRotorSpeed))
+                termUI.write(1,7,"Turbine RF/tick: "..tostring(lmath.round(turbinesInfo.totalEnergyProduced, 2)))
             end
         end
     end
