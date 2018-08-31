@@ -238,7 +238,7 @@ local function updateMonitor()
     for i = 1, #settings.components["induction_matrix"], 1 do
         local proxy = component.proxy(settings.components["induction_matrix"][i])
         monitorInfo.totalEnergy = monitorInfo.totalEnergy + (proxy.getEnergy() * JtoRFmult)
-        monitorInfo.totalEnergyMax = monitorInfo.totalEnergyMax + (proxy.getEnergyMax() * JtoRFmult)
+        monitorInfo.totalEnergyMax = monitorInfo.totalEnergyMax + (proxy.getMaxEnergy() * JtoRFmult)
         monitorInfo.input = monitorInfo.input + (proxy.getInput() * JtoRFmult)
         monitorInfo.output = monitorInfo.output + (proxy.getOutput() * JtoRFmult)
     end
