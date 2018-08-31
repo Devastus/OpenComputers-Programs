@@ -210,7 +210,7 @@ local function updateControl()
         local diff = settings.targetRotorSpeed - turbinesInfo.averageRotorSpeed
         if math.abs(diff) > 50 then
             local sign = 2 * lmath.sign(diff)
-            reactorInfo.controlRodLevel = lmath.clamp(reactorInfo.controlRodLevel + sign, 0, 100)
+            reactorInfo.controlRodLevel = lmath.clamp(reactorInfo.controlRodLevel - sign, 0, 100)
             reactorProxy.setAllControlRodLevels(reactorInfo.controlRodLevel)
         end
         -- local totalSteamPerTurbine = turbinesInfo.turbineCount * settings.steamPerTurbine
