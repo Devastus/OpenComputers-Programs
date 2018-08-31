@@ -247,7 +247,7 @@ local function closeServer()
     event.cancel(updateTimerID)
     termUI.clear()
     termUI.write(1,1, "ReactorNet Server | Closing...")
-    os.sleep(0)
+    os.sleep(1)
     os.exit()
 end
 
