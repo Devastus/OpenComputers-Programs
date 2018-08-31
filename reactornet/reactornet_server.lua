@@ -238,6 +238,7 @@ end
 local function runServer()
     termUI.clear()
     setActive(true)
+    updateControl()
     updateTimerID = event.timer(2, updateControl, math.huge)
     while event.pull(2, "interrupted") == nil do
         --do server stuff
