@@ -16,6 +16,15 @@ local function mod(value, max)
     return (value + max) % max
 end
 
+local function clamp(value, min, max)
+    return math.max(math.min(value, max), min)
+end
+
+function round(num, numDecimalPlaces)
+    local mult = 10^(numDecimalPlaces or 0)
+    return math.floor(num * mult + 0.5) / mult
+end
+
 local function __drawOptions(x, y, options, selected)
     for i = 1, #options, 1 do
         if i == selected then
