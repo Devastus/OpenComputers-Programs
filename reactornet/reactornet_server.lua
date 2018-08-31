@@ -226,6 +226,8 @@ end
 
 local function setActive(active)
     local proxy = component.proxy(settings.components["br_reactor"][1])
+    reactorInfo.controlRodLevel = 0
+    proxy.setAllControlRodLevels(reactorInfo.controlRodLevel)
     proxy.setActive(active)
     for i,v in ipairs(settings.components["br_turbine"]) do
         proxy = component.proxy(v)
