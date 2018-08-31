@@ -49,8 +49,8 @@ function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, 
 end
 
 function API.clear()
-    gpu.setForeground(fgColor)
-    gpu.setBackground(bgColor)
+    gpu.setForeground(fgColor, false)
+    gpu.setBackground(bgColor, false)
     gpu.fill(1,1,w,h," ")
 end
 
@@ -254,8 +254,8 @@ function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue,
         local oldFG = gpu.getForeground()
         local segwidth = math.floor((self.width-2) / #values)
         API.drawRect(self.x, self.y, self.width, self.height, baseForegroundColor, self.state.bgColor, self.state.frame)
-        gpu.setForeground(self.state.fillColor)
-        gpu.setBackground(self.state.bgColor)
+        gpu.setForeground(self.state.fillColor, false)
+        gpu.setBackground(self.state.bgColor, false)
         for i=1, #values, 1 do
             local seg = self.x+1+((i-1)*segwidth)
             if self.state.values[i] ~= nil and self.state.values[i] > 0 then
@@ -271,8 +271,8 @@ function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue,
                 gpu.fill(seg, self.y, segwidth, self.height, " ")
             end
         end
-        gpu.setForeground(oldFG)
-        gpu.setBackground(oldBG)
+        gpu.setForeground(oldFG, false)
+        gpu.setBackground(oldBG, false)
     end
 end
 
