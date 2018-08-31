@@ -30,8 +30,8 @@ local function clamp(value,min,max) return math.min(math.max(value, min), max) e
 
 function API.init(foregroundColor, backgroundColor)
     w, h = gpu.getResolution()
-    baseForegroundColor = foregroundColor
-    baseBackgroundColor = backgroundColor
+    baseForegroundColor = foregroundColor or 0xFFFFFF
+    baseBackgroundColor = backgroundColor or 0x000000
 end
 
 function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, visible)
@@ -49,8 +49,8 @@ function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, 
 end
 
 function API.clear()
-    gpu.setForeground(fgColor, false)
-    gpu.setBackground(bgColor, false)
+    gpu.setForeground(baseForegroundColor, false)
+    gpu.setBackground(baseBackgroundColor, false)
     gpu.fill(1,1,w,h," ")
 end
 
