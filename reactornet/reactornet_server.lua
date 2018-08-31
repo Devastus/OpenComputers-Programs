@@ -243,12 +243,12 @@ local function runServer()
         --do server stuff
         if not settings.headless then
             termUI.write(1,1,"ReactorNet Server | Running...")
-            --termUI.write(1,2,"Reactor Steam: "..reactorInfo.hotFluidProduced)
-            termUI.write(1,3,"Reactor Fuel: "..reactorInfo.fuelAmount.."/"..reactorInfo.fuelAmountMax)
-            termUI.write(1,4,"Reactor Control Rods: "..reactorInfo.controlRodLevel)
-            termUI.write(1,5,"Turbines: "..turbineInfo.turbineCount)
-            termUI.write(1,6,"Turbine Rotor Speed: "..turbineInfo.averageRotorSpeed.."/"..settings.targetRotorSpeed)
-            termUI.write(1,7,"Turbine RF/tick: "..turbineInfo.totalEnergyProduced)
+            termUI.write(1,2,"Reactor Steam: "..tostring(reactorInfo.hotFluidProduced))
+            termUI.write(1,3,"Reactor Fuel: "..tostring(reactorInfo.fuelAmount).."/"..tostring(reactorInfo.fuelAmountMax))
+            termUI.write(1,4,"Reactor Control Rods: "..tostring(reactorInfo.controlRodLevel))
+            termUI.write(1,5,"Turbines: "..tostring(turbineInfo.turbineCount))
+            termUI.write(1,6,"Turbine Rotor Speed: "..tostring(turbineInfo.averageRotorSpeed).."/"..tostring(settings.targetRotorSpeed))
+            termUI.write(1,7,"Turbine RF/tick: "..tostring(turbineInfo.totalEnergyProduced))
         end
     end
     closeServer()
