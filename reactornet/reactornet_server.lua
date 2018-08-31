@@ -180,29 +180,29 @@ local function updateControl()
     reactorInfo.coolantAmountMax = reactorProxy.getCoolantAmountMax()
 
     if reactorInfo.isActivelyCooled then
-        turbineInfo.averageRotorSpeed = 0
-        turbineInfo.turbineCount = #settings.components["br_turbine"]
+        turbinesInfo.averageRotorSpeed = 0
+        turbinesInfo.turbineCount = #settings.components["br_turbine"]
         for i,v in ipairs(settings.components["br_turbine"]) do
             local turbineProxy = component.proxy(v)
-            turbineInfo[i].active = turbineProxy.getActive()
-            turbineInfo[i].energyStored = turbineProxy.getEnergyStored()
-            turbineInfo[i].rotorSpeed = turbineProxy.getRotorSpeed()
-            turbineInfo[i].inputAmount = turbineProxy.getInputAmount()
-            turbineInfo[i].outputAmount = turbineProxy.getOutputAmount()
-            turbineInfo[i].fluidAmountMax = turbineProxy.getFluidAmountMax()
-            turbineInfo[i].fluidFlowRate = turbineProxy.getFluidFlowRate()
-            turbineInfo[i].fluidFlowRateMax = turbineProxy.getFluidFlowRateMax()
-            turbineInfo[i].fluidFlowRateMaxMax = turbineProxy.getFluidFlowRateMaxMax()
-            turbineInfo[i].energyProduced = turbineProxy.getEnergyProducedLastTick()
-            turbineInfo[i].inductorEngaged = turbineProxy.getInductorEngaged()
-            turbineInfo.averageRotorSpeed = turbineInfo.averageRotorSpeed + turbineInfo[i].rotorSpeed
-            turbineInfo.totalEnergyProduced = turbineInfo.totalEnergyProduced + turbineInfo[i].energyProduced
+            turbinesInfo[i].active = turbineProxy.getActive()
+            turbinesInfo[i].energyStored = turbineProxy.getEnergyStored()
+            turbinesInfo[i].rotorSpeed = turbineProxy.getRotorSpeed()
+            turbinesInfo[i].inputAmount = turbineProxy.getInputAmount()
+            turbinesInfo[i].outputAmount = turbineProxy.getOutputAmount()
+            turbinesInfo[i].fluidAmountMax = turbineProxy.getFluidAmountMax()
+            turbinesInfo[i].fluidFlowRate = turbineProxy.getFluidFlowRate()
+            turbinesInfo[i].fluidFlowRateMax = turbineProxy.getFluidFlowRateMax()
+            turbinesInfo[i].fluidFlowRateMaxMax = turbineProxy.getFluidFlowRateMaxMax()
+            turbinesInfo[i].energyProduced = turbineProxy.getEnergyProducedLastTick()
+            turbinesInfo[i].inductorEngaged = turbineProxy.getInductorEngaged()
+            turbinesInfo.averageRotorSpeed = turbinesInfo.averageRotorSpeed + turbinesInfo[i].rotorSpeed
+            turbinesInfo.totalEnergyProduced = turbinesInfo.totalEnergyProduced + turbinesInfo[i].energyProduced
         end
-        turbineInfo.averageRotorSpeed = turbineInfo.averageRotorSpeed / turbineInfo.turbineCount
+        turbinesInfo.averageRotorSpeed = turbinesInfo.averageRotorSpeed / turbinesInfo.turbineCount
 
         -- Reactor active (turbines) autocontrol
         -- Every turbine connected should be getting a maximum of 2000mb/t steam
-        local totalSteamPerTurbine = turbineInfo.turbineCount * settings.steamPerTurbine
+        local totalSteamPerTurbine = turbinesInfo.turbineCount * settings.steamPerTurbine
         local steamDifference = totalSteamPerTurbine - reactorInfo.hotFluidProduced
         if steamDifference < 0 then
             reactorInfo.controlRodLevel = math.min(reactorInfo.controlRodLevel + 1, 100)
