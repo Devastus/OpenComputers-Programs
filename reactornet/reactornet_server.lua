@@ -91,6 +91,11 @@ local function setTurbines(functionName, args)
     end
 end
 
+--Displays long numbers with commas
+function fancyNumber(n)
+    return tostring(math.floor(n)):reverse():gsub("(%d%d%d)", "%1,"):gsub("%D$",""):reverse()
+end
+
 local function setupServer()
     --Select server type
     settings = {headless=false, targetRotorSpeed=1800, steamPerTurbine=2000}
@@ -237,10 +242,10 @@ local function updateMonitor()
     -- Mekanism Induction Matrix
     for i = 1, #settings.components["induction_matrix"], 1 do
         local proxy = component.proxy(settings.components["induction_matrix"][i])
-        monitorInfo.totalEnergy = monitorInfo.totalEnergy + (proxy.getEnergy() * JtoRFmult)
-        monitorInfo.totalEnergyMax = monitorInfo.totalEnergyMax + (proxy.getMaxEnergy() * JtoRFmult)
-        monitorInfo.input = monitorInfo.input + (proxy.getInput() * JtoRFmult)
-        monitorInfo.output = monitorInfo.output + (proxy.getOutput() * JtoRFmult)
+        monitorInfo.totalEnergy = math.floor(monitorInfo.totalEnergy + (proxy.getEnergy() * JtoRFmult))
+        monitorInfo.totalEnergyMax = math.floor(monitorInfo.totalEnergyMax + (proxy.getMaxEnergy() * JtoRFmult))
+        monitorInfo.input = math.floor(monitorInfo.input + (proxy.getInput() * JtoRFmult))
+        monitorInfo.output = math.floor(monitorInfo.output + (proxy.getOutput() * JtoRFmult))
     end
 end
 
