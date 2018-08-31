@@ -32,6 +32,7 @@ function API.init(foregroundColor, backgroundColor)
     w, h = gpu.getResolution()
     baseForegroundColor = foregroundColor or 0xFFFFFF
     baseBackgroundColor = backgroundColor or 0x000000
+    API.clearAll()
 end
 
 function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, visible)
@@ -45,23 +46,24 @@ function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, 
     comp.render = renderFunc
     comp.callback = callbackFunc
     comp.visible = visible or true
+    comp.focused = false
     components[id] = comp
     return id
 end
 
-function API.clear()
+function API.clearScreen()
     gpu.setForeground(baseForegroundColor, false)
     gpu.setBackground(baseBackgroundColor, false)
     gpu.fill(1,1,w,h," ")
 end
 
-function API.cleanup()
-    API.clear()
+function API.clearAll()
+    API.clearScreen()
     components = {}
 end
 
 function API.renderAll()
-    API.clear()
+    API.clearScreen()
     for i = 1, #components, 1 do
         components[i]:render()
     end
@@ -73,20 +75,22 @@ function API.render(componentID)
 end
 
 function API.click(x, y)
-    for id = 1, #components, 1 do
-        local comp = components[id]
+    local id = -1
+    for i = 1, #components, 1 do
+        local comp = components[i]
         if comp.visible then
             local xmax = comp.x + comp.width-1
             local ymax = comp.y + comp.height-1
-            if x >= comp.x and x <= xmax then
-                if y >= comp.y and y <= ymax then
-                    if comp.callback ~= nil then comp:callback(x, y) end
-                    return id
-                end
+            if x >= comp.x and x <= xmax and y >= comp.y and y <= ymax then
+                if comp.callback ~= nil then comp:callback(x, y) end
+                comp.focused = true
+                id = i
+            else
+                comp.focused = false
             end
         end
     end
-    return nil
+    return id
 end
 
 function API.setVisible(componentID, visible)
@@ -153,6 +157,7 @@ end
 -- DEFAULT COMPONENTS --
 --------------------------------------------
 
+-- Draws a simple Label
 function API.newLabel(x, y, width, height, label, centered, fgColor, bgColor)
     local state = {}
     state.text = label
@@ -160,9 +165,10 @@ function API.newLabel(x, y, width, height, label, centered, fgColor, bgColor)
     state.fgColor = fgColor or baseForegroundColor
     state.bgColor = bgColor or baseBackgroundColor
     local renderFunc = API.drawText(x, y, state.text, width, height, centered)
-    API.newComponent(x, y, width, height, state, renderFunc, nil)
+    return API.newComponent(x, y, width, height, state, renderFunc, nil)
 end
 
+-- Draws a Button that can be pressed
 function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, frame, callbackFunc)
     local state = {}
     state.text = label
@@ -190,9 +196,10 @@ function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
         self:render()
         if callbackFunc ~= nil then callbackFunc() end
     end
-    API.newComponent(x, y, width, height, state, renderFunc, callback)
+    return API.newComponent(x, y, width, height, state, renderFunc, callback)
 end
 
+-- Draws a Toggle that will have an activated state
 function API.newToggle(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, frame, callbackFunc)
     local state = {}
     state.text = label
@@ -216,9 +223,10 @@ function API.newToggle(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
         self:render()
         if callbackFunc ~= nil then callbackFunc(self, x, y) end
     end
-    API.newComponent(x, y, width, height, state, renderFunc, callback)
+    return API.newComponent(x, y, width, height, state, renderFunc, callback)
 end
 
+-- Draws a Horizontal/Vertical bar that represents a percentage between value/maxValue
 function API.newValueBar(x, y, width, height, value, maxValue, fillColor, bgColor, horizontal, frame)
     local state = {}
     state.value = value or 0
@@ -237,9 +245,10 @@ function API.newValueBar(x, y, width, height, value, maxValue, fillColor, bgColo
             API.drawRect(self.x+1, self.y+self.height-valLength, self.width-2, valLength+1, baseForegroundColor, self.state.fillColor, nil)
         end
     end
-    API.newComponent(x, y, width, height, state, renderFunc, nil)
+    return API.newComponent(x, y, width, height, state, renderFunc, nil)
 end
 
+-- Draws a Bar Chart of given values
 function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue, frame)
     local state = {}
     state.fillColor = fillColor
@@ -273,7 +282,29 @@ function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue,
         gpu.setForeground(oldFG, false)
         gpu.setBackground(oldBG, false)
     end
-    API.newComponent(x, y, width, height, state, renderFunc, nil)
+    return API.newComponent(x, y, width, height, state, renderFunc, nil)
+end
+
+-- Draws a single-line Text Input Field that can take in keyboard input
+function API.newInputField(x, y, width, height, fgColor, bgColor, frame, characterLimit)
+    -- Requires some thought on implementation
+    -- Requires the possibility to be focused and run a "input characters sequence" upon being clicked
+    -- Also, text should be wrapped inside the rect in a logical manner
+    local state = {}
+    state.text = ""
+    state.characterLimit = characterLimit
+    state.fgColor = fgColor
+    state.bgColor = bgColor
+    state.frame = frame
+    local renderFunc = function(self)
+        -- Render a textbox that encapsulates text
+        -- Upon being activated redraws constantly and displays an additional "cursor" appended to text
+    end
+    local callbackFunc = function(self, x, y)
+        -- Probably launches a blocking while loop that expects keyboard OR touch input
+        -- Enter, ESC or clicking away from the input field will end the input sequence
+        -- Clicking inside while activated will take the x-value and place "cursor" close to it
+    end
 end
 
 return API
