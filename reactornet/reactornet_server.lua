@@ -9,7 +9,7 @@ local fs = require("filesystem")
 local __SERVER_TYPES = {"controller", "monitor"}
 local __COMPONENT_TYPES = {
     [__SERVER_TYPES[1]] = {"br_reactor", "br_turbine"},
-    [__SERVER_TYPES[2]] = {},
+    [__SERVER_TYPES[2]] = {"induction_matrix"},
 }
 local __TARGET_ROTOR_SPEED = {
     900, 1800
@@ -19,6 +19,7 @@ local SETTINGS_PATH = "/etc/reactornet_server.cfg"
 local settings = {headless=false, targetRotorSpeed=1800, steamPerTurbine=2000}
 local reactorInfo = {}
 local turbinesInfo = {}
+local monitorInfo = {}
 local updateTimerID = 0
 
 -----------------------------------------------
@@ -93,7 +94,7 @@ local function setupServer()
     --Select server type
     settings = {headless=false, targetRotorSpeed=1800, steamPerTurbine=2000}
     termUI.clear()
-    termUI.write(1, 1, "ReactorNet Server | Setup - Server Type (1/6)")
+    termUI.write(1, 1, "ReactorNet Server | Setup - Server Type")
     termUI.write(1, 2, "Select Server type: \n")
     settings.server_type = __SERVER_TYPES[termUI.selectOptions(2, 3,__SERVER_TYPES)]
     
@@ -102,7 +103,7 @@ local function setupServer()
     local componentList = listAvailableComponents()
     if not componentList or #componentList == 0 then
         termUI.clear()
-        termUI.write(1, 1, "ReactorNet Server | Setup - Available Components (2/6)")
+        termUI.write(1, 1, "ReactorNet Server | Setup - Available Components")
         termUI.write(1, 2, "Error: no available components found! Aborting...", "error")
         os.exit()
     end
@@ -113,7 +114,7 @@ local function setupServer()
          componentLabels[i] = componentList[i][2].."("..string.sub(componentList[i][1],1,8).."...)"
     end
     termUI.clear()
-    termUI.write(1, 1, "ReactorNet Server | Setup - Available Components (2/6)")
+    termUI.write(1, 1, "ReactorNet Server | Setup - Available Components")
     termUI.write(1, 2, "Select components to connect to:")
     termUI.selectToggles(2, 3, componentLabels, selected)
     for i=1, #selected, 1 do
@@ -124,7 +125,7 @@ local function setupServer()
 
     -- Write a network ID
     termUI.clear()
-    termUI.write(1, 1, "ReactorNet Server | Setup - Network ID (3/6)")
+    termUI.write(1, 1, "ReactorNet Server | Setup - Network ID")
     local validID = false
     local id_postfix = ""
     while validID == false do
@@ -139,20 +140,23 @@ local function setupServer()
     end
     settings.network_id = "RNet_" .. settings.server_type .. "_" .. id_postfix
 
-    termUI.clear()
-    termUI.write(1, 1, "ReactorNet Server | Setup - Turbine Rotor Speed (4/6)")
-    termUI.write(1, 2, "Select target Turbine Rotor Speed (900/1800 RPM):")
-    settings.targetRotorSpeed = __TARGET_ROTOR_SPEED[termUI.selectOptions(2, 3,__TARGET_ROTOR_SPEED)]
+    -- Set Turbine settings if this is a controller
+    if settings.server_type == "controller" then
+        termUI.clear()
+        termUI.write(1, 1, "ReactorNet Server | Setup - Turbine Rotor Speed")
+        termUI.write(1, 2, "Select target Turbine Rotor Speed (900/1800 RPM):")
+        settings.targetRotorSpeed = __TARGET_ROTOR_SPEED[termUI.selectOptions(2, 3,__TARGET_ROTOR_SPEED)]
+
+        termUI.clear()
+        termUI.write(1, 1, "ReactorNet Server | Setup - Steam per Turbine")
+        termUI.write(1, 2, "Specify target Steam per Turbine (0-2000 mb/t):\n")
+        local steamValue = termUI.read(1, 3, false)
+        settings.steamPerTurbine = lmath.clamp(tonumber(steamValue), 0, 2000)
+        setTurbines("setFluidFlowRateMax", {settings.steamPerTurbine})
+    end
 
     termUI.clear()
-    termUI.write(1, 1, "ReactorNet Server | Setup - Steam per Turbine (5/6)")
-    termUI.write(1, 2, "Specify target Steam per Turbine (0-2000 mb/t):\n")
-    local steamValue = termUI.read(1, 3, false)
-    settings.steamPerTurbine = lmath.clamp(tonumber(steamValue), 0, 2000)
-    setTurbines("setFluidFlowRateMax", {settings.steamPerTurbine})
-
-    termUI.clear()
-    termUI.write(1, 1, "ReactorNet Server | Setup - Verbosity (6/6)")
+    termUI.write(1, 1, "ReactorNet Server | Setup - Verbosity")
     termUI.write(1, 2, "Select server verbosity mode:\n")
     local modenum = termUI.selectOptions(2, 3, {"normal", "headless"})
     settings.headless = modenum == 2
@@ -222,6 +226,23 @@ local function updateControl()
     end
 end
 
+-- Update the total energy amount in the network
+local function updateMonitor()
+    monitorInfo.totalEnergy = 0
+    monitorInfo.totalEnergyMax = 0
+    monitorInfo.input = 0
+    monitorInfo.output = 0
+    for type,list in settings.components do
+        for i = 1, #list, 1 do
+            local proxy = component.proxy(list[i])
+            monitorInfo.totalEnergy = monitorInfo.totalEnergy + proxy.getEnergy()
+            monitorInfo.totalEnergyMax = monitorInfo.totalEnergyMax + proxy.getEnergyMax()
+            monitorInfo.input = monitorInfo.input + proxy.getInput()
+            monitorInfo.output = monitorInfo.output + proxy.getOutput()
+        end
+    end
+end
+
 local function setActive(active)
     local proxy = component.proxy(settings.components["br_reactor"][1])
     reactorInfo.controlRodLevel = 0
@@ -234,7 +255,6 @@ local function setActive(active)
 end
 
 local function closeServer()
-    setActive(false)
     event.cancel(updateTimerID)
     termUI.clear()
     termUI.write(1,1, "ReactorNet Server | Closing...")
@@ -244,20 +264,35 @@ end
 
 local function runServer()
     termUI.clear()
-    setActive(true)
-    updateControl()
-    updateTimerID = event.timer(2, updateControl, math.huge)
-    while event.pull(2, "interrupted") == nil do
-        --do server stuff
-        if not settings.headless then
-            termUI.write(1,1, settings.network_id.." | Running...")
-            termUI.write(1,2,"Reactor Steam: "..tostring(reactorInfo.hotFluidProduced))
-            termUI.write(1,3,"Reactor Fuel: "..tostring(reactorInfo.fuelAmount).."/"..tostring(reactorInfo.fuelAmountMax))
-            termUI.write(1,4,"Reactor Control Rods: "..tostring(reactorInfo.controlRodLevel))
-            if reactorInfo.isActivelyCooled then
-                termUI.write(1,5,"Turbines: "..tostring(turbinesInfo.turbineCount))
-                termUI.write(1,6,"Turbine Rotor Speed: "..tostring(math.floor(turbinesInfo.averageRotorSpeed)).."/"..tostring(settings.targetRotorSpeed))
-                termUI.write(1,7,"Turbine RF/tick: "..tostring(lmath.round(turbinesInfo.totalEnergyProduced, 2)))
+    if settings.server_type == "controller" then
+        setActive(true)
+        updateControl()
+        updateTimerID = event.timer(2, updateControl, math.huge)
+        while event.pull(2, "interrupted") == nil do
+            --do reactor controlling stuff
+            if not settings.headless then
+                termUI.write(1,1, settings.network_id.." | Running...")
+                termUI.write(1,2,"Reactor Steam: "..tostring(reactorInfo.hotFluidProduced))
+                termUI.write(1,3,"Reactor Fuel: "..tostring(reactorInfo.fuelAmount).."/"..tostring(reactorInfo.fuelAmountMax))
+                termUI.write(1,4,"Reactor Control Rods: "..tostring(reactorInfo.controlRodLevel))
+                if reactorInfo.isActivelyCooled then
+                    termUI.write(1,5,"Turbines: "..tostring(turbinesInfo.turbineCount))
+                    termUI.write(1,6,"Turbine Rotor Speed: "..tostring(math.floor(turbinesInfo.averageRotorSpeed)).."/"..tostring(settings.targetRotorSpeed))
+                    termUI.write(1,7,"Turbine RF/tick: "..tostring(lmath.round(turbinesInfo.totalEnergyProduced, 2)))
+                end
+            end
+        end
+        setActive(false)
+    else
+        updateMonitor()
+        updateTimerID = event.timer(2, updateMonitor, math.huge)
+        while event.pull(2, "interrupted") == nil do
+            -- do monitoring stuff
+            if not settings.headless then
+                termUI.write(1,1, settings.network_id.." | Running...")
+                termUI.write(1,2, "Total RF: "..tostring(monitorInfo.totalEnergy).."/"..tostring(monitorInfo.totalEnergyMax))
+                termUI.write(1,2, "RF/t Input: "..tostring(monitorInfo.input))
+                termUI.write(1,2, "RF/t Output: "..tostring(monitorInfo.output))
             end
         end
     end
@@ -286,6 +321,7 @@ end
 while event.pull(0.05, "interrupted") == nil do
     termUI.clear()
     termUI.write(1, 1, "ReactorNet Server | Launch \n")
+    termUI.write(1, 2, settings.network_id)
     local option = termUI.selectOptions(2, 3, {"Start", "Setup", "Exit"})
     if option == 1 then 
         return runServer()
