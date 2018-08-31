@@ -3,6 +3,7 @@ local serialization = require("serialization")
 local fs = require("filesystem")
 local net = require("libnet")
 local event = require("event")
+local gui = require("libcgui")
 
 local settings = {}
 local SETTINGS_PATH = "/etc/reactornet_client.cfg"
@@ -38,16 +39,26 @@ local function saveSettings()
     file:close()
 end
 
-local function setupClient()
+local function launchScreenGUI()
+    -- Draw launch gui with Start, Setup and Exit
+    local cX = gui.percentX(0.5)
+    local cY = gui.percentY(0.5)
+    gui.clear()
+    gui.newButton(cX-8, cY-6, 16, 3, "Start", 0xCCCCCC, 0xFFFFFF, 0x2299CC, 0x44AAFF, "light", runClient)
+    gui.newButton(cX-8, cY-2, 16, 3, "Setup", 0xCCCCCC, 0xFFFFFF, 0x2299CC, 0x44AAFF, "light", setupClient)
+    gui.newButton(cX-8, cY+2, 16, 3, "Exit", 0xCCCCCC, 0xFFFFFF, 0x2299CC, 0x44AAFF, "light", function() os.exit() end)
+end
+
+local function mainScreenGUI()
 
 end
 
-local function gatherAllServers()
-
+local function setupClient()
+    print("SETUP CLIENT")
 end
 
 local function runClient()
-
+    print("RUNNING CLIENT")
 end
 
 local function closeClient()
@@ -58,10 +69,15 @@ end
 -- MAIN LOOP --
 -----------------------------------------------
 
-if loadSettings() == false then
-    setupClient()
-end
+-- if loadSettings() == false then
+--     setupClient()
+-- end
 
+gui.init()
+launchScreenGUI()
 while event.pull(0.05, "interrupted") == nil do
-    -- Draw launch gui with Start, Setup and Exit
+    local _, _, x, y = event.pull(updateInterval, "touch")
+    if x and y then
+        gui.click(x, y)
+    end
 end
