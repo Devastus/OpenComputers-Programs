@@ -182,8 +182,8 @@ local function updateControl()
     if reactorInfo.isActivelyCooled then
         turbinesInfo.averageRotorSpeed = 0
         turbinesInfo.turbineCount = #settings.components["br_turbine"]
-        for i,v in ipairs(settings.components["br_turbine"]) do
-            local turbineProxy = component.proxy(v)
+        for i = 1, turbinesInfo.turbineCount, 1 do
+            local turbineProxy = component.proxy(settings.components["br_turbine"][i])
             turbinesInfo[i].active = turbineProxy.getActive()
             turbinesInfo[i].energyStored = turbineProxy.getEnergyStored()
             turbinesInfo[i].rotorSpeed = turbineProxy.getRotorSpeed()
