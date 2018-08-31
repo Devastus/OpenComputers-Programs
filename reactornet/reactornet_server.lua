@@ -20,6 +20,7 @@ local settings = {headless=false, targetRotorSpeed=1800, steamPerTurbine=2000}
 local reactorInfo = {}
 local turbinesInfo = {}
 local monitorInfo = {}
+local JtoRFmult = 0.4
 local updateTimerID = 0
 
 -----------------------------------------------
@@ -232,14 +233,14 @@ local function updateMonitor()
     monitorInfo.totalEnergyMax = 0
     monitorInfo.input = 0
     monitorInfo.output = 0
-    for t = 1, #settings.components, 1 do
-        for i = 1, #settings.components[t], 1 do
-            local proxy = component.proxy(settings.components[t][i])
-            monitorInfo.totalEnergy = monitorInfo.totalEnergy + proxy.getEnergy()
-            monitorInfo.totalEnergyMax = monitorInfo.totalEnergyMax + proxy.getEnergyMax()
-            monitorInfo.input = monitorInfo.input + proxy.getInput()
-            monitorInfo.output = monitorInfo.output + proxy.getOutput()
-        end
+
+    -- Mekanism Induction Matrix
+    for i = 1, #settings.components["induction_matrix"], 1 do
+        local proxy = component.proxy(settings.components[t][i])
+        monitorInfo.totalEnergy = monitorInfo.totalEnergy + (proxy.getEnergy() * JtoRFmult)
+        monitorInfo.totalEnergyMax = monitorInfo.totalEnergyMax + (proxy.getEnergyMax() * JtoRFmult)
+        monitorInfo.input = monitorInfo.input + (proxy.getInput() * JtoRFmult)
+        monitorInfo.output = monitorInfo.output + (proxy.getOutput() * JtoRFmult)
     end
 end
 
