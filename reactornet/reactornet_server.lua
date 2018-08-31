@@ -184,6 +184,9 @@ local function updateControl()
         turbinesInfo.turbineCount = #settings.components["br_turbine"]
         for i = 1, turbinesInfo.turbineCount, 1 do
             local turbineProxy = component.proxy(settings.components["br_turbine"][i])
+            if turbinesInfo[i] == nil then
+                turbinesInfo[i] = {}
+            end
             turbinesInfo[i].active = turbineProxy.getActive()
             turbinesInfo[i].energyStored = turbineProxy.getEnergyStored()
             turbinesInfo[i].rotorSpeed = turbineProxy.getRotorSpeed()
