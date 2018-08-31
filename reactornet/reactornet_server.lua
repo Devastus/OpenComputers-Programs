@@ -232,9 +232,9 @@ local function updateMonitor()
     monitorInfo.totalEnergyMax = 0
     monitorInfo.input = 0
     monitorInfo.output = 0
-    for type,list in settings.components do
-        for i = 1, #list, 1 do
-            local proxy = component.proxy(list[i])
+    for t = 1, #settings.components, 1 do
+        for i = 1, #settings.components[t], 1 do
+            local proxy = component.proxy(settings.components[t][i])
             monitorInfo.totalEnergy = monitorInfo.totalEnergy + proxy.getEnergy()
             monitorInfo.totalEnergyMax = monitorInfo.totalEnergyMax + proxy.getEnergyMax()
             monitorInfo.input = monitorInfo.input + proxy.getInput()
