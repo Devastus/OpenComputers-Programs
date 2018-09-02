@@ -38,8 +38,15 @@ function contexts.mainScreenGUI()
     local sidepanelW = gui.width() - monW
     -- FIXME: this is all just template designing stuff
     local powerMax = 100000
-    local powervalues = {73500, 34600, 96500, 81200, 63000, 12300, 54000, 100000}
-    local powerchart = gui.newChart(1, 1, monW, gui.height(), 0x00FF00, 0x000000, powervalues, powerMax, "heavy")
+    local powerQueue = queue.new(6)
+    powerQueue.pushright(73500)
+    powerQueue.pushright(34600)
+    powerQueue.pushright(96500)
+    powerQueue.pushright(81200)
+    powerQueue.pushright(63000)
+    powerQueue.pushright(12300)
+    powerQueue.pushright(100000)
+    local powerchart = gui.newChart(1, 1, monW, gui.height(), 0x00FF00, 0x000000, powerQueue.values, powerMax, "heavy")
     gui.render(powerchart)
     -- gui.drawRect(1, 1, monW, gui.height(), 0xFFFFFF, 0x000000, "heavy")
     --gui.drawText(1, 1, monW, 1, "Monitor", 0xFFFFFF, 0x000000, true)
