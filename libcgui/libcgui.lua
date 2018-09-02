@@ -228,7 +228,7 @@ function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
     return API.newComponent(x, y, width, height, state, renderFunc, callback)
 end
 
--- Draws a Toggle that will have an activated state
+-- Draws a Button that will keep it's state (and toggle it upon press)
 function API.newToggle(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, frame, callbackFunc)
     local state = {}
     state.text = label
@@ -315,7 +315,7 @@ function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue,
 end
 
 -- Draws a single-line Text Input Field that can take in keyboard input
-function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit)
+function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit, onChangeCallback)
     local state = {}
     state.text = ""
     state.characterLimit = characterLimit
@@ -327,13 +327,14 @@ function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit
     local renderFunc = function(self)
         -- Render a textbox that encapsulates text
         -- Upon being activated redraws constantly and displays an additional "cursor" appended to text
-        local widthDiff = math.min((#self.state.text+1) - self.width, 0)
         if self.state.active then
             API.drawRect(self.x, self.y, self.width, 1, self.state.fgOn, self.state.bgOn, nil)
+            local widthDiff = math.max((#self.state.text+1) - self.width, 0)
             local shownText = string.sub(self.state.text.."|", 1+widthDiff)
             API.drawText(self.x, self.y, self.width, 1, shownText, self.state.fgOn, self.state.bgOn, false)
         else
             API.drawRect(self.x, self.y, self.width, 1, self.state.fgOff, self.state.bgOff, nil)
+            local widthDiff = math.max(#self.state.text - self.width, 0)
             local shownText = string.sub(self.state.text, 1+widthDiff)
             API.drawText(self.x, self.y, self.width, 1, shownText, self.state.fgOff, self.state.bgOff, false)
         end
@@ -350,6 +351,7 @@ function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit
                 if ev == "interrupted" then
                     self.state.active = false
                     self:render()
+                    if onChangeCallback ~= nil then onChangeCallback(self.state.text) end
                     break
                 elseif ev == "key_down" then
                     local space_char = 32
@@ -372,6 +374,7 @@ function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit
                     elseif p2 == enter_char then
                         self.state.active = false
                         self:render()
+                        if onChangeCallback ~= nil then onChangeCallback(self.state.text) end
                         break
                     end
                     self:render()
@@ -379,6 +382,7 @@ function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit
                     if not self:contains(p2, p3) then
                         self.state.active = false
                         self:render()
+                        if onChangeCallback ~= nil then onChangeCallback(self.state.text) end
                         break
                     end
                 end

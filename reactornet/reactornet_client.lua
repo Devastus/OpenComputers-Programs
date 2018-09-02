@@ -4,7 +4,7 @@ local event = require("event")
 local gui = require("libcgui")
 
 local updateInterval = 0.05
-local servers = {controller={}, monitor={}}
+local settings = {servers = {controller={}, monitor={}}}
 
 -----------------------------------------------
 -- METHODS --
@@ -27,7 +27,7 @@ local function setupClient()
     local cY = gui.percentY(0.5)
     gui.newLabel(cX-16, cY-2, 32, 1, "ReactorNet Client | Setup", true)
     gui.newLabel(cX-16, cY, 32, 1, "Network ID", true)
-    local networkID_inputfield = gui.newInputField(cX-16, cY+1, 32, 0xFFFFFF, 0xCCCCCC, 0x444444, 0x222222, 16)
+    local networkID_inputfield_id = gui.newInputField(cX-16, cY+1, 32, 0xFFFFFF, 0xCCCCCC, 0x444444, 0x222222, 16, function(id) settings.network_id = "client_"..id end)
     gui.renderAll()
 end
 
@@ -67,7 +67,7 @@ end
 gui.init()
 net.open(1337, "RNet")
 launchScreenGUI()
-while event.pull(0.01, "interrupted") == nil do
+while event.pull("interrupted") == nil do
     local _, _, x, y = event.pull(updateInterval, "touch")
     if x and y then
         gui.click(x, y)
