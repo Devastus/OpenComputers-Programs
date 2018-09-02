@@ -4,7 +4,7 @@ local event = require("event")
 local gui = require("libcgui")
 local queue = require("libqueue")
 
-local updateInterval = 0.01
+local updateInterval = 0.1
 local contexts = {}
 local settings = {servers = {controller={}, monitor={}}}
 local powerQueue = queue.new(12)
@@ -95,7 +95,7 @@ function contexts.mainScreenGUI()
     for i=1, maxReactorCount, 1 do
         local buttonWidth = sidepanelW-2
         local button_y = 2 + (i-1) * 3
-        newReactorButton(monW+1, button_y, buttonWidth, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x22DD55, 0xDD5522, "light")
+        newReactorButton(monW+1, button_y, buttonWidth, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x22CC55, 0xCC5522, "light")
     end
     gui.renderAll()
 end
