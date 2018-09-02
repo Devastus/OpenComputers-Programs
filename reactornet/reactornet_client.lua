@@ -34,7 +34,7 @@ end
 
 local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bgOn, bgOff, frame, callback)
     local state = {}
-    state.reactor_id = reactor_id
+    state.reactor_id = reactor_id or ""
     state.energyProduced = 0
     state.averageRotorSpeed = 0
     state.active = false
@@ -51,7 +51,7 @@ local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bg
         else
             gui.drawRect(self.x, self.y, self.width, self.height, self.fgOff, self.bgOff, frame)
             gui.drawText(self.x, self.y, self.width, 1, self.state.reactor_id, self.fgOff, self.bgOff, true)
-            gui.drawText(self.x, self.y+1, self.width, 1, "disabled", self.fgOn, self.bgOn, true)
+            gui.drawText(self.x, self.y+1, self.width, 1, "disabled", self.fgOff, self.bgOff, true)
         end
     end
     local callbackFunc = function(self, x, y)
@@ -84,11 +84,11 @@ function contexts.mainScreenGUI()
 
     powermonitor_id = gui.newChart(1, 1, monW, gui.height(), 0x00FF00, 0x000000, powerQueue.values, powerMax, "heavy")
     gui.newContainer(monW, 1, sidepanelW, gui.height(), 0xFFFFFF, 0x000000, "heavy")
-    for i=1, 3, 1 do
-        local width = monW-2
-        local y = (i-1) * 3
-        newReactorButton(monW+1, y, width, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x55CC77, 0xCC7755, "light", nil)
-    end
+    -- for i=1, 3, 1 do
+    --     local width = monW-2
+    --     local y = (i-1) * 3
+    --     newReactorButton(monW+1, y, width, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x55CC77, 0xCC7755, "light", nil)
+    -- end
     gui.renderAll()
 end
 
