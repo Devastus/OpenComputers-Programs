@@ -49,17 +49,17 @@ local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bg
     state.frame = frame or nil
     local renderFunc = function(self)
         if self.state.active then
-            gui.drawRect(self.x, self.y, self.width, self.height, self.fgOn, self.bgOn, frame)
-            gui.drawText(self.x, self.y, self.width, 1, self.state.reactor_id, self.fgOn, self.bgOn, true)
-            gui.drawText(self.x, self.y+1, self.width, 1, tostring(self.state.energyProduced), self.fgOn, self.bgOn, true)
+            gui.drawRect(self.x, self.y, self.width, self.height, self.state.fgOn, self.state.bgOn, self.state.frame)
+            gui.drawText(self.x, self.y, self.width, 1, self.state.reactor_id, self.state.fgOn, self.state.bgOn, true)
+            gui.drawText(self.x, self.y+1, self.width, 1, tostring(self.state.energyProduced), self.state.fgOn, self.state.bgOn, true)
         else
-            gui.drawRect(self.x, self.y, self.width, self.height, self.fgOff, self.bgOff, frame)
-            gui.drawText(self.x, self.y, self.width, 1, self.state.reactor_id, self.fgOff, self.bgOff, true)
-            gui.drawText(self.x, self.y+1, self.width, 1, "disabled", self.fgOff, self.bgOff, true)
+            gui.drawRect(self.x, self.y, self.width, self.height, self.state.fgOff, self.state.bgOff, self.state.frame)
+            gui.drawText(self.x, self.y, self.width, 1, self.state.reactor_id, self.state.fgOff, self.state.bgOff, true)
+            gui.drawText(self.x, self.y+1, self.width, 1, "disabled", self.state.fgOff, self.state.bgOff, true)
         end
     end
     local callbackFunc = function(self, x, y)
-        toggleReactor(self.reactor_id)
+        toggleReactor(self.state.reactor_id)
     end
     return gui.newComponent(x, y, width, height, state, renderFunc, callbackFunc)
 end
