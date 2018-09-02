@@ -83,7 +83,7 @@ end
 -- MAIN LOOP --
 -----------------------------------------------
 
-gui.init()
+gui.init(0xFFFFFF, 0x000000, 80, 25)
 net.open(1337, "RNet")
 contexts.launchScreenGUI()
 while event.pull(updateInterval, "interrupted") == nil do
