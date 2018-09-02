@@ -7,6 +7,8 @@ local queue = require("libqueue")
 local updateInterval = 0.01
 local contexts = {}
 local settings = {servers = {controller={}, monitor={}}}
+local powerQueue = queue.new(12)
+local powermonitor_id = -1
 
 -----------------------------------------------
 -- METHODS --
@@ -30,15 +32,47 @@ local function closeClient()
     os.exit()
 end
 
+local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bgOn, bgOff, frame, callback)
+    local state = {}
+    state.reactor_id = reactor_id
+    state.energyProduced = 0
+    state.averageRotorSpeed = 0
+    state.active = false
+    state.fgOn = fgOn
+    state.fgOff = fgOff
+    state.bgOn = bgOn
+    state.bgOff = bgOff
+    state.frame = frame or nil
+    local renderFunc = function(self)
+        if self.state.active then
+            gui.drawRect(self.x, self.y, self.width, self.height, self.fgOn, self.bgOn, frame)
+            gui.drawText(self.x, self.y, self.width, 1, self.state.reactor_id, self.fgOn, self.bgOn, true)
+            gui.drawText(self.x, self.y+1, self.width, 1, tostring(self.state.energyProduced), self.fgOn, self.bgOn, true)
+        else
+            gui.drawRect(self.x, self.y, self.width, self.height, self.fgOff, self.bgOff, frame)
+            gui.drawText(self.x, self.y, self.width, 1, self.state.reactor_id, self.fgOff, self.bgOff, true)
+            gui.drawText(self.x, self.y+1, self.width, 1, "disabled", self.fgOn, self.bgOn, true)
+        end
+    end
+    local callbackFunc = function(self, x, y)
+        if callback ~= nil then callback(reactor_id) end
+    end
+    return gui.newComponent(x, y, width, height, state, renderFunc, callbackFunc)
+end
+
+local function onMonitorUpdate()
+    local monitor_component = gui.getComponent(powermonitor_id)
+    monitor_component.values = powerQueue.values
+    gui.render(powermonitor_id)
+end
+
 function contexts.mainScreenGUI()
     -- Draw a Power Chart of total energy numbers from monitors
     -- Draw a list of buttons for reactor controllers
     gui.clearAll()
     local monW = gui.percentX(0.7)
     local sidepanelW = gui.width() - monW
-    -- FIXME: this is all just template designing stuff
     local powerMax = 100000
-    local powerQueue = queue.new(6)
     powerQueue:pushright(73500)
     powerQueue:pushright(34600)
     powerQueue:pushright(96500)
@@ -46,12 +80,16 @@ function contexts.mainScreenGUI()
     powerQueue:pushright(63000)
     powerQueue:pushright(12300)
     powerQueue:pushright(100000)
-    local powerchart = gui.newChart(1, 1, monW, gui.height(), 0x00FF00, 0x000000, powerQueue.values, powerMax, "heavy")
-    gui.render(powerchart)
-    -- gui.drawRect(1, 1, monW, gui.height(), 0xFFFFFF, 0x000000, "heavy")
-    --gui.drawText(1, 1, monW, 1, "Monitor", 0xFFFFFF, 0x000000, true)
-    gui.drawRect(monW, 1, sidepanelW, gui.height(), 0xFFFFFF, 0x000000, "heavy")
-    gui.drawText(monW, 1, sidepanelW, 1, "Reactors", 0xFFFFFF, 0x000000, true)
+    -- FIXME: this is all just template designing stuff
+
+    powermonitor_id = gui.newChart(1, 1, monW, gui.height(), 0x00FF00, 0x000000, powerQueue.values, powerMax, "heavy")
+    gui.newContainer(monW, 1, sidepanelW, gui.height(), 0xFFFFFF, 0x000000, "heavy")
+    for i=1, 3, 1 do
+        local width = monW-2
+        local y = (i-1) * 3
+        newReactorButton(monW+1, y, width, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x55CC77, 0xCC7755, "light")
+    end
+    gui.renderAll()
 end
 
 function contexts.setupScreenGUI()
@@ -92,3 +130,4 @@ while event.pull(updateInterval, "interrupted") == nil do
         gui.click(x, y)
     end
 end
+closeClient()

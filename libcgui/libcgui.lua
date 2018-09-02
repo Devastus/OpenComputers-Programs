@@ -208,6 +208,18 @@ function API.newLabel(x, y, width, height, label, centered, fgColor, bgColor)
     return API.newComponent(x, y, width, height, state, renderFunc, nil)
 end
 
+-- Draws a rect
+function API.newContainer(x, y, width, height, fgColor, bgColor, frame)
+    local state = {}
+    state.fgColor = fgColor
+    state.bgColor = bgColor
+    state.frame = frame
+    local renderFunc = function(self)
+        API.drawRect(self.x, self.y, self.width, self.height, self.fgColor, self.bgColor, self.frame)
+    end
+    return API.newComponent(x, y, width, height, state, renderFunc, nil)
+end
+
 -- Draws a Button that can be pressed
 function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, frame, callbackFunc)
     local state = {}
