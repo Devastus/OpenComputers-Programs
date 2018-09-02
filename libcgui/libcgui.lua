@@ -323,7 +323,7 @@ function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit
     local renderFunc = function(self)
         -- Render a textbox that encapsulates text
         -- Upon being activated redraws constantly and displays an additional "cursor" appended to text
-        local widthDiff = math.min((#text+1) - self.width, 0)
+        local widthDiff = math.min((#self.state.text+1) - self.width, 0)
         if self.state.active then
             API.drawRect(self.x, self.y, self.width, 1, self.state.fgOn, self.state.bgOn, nil)
             local shownText = string.sub(self.state.text.."|", 1+widthDiff)
