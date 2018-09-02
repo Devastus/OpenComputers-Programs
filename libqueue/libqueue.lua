@@ -1,11 +1,6 @@
 local QUEUE = {}
 
-function QUEUE.new(queueLimit)
-    local limit = queueLimit or 0
-    return {first = 0, last = -1, limit = limit, values={}}
-end
-
-function QUEUE.pushleft(self, value)
+local function pushleft(self, value)
     local first = self.first - 1
     self.first = first
     self.values[first] = value
@@ -14,7 +9,7 @@ function QUEUE.pushleft(self, value)
     end
 end
 
-function QUEUE.pushright(self, value)
+local function pushright(self, value)
     local last = self.last + 1
     self.last = last
     self.values[last] = value
@@ -23,7 +18,7 @@ function QUEUE.pushright(self, value)
     end
 end
 
-function QUEUE.popleft(self)
+local function popleft(self)
     local first = self.first
     if first > self.last then error("Queue is empty") return nil end
     local value = self.values[first]
@@ -32,13 +27,30 @@ function QUEUE.popleft(self)
     return value
 end
 
-function QUEUE.popright(self)
+local function popright(self)
     local last = self.last
     if last < self.first then error("Queue is empty") return nil end
     local value = self.values[last]
     self.values[last] = nil
     self.last = last - 1
     return value
+end
+
+local function clear(self)
+    self.first = 0
+    self.last = -1
+    self.values = {}
+end
+
+function QUEUE.new(queueLimit)
+    local limit = queueLimit or 0
+    local newQ = {first = 0, last = -1, limit = limit, values={}}
+    newQ.pushright = pushright
+    newQ.pushleft = pushleft
+    newQ.popright = popright
+    newQ.popleft = popleft
+    newQ.clear = clear
+    return newQ
 end
 
 return QUEUE
