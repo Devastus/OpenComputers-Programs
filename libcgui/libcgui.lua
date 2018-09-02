@@ -345,7 +345,7 @@ function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit
             self.state.active = true
             self:render()
             while self.state.active do
-                local ev, p0, p1, p2, p3, p4 = event.pull(_, ev, p0, p1, p2, p3, p4)
+                local ev, p1, p2, p3, p4, p5 = event.pull()
                 if ev == "interrupted" then
                     self.state.active = false
                     self:render()
@@ -362,20 +362,20 @@ function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit
                         if #self.state.text < self.state.characterLimit then
                             self.state.text = self.state.text..char
                         end
-                    elseif char == space_char then
+                    elseif p2 == space_char then
                         if #self.state.text < self.state.characterLimit then
                             self.state.text = self.state.text.." "
                         end
-                    elseif char == backspace_char then
+                    elseif p2 == backspace_char then
                         self.state.text = self.state.text:sub(1, -2)
-                    elseif char == enter_char then
+                    elseif p2 == enter_char then
                         self.state.active = false
                         self:render()
                         break
                     end
                     self:render()
                 elseif ev == "touch" then
-                    if not self:contains(p1, p2) then
+                    if not self:contains(p2, p3) then
                         self.state.active = false
                         self:render()
                         break
