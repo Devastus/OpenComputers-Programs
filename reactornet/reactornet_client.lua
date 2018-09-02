@@ -80,6 +80,8 @@ function contexts.mainScreenGUI()
     local botpanelH = gui.height() - mainH
     local monW = gui.percentX(0.7)
     local sidepanelW = gui.width() - monW
+
+    -- FIXME: this is all just template designing stuff
     local powerMax = 100000
     powerQueue:pushright(73500)
     powerQueue:pushright(34600)
@@ -88,25 +90,37 @@ function contexts.mainScreenGUI()
     powerQueue:pushright(63000)
     powerQueue:pushright(12300)
     powerQueue:pushright(100000)
-    -- FIXME: this is all just template designing stuff
 
-    powermonitor_id = gui.newChart(1, 1, monW, mainH, 0x00FF00, 0x000000, powerQueue.values, powerMax, "heavy")
-    gui.newContainer(monW, 1, sidepanelW, mainH, 0xFFFFFF, 0x000000, "heavy")
-    local maxReactorCount = math.floor((mainH-2) / 3)
-    for i=1, maxReactorCount, 1 do
-        local buttonWidth = sidepanelW-2
-        local button_y = 2 + (i-1) * 3
-        newReactorButton(monW+1, button_y, buttonWidth, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x22CC55, 0xCC5522, "light")
+
+    -- Draw power monitor, or a "debug message" if no monitors are available
+    if #settings["servers"]["monitor"] > 0 then
+        powermonitor_id = gui.newChart(1, 1, monW, mainH, 0x00FF00, 0x000000, powerQueue.values, powerMax, "heavy")
+    else
+        gui.newContainer(1, 1, monW, mainH, 0xFFFFFF, 0x000000, "heavy")
+        gui.newLabel(1, 1, monW, mainH, "No monitors available", 0xFFFFFF, 0x000000, true)
     end
 
-    local botBWidth = gui.width() / 3
-    gui.newButton(1, mainH+1, botBWidth, botpanelH, "Monitor", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil)
-    gui.newButton(botBWidth, mainH+1, botBWidth, botpanelH, "Settings", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil)
-    gui.newButton(botBWidth*2, mainH+1, botBWidth, botpanelH, "Shutdown", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, closeClient)
+    -- Draw reactor toggles, or a "debug message" if no reactors are available
+    gui.newContainer(monW, 1, sidepanelW, mainH, 0xFFFFFF, 0x000000, "heavy")
+    if #settings["servers"]["controller"] > 0 then
+        local maxReactorCount = math.floor((mainH-2) / 3)
+        for i=1, maxReactorCount, 1 do
+            local buttonWidth = sidepanelW-2
+            local button_y = 2 + (i-1) * 3
+            newReactorButton(monW+1, button_y, buttonWidth, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x22CC55, 0xCC5522, "light")
+        end
+    end
+
+    -- Draw bottom panel for context buttons
+    
+    local botBWidth = gui.width() / 5
+    gui.newButton(1, mainH+1, botBWidth, botpanelH, "Monitor", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.mainScreenGUI)
+    gui.newButton(botBWidth*2, mainH+1, botBWidth, botpanelH, "Settings", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.settingsScreenGUI)
+    gui.newButton(botBWidth*4, mainH+1, botBWidth, botpanelH, "Shutdown", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, closeClient)
     gui.renderAll()
 end
 
-function contexts.setupScreenGUI()
+function contexts.settingsScreenGUI()
     -- Set a network ID for this client
     -- Gather all egilible RNet servers for communication
     -- We need to separate monitors from controllers and toggle GUI features based on them
@@ -116,20 +130,26 @@ function contexts.setupScreenGUI()
     gui.newLabel(cX-16, cY-9, 32, 1, "ReactorNet Client | Setup", true)
     gui.newLabel(cX-16, cY-6, 32, 1, "Network ID (1-12 Characters)", true)
     gui.newInputField(cX-8, cY-5, 16, settings.network_id, 0xFFFFFF, 0xCCCCCC, 0x666666, 0x333333, 12, function(id) settings.network_id = "client_"..id end)
-    gui.newButton(cX-8, cY+9, 16, 3, "Save", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.launchScreenGUI)
+
+    local mainH = gui.percentY(0.9)
+    local botpanelH = gui.height() - mainH
+    local botBWidth = gui.width() / 5
+    gui.newButton(1, mainH+1, botBWidth, botpanelH, "Monitor", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.mainScreenGUI)
+    gui.newButton(botBWidth*2, mainH+1, botBWidth, botpanelH, "Settings", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.settingsScreenGUI)
+    gui.newButton(botBWidth*4, mainH+1, botBWidth, botpanelH, "Shutdown", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, closeClient)
     gui.renderAll()
 end
 
-function contexts.launchScreenGUI()
-    local cX = gui.percentX(0.5)
-    local cY = gui.percentY(0.5)
-    gui.clearAll()
-    gui.newLabel(cX-8, cY-9, 16, 3, "ReactorNet Client | Launch", true, 0xFFFFFF, 0x000000)
-    gui.newButton(cX-8, cY-6, 16, 3, "Start", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.mainScreenGUI)
-    gui.newButton(cX-8, cY-2, 16, 3, "Setup", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.setupScreenGUI)
-    gui.newButton(cX-8, cY+2, 16, 3, "Exit", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, closeClient)
-    gui.renderAll()
-end
+-- function contexts.launchScreenGUI()
+--     local cX = gui.percentX(0.5)
+--     local cY = gui.percentY(0.5)
+--     gui.clearAll()
+--     gui.newLabel(cX-8, cY-9, 16, 3, "ReactorNet Client | Launch", true, 0xFFFFFF, 0x000000)
+--     gui.newButton(cX-8, cY-6, 16, 3, "Start", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.mainScreenGUI)
+--     gui.newButton(cX-8, cY-2, 16, 3, "Setup", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.settingsScreenGUI)
+--     gui.newButton(cX-8, cY+2, 16, 3, "Exit", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, closeClient)
+--     gui.renderAll()
+-- end
 
 -----------------------------------------------
 -- MAIN LOOP --
@@ -137,7 +157,7 @@ end
 
 gui.init(0xFFFFFF, 0x000000, 80, 25)
 net.open(1337, "RNet")
-contexts.launchScreenGUI()
+contexts.mainScreenGUI()
 while event.pull(updateInterval, "interrupted") == nil do
     local _, _, x, y = event.pull(updateInterval, "touch")
     if x and y then
