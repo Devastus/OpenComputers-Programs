@@ -173,9 +173,10 @@ end
 --------------------------------------------
 
 local function isAlphanumeric(char)
-    local alphaNumeric = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    for c = 1, #alphaNumeric, 1 do
-        if char == alphaNumeric[c] then return true end
+    local alphanumeric = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    for i = 1, #alphanumeric, 1 do
+        local c = string.char(alphanumeric:byte(i))
+        if char == c then return true end
     end
     return false
 end
