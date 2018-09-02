@@ -112,7 +112,6 @@ function contexts.mainScreenGUI()
     end
 
     -- Draw bottom panel for context buttons
-    
     local botBWidth = gui.width() / 5
     gui.newButton(1, mainH+1, botBWidth, botpanelH, "Monitor", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.mainScreenGUI)
     gui.newButton(botBWidth*2, mainH+1, botBWidth, botpanelH, "Settings", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.settingsScreenGUI)
