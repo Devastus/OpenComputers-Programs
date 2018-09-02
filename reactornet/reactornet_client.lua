@@ -2,6 +2,7 @@ local component = require("component")
 local net = require("libnet")
 local event = require("event")
 local gui = require("libcgui")
+local queue = require("libqueue")
 
 local updateInterval = 0.01
 local contexts = {}
