@@ -18,7 +18,7 @@ local function runClient()
     -- If both are accessible, auto-control activation/deactivation of reactors based on total energy in battery
     
     gui.clearAll()
-
+    contexts.mainScreenGUI()
     gui.renderAll()
 end
 
@@ -35,10 +35,11 @@ function contexts.mainScreenGUI()
     gui.clearAll()
     local monW = gui.percentX(0.7)
     local sidepanelW = gui.width() - monW
+    -- FIXME: this is all just template designing stuff
     gui.drawRect(1, 1, monW, gui.height(), 0xFFFFFF, 0x000000, "heavy")
     gui.drawRect(monW, 1, sidepanelW, gui.height(), 0xFFFFFF, 0x000000, "heavy")
-    gui.newLabel(1,1,monW,1,"Monitor",0xFFFFFF,0x000000,true)
-    gui.renderAll()
+    gui.drawText(1, 1, monW, 1, "Monitor", 0xFFFFFF, 0x000000, true)
+    gui.drawText(monW, 1, sidepanelW, 1, "Reactors", 0xFFFFFF, 0x000000, true)
 end
 
 function contexts.setupScreenGUI()
