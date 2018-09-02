@@ -343,6 +343,7 @@ function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit
         -- Clicking inside while activated will take the x-value and place "cursor" close to it
         if not self.state.active then
             self.state.active = true
+            self:render()
             while self.state.active do
                 local ev, p0, p1, p2, p3, p4 = event.pull(_, ev, p0, p1, p2, p3, p4)
                 if ev == "interrupted" then
