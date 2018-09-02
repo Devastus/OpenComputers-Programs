@@ -264,6 +264,7 @@ local function closeServer()
     event.cancel(updateTimerID)
     termUI.clear()
     termUI.write(1,1, "ReactorNet Server | Closing...")
+    net.close()
     os.sleep(1)
     os.exit()
 end
@@ -324,6 +325,7 @@ else
 end 
 
 -- Present the launch screen
+net.open(1337, "RNet")
 while event.pull(0.05, "interrupted") == nil do
     termUI.clear()
     termUI.write(1, 1, "ReactorNet Server | Launch \n")
@@ -334,6 +336,7 @@ while event.pull(0.05, "interrupted") == nil do
     elseif option == 2 then 
         setupServer()
     else 
+        net.close()
         os.exit()
     end
 end

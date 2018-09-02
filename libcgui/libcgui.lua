@@ -1,5 +1,6 @@
 local component = require("component")
 local gpu = component.gpu
+local keyboard = require("keyboard")
 
 local API = {}
 local components = {}
@@ -47,6 +48,11 @@ function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, 
     comp.callback = callbackFunc
     comp.visible = visible or true
     comp.focused = false
+    comp.contains = function(self, x, y)
+        local xmax = self.x + self.width-1
+        local ymax = self.y + self.height-1
+        return x >= self.x and x <= xmax and y >= self.y and y <= ymax
+    end
     components[id] = comp
     return id
 end
@@ -79,9 +85,7 @@ function API.click(x, y)
     for i = 1, #components, 1 do
         local comp = components[i]
         if comp.visible then
-            local xmax = comp.x + comp.width-1
-            local ymax = comp.y + comp.height-1
-            if x >= comp.x and x <= xmax and y >= comp.y and y <= ymax then
+            if comp:contains(x, y) then
                 if comp.callback ~= nil then comp:callback(x, y) end
                 comp.focused = true
                 id = i
@@ -151,6 +155,18 @@ function API.drawText(x, y, text, fgColor, bgColor, centered, width, height)
     end
     gpu.setForeground(oldFG, false)
     gpu.setBackground(oldBG, false)
+end
+
+--------------------------------------------
+-- UTILITY METHODS --
+--------------------------------------------
+
+local function isAlphanumeric(char)
+    local alphaNumeric = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    for c = 1, #alphaNumeric, 1 do
+        if char == alphaNumeric[c] then return true end
+    end
+    return false
 end
 
 --------------------------------------------
@@ -286,25 +302,76 @@ function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue,
 end
 
 -- Draws a single-line Text Input Field that can take in keyboard input
-function API.newInputField(x, y, width, height, fgColor, bgColor, frame, characterLimit)
-    -- Requires some thought on implementation
-    -- Requires the possibility to be focused and run a "input characters sequence" upon being clicked
-    -- Also, text should be wrapped inside the rect in a logical manner
+function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit)
     local state = {}
     state.text = ""
     state.characterLimit = characterLimit
-    state.fgColor = fgColor
-    state.bgColor = bgColor
-    state.frame = frame
+    state.fgOn = fgOn
+    state.fgOff = fgOff
+    state.bgOn = bgOn
+    state.bgOff = bgOff
+    state.active = false
     local renderFunc = function(self)
         -- Render a textbox that encapsulates text
         -- Upon being activated redraws constantly and displays an additional "cursor" appended to text
+        local widthDiff = math.min((#text+1) - self.width, 0)
+        if self.state.active then
+            API.drawRect(self.x, self.y, self.width, 1, self.state.fgOn, self.state.bgOn, nil)
+            local shownText = string.sub(self.state.text.."|", 1+widthDiff)
+            API.drawText(self.x, self.y, shownText, self.state.fgOn, self.state.bgOn, false, self.width, 1)
+        else
+            API.drawRect(self.x, self.y, self.width, 1, self.state.fgOff, self.state.bgOff, nil)
+            local shownText = string.sub(self.state.text, 1+widthDiff)
+            API.drawText(self.x, self.y, shownText, self.state.fgOff, self.state.bgOff, false, self.width, 1)
+        end
     end
     local callbackFunc = function(self, x, y)
         -- Probably launches a blocking while loop that expects keyboard OR touch input
         -- Enter, ESC or clicking away from the input field will end the input sequence
         -- Clicking inside while activated will take the x-value and place "cursor" close to it
+        if not self.state.active then
+            self.state.active = true
+            while self.state.active do
+                local ev, p0, p1, p2, p3, p4 = event.pull(_, ev, p0, p1, p2, p3, p4)
+                if ev == "interrupted" then
+                    self.state.active = false
+                    self:render()
+                    break
+                elseif ev == "key_down" then
+                    local space_char = 32
+                    local enter_char = 13
+                    local backspace_char = 8
+                    local char = string.char(p2)
+                    if keyboard.isShiftDown() then
+                        char = string.upper(char)
+                    end
+                    if isAlphanumeric(char) then
+                        if #self.state.text < self.state.characterLimit then
+                            self.state.text = self.state.text..char
+                        end
+                    elseif char == space_char then
+                        if #self.state.text < self.state.characterLimit then
+                            self.state.text = self.state.text.." "
+                        end
+                    elseif char == backspace_char then
+                        self.state.text = self.state.text:sub(1, -2)
+                    elseif char == enter_char then
+                        self.state.active = false
+                        self:render()
+                        break
+                    end
+                    self:render()
+                elseif ev == "touch" then
+                    if not self:contains(p1, p2) then
+                        self.state.active = false
+                        self:render()
+                        break
+                    end
+                end
+            end
+        end
     end
+    return API.newComponent(x, y, width, height, state, renderFunc, callbackFunc)
 end
 
 return API

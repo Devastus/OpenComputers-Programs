@@ -28,6 +28,10 @@ local function printUsage()
     print("remove [-f] <...> \t\t Remove packages (-f:force remove dependencies)")
 end
 
+--------------------------------------------------
+--- PRIVATE METHODS ---
+--------------------------------------------------
+
 local function __getMultiPackNames(args)
     if args[2] then
         local result = {}
@@ -176,7 +180,7 @@ local function __getPack(packageName, settings, force, ignoreDependencies)
                         curFileIndex = curFileIndex + 1
                     else
                         io.stderr:write("spm-error: Error installing '"..packageName.."', file '"..dpath.."'. Aborting...\n")
-                        -- TODO: Revert changes
+                        -- TODO: Revert/remove changes
                         return false
                     end
                 end
@@ -215,11 +219,11 @@ local function __deletePack(packageName, settings, force, ignoreDependencies)
                 end
                 for i = 1, #package["dependencies"], 1 do
                     if force then
-                        __deletePack(package["dependencies"][i], settings, false)
+                        __deletePack(package["dependencies"][i], settings, false, false)
                     else
                         local deps = __tryFindDependencies(package["dependencies"][i], settings)
                         if not deps or #deps == 0 then
-                            __deletePack(package["dependencies"][i], settings, false)
+                            __deletePack(package["dependencies"][i], settings, false, false)
                         end
                     end
                 end
@@ -231,6 +235,10 @@ local function __deletePack(packageName, settings, force, ignoreDependencies)
         return false
     end
 end
+
+--------------------------------------------------
+--- PUBLIC METHODS ---
+--------------------------------------------------
 
 local function addRepository(repositoryUrl)
     -- Look for packages.cfg in given url, if found write it to settings
@@ -404,6 +412,10 @@ local function updatePackage(packageNames, reboot)
         end
     end
 end
+
+--------------------------------------------------
+--- MAIN ---
+--------------------------------------------------
 
 local args, options = shell.parse(...)
 if args[1] == "addrepo" then
