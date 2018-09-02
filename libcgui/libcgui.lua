@@ -104,6 +104,10 @@ function API.setVisible(componentID, visible)
     end
 end
 
+function API.getComponent(componentID)
+    return components[componentID]
+end
+
 --------------------------------------------
 -- PRIMITIVE DRAW METHODS --
 --------------------------------------------

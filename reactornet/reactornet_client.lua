@@ -38,7 +38,7 @@ local function setupClient()
     local cY = gui.percentY(0.5)
     gui.newLabel(cX-16, cY-2, 32, 1, "ReactorNet Client | Setup", true)
     gui.newLabel(cX-16, cY, 32, 1, "Network ID", true)
-    gui.newInputField(cX-16, cY+1, 32, 0xFFFFFF, 0xCCCCCC, 0x444444, 0x222222, 16)
+    local networkID_inputfield = gui.newInputField(cX-16, cY+1, 32, 0xFFFFFF, 0xCCCCCC, 0x444444, 0x222222, 16)
     gui.renderAll()
 end
 
