@@ -382,7 +382,7 @@ function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit
             end
         end
     end
-    return API.newComponent(x, y, width, height, state, renderFunc, callbackFunc)
+    return API.newComponent(x, y, width, 1, state, renderFunc, callbackFunc)
 end
 
 return API
