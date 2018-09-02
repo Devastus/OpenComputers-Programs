@@ -10,17 +10,6 @@ local servers = {controller={}, monitor={}}
 -- METHODS --
 -----------------------------------------------
 
-local function launchScreenGUI()
-    local cX = gui.percentX(0.5)
-    local cY = gui.percentY(0.5)
-    gui.clearAll()
-    gui.newLabel(cX-8, cY-9, 16, 3, "ReactorNet Client | Launch", true, 0xFFFFFF, 0x000000)
-    gui.newButton(cX-8, cY-6, 16, 3, "Start", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, "double", runClient)
-    gui.newButton(cX-8, cY-2, 16, 3, "Setup", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, "double", setupClient)
-    gui.newButton(cX-8, cY+2, 16, 3, "Exit", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, "double", closeClient)
-    gui.renderAll()
-end
-
 local function mainScreenGUI()
     -- Draw a Power Chart of total energy numbers from monitors
     -- Draw a list of buttons for reactor controllers
@@ -58,6 +47,17 @@ local function closeClient()
     net.close()
     gui.clearAll()
     os.exit()
+end
+
+local function launchScreenGUI()
+    local cX = gui.percentX(0.5)
+    local cY = gui.percentY(0.5)
+    gui.clearAll()
+    gui.newLabel(cX-8, cY-9, 16, 3, "ReactorNet Client | Launch", true, 0xFFFFFF, 0x000000)
+    gui.newButton(cX-8, cY-6, 16, 3, "Start", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, "double", runClient)
+    gui.newButton(cX-8, cY-2, 16, 3, "Setup", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, "double", setupClient)
+    gui.newButton(cX-8, cY+2, 16, 3, "Exit", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, "double", closeClient)
+    gui.renderAll()
 end
 
 -----------------------------------------------
