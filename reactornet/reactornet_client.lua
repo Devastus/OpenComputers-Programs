@@ -67,7 +67,7 @@ end
 gui.init()
 net.open(1337, "RNet")
 launchScreenGUI()
-while event.pull("interrupted") == nil do
+while event.pull(0.01, "interrupted") == nil do
     local _, _, x, y = event.pull(updateInterval, "touch")
     if x and y then
         gui.click(x, y)
