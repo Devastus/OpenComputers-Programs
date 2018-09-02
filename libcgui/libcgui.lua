@@ -315,9 +315,9 @@ function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue,
 end
 
 -- Draws a single-line Text Input Field that can take in keyboard input
-function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit, onChangeCallback)
+function API.newInputField(x, y, width, text, fgOn, fgOff, bgOn, bgOff, characterLimit, onChangeCallback)
     local state = {}
-    state.text = ""
+    state.text = text or ""
     state.characterLimit = characterLimit
     state.fgOn = fgOn
     state.fgOff = fgOff
