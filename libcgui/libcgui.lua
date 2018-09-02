@@ -1,4 +1,5 @@
 local component = require("component")
+local event = require("event")
 local gpu = component.gpu
 local keyboard = require("keyboard")
 
