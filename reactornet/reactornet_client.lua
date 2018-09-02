@@ -32,7 +32,11 @@ local function closeClient()
     os.exit()
 end
 
-local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bgOn, bgOff, frame, callback)
+local function toggleReactor(reactor_id)
+
+end
+
+local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bgOn, bgOff, frame)
     local state = {}
     state.reactor_id = reactor_id or ""
     state.energyProduced = 0
@@ -55,7 +59,7 @@ local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bg
         end
     end
     local callbackFunc = function(self, x, y)
-        if callback ~= nil then callback(self.reactor_id) end
+        toggleReactor(self.reactor_id)
     end
     return gui.newComponent(x, y, width, height, state, renderFunc, callbackFunc)
 end
@@ -87,7 +91,7 @@ function contexts.mainScreenGUI()
     -- for i=1, 3, 1 do
     --     local width = monW-2
     --     local y = (i-1) * 3
-    --     newReactorButton(monW+1, y, width, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x55CC77, 0xCC7755, "light", nil)
+    --     newReactorButton(monW+1, y, width, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x55CC77, 0xCC7755, "light")
     -- end
     gui.renderAll()
 end
