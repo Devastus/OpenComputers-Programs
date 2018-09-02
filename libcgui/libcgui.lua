@@ -145,11 +145,15 @@ function API.drawRect(x, y, width, height, fgColor, bgColor, frame)
     gpu.setBackground(oldBG, false)
 end
 
-function API.drawText(x, y, text, fgColor, bgColor, centered, width, height)
+function API.drawText(x, y, width, height, text, fgColor, bgColor, centered)
     local oldFG = gpu.getForeground()
     local oldBG = gpu.getBackground()
     gpu.setForeground(fgColor, false)
     gpu.setBackground(bgColor, false)
+    if #text > width then
+        local diff = #text - width
+        text = text:sub(1, -diff)
+    end
     if centered then
         local px = (x+width/2)-string.len(text)/2
         local py = (y+height/2)
@@ -185,7 +189,7 @@ function API.newLabel(x, y, width, height, label, centered, fgColor, bgColor)
     state.fgColor = fgColor or baseForegroundColor
     state.bgColor = bgColor or baseBackgroundColor
     local renderFunc = function(self)
-        API.drawText(self.x, self.y, self.state.text, self.state.fgColor, self.state.bgColor, self.state.centered, self.width, self.height)
+        API.drawText(self.x, self.y,  self.width, self.height, self.state.text, self.state.fgColor, self.state.bgColor, self.state.centered)
     end
     return API.newComponent(x, y, width, height, state, renderFunc, nil)
 end
@@ -203,12 +207,11 @@ function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
     local renderFunc = function(self)
         if self.state.active then
             API.drawRect(self.x, self.y, self.width, self.height, self.state.fgOn, self.state.bgOn, self.state.frame)
-            API.drawText(self.x, self.y, self.state.text, self.state.fgOn, self.state.bgOn, true, self.width, self.height)
+            API.drawText(self.x, self.y, self.width, self.height, self.state.text, self.state.fgOn, self.state.bgOn, true)
         else
             API.drawRect(self.x, self.y, self.width, self.height, self.state.fgOff, self.state.bgOff, self.state.frame)
-            API.drawText(self.x, self.y, self.state.text, self.state.fgOff, self.state.bgOff, true, self.width, self.height)
+            API.drawText(self.x, self.y, self.width, self.height, self.state.text, self.state.fgOff, self.state.bgOff, true)
         end
-        
     end
     local callback = function(self, x, y)
         self.state.active = true
@@ -234,10 +237,10 @@ function API.newToggle(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
     local renderFunc = function(self)
         if self.state.active then
             API.drawRect(self.x, self.y, self.width, self.height, self.state.fgOn, self.state.bgOn, self.state.frame)
-            API.drawText(self.x, self.y, self.state.text, self.state.fgOn, self.state.bgOn, true, self.width, self.height)
+            API.drawText(self.x, self.y, self.width, self.height, self.state.text, self.state.fgOn, self.state.bgOn, true)
         else
             API.drawRect(self.x, self.y, self.width, self.height, self.state.fgOff, self.state.bgOff, self.state.frame)
-            API.drawText(self.x, self.y, self.state.text, self.state.fgOff, self.state.bgOff, true, self.width, self.height)
+            API.drawText(self.x, self.y, self.width, self.height, self.state.text, self.state.fgOff, self.state.bgOff, true)
         end
     end
     local callback = function(self, x, y)
@@ -324,11 +327,11 @@ function API.newInputField(x, y, width, fgOn, fgOff, bgOn, bgOff, characterLimit
         if self.state.active then
             API.drawRect(self.x, self.y, self.width, 1, self.state.fgOn, self.state.bgOn, nil)
             local shownText = string.sub(self.state.text.."|", 1+widthDiff)
-            API.drawText(self.x, self.y, shownText, self.state.fgOn, self.state.bgOn, false, self.width, 1)
+            API.drawText(self.x, self.y, self.width, 1, shownText, self.state.fgOn, self.state.bgOn, false)
         else
             API.drawRect(self.x, self.y, self.width, 1, self.state.fgOff, self.state.bgOff, nil)
             local shownText = string.sub(self.state.text, 1+widthDiff)
-            API.drawText(self.x, self.y, shownText, self.state.fgOff, self.state.bgOff, false, self.width, 1)
+            API.drawText(self.x, self.y, self.width, 1, shownText, self.state.fgOff, self.state.bgOff, false)
         end
     end
     local callbackFunc = function(self, x, y)
