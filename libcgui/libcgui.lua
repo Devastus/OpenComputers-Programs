@@ -84,13 +84,15 @@ function API.click(x, y)
     local id = -1
     for i = 1, #components, 1 do
         local comp = components[i]
-        if comp.visible then
-            if comp:contains(x, y) then
-                if comp.callback ~= nil then comp:callback(x, y) end
-                comp.focused = true
-                id = i
-            else
-                comp.focused = false
+        if comp ~= nil then
+            if comp.visible then
+                if comp:contains(x, y) then
+                    if comp.callback ~= nil then comp:callback(x, y) end
+                    comp.focused = true
+                    id = i
+                else
+                    comp.focused = false
+                end
             end
         end
     end
