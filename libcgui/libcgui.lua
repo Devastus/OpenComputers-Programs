@@ -180,7 +180,7 @@ function API.newLabel(x, y, width, height, label, centered, fgColor, bgColor)
     state.centered = centered
     state.fgColor = fgColor or baseForegroundColor
     state.bgColor = bgColor or baseBackgroundColor
-    local renderFunc = API.drawText(x, y, state.text, width, height, centered)
+    local renderFunc = API.drawText(x, y, state.text, state.fgColor, state.bgColor, centered, width, height)
     return API.newComponent(x, y, width, height, state, renderFunc, nil)
 end
 
