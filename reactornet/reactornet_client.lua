@@ -55,7 +55,7 @@ local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bg
         end
     end
     local callbackFunc = function(self, x, y)
-        if callback ~= nil then callback(reactor_id) end
+        if callback ~= nil then callback(self.reactor_id) end
     end
     return gui.newComponent(x, y, width, height, state, renderFunc, callbackFunc)
 end
