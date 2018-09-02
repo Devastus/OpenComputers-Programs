@@ -309,7 +309,7 @@ function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue,
                 local v = clamp(self.state.values[i] / self.state.maxValue, 0, 1) * self.height
                 local vfloor = math.floor(v)
                 local frac = v - vfloor
-                gpu.fill(seg, self.y + (self.height-vfloor), segwidth, vfloor, asciiBox[3])
+                gpu.fill(seg, self.y + (self.height-vfloor-1), segwidth, vfloor, asciiBox[3])
                 if frac > 0.0 then
                     local halfs = math.floor(frac / 0.5) + 1
                     gpu.fill(seg, self.y + (self.height-vfloor-1), segwidth, 1, asciiBox[halfs])
