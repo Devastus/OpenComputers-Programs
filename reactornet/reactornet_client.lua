@@ -76,7 +76,7 @@ function contexts.mainScreenGUI()
     -- Draw a Power Chart of total energy numbers from monitors
     -- Draw a list of buttons for reactor controllers
     gui.clearAll()
-    local mainH = gui.percentY(0.8)
+    local mainH = gui.percentY(0.9)
     local botpanelH = gui.height() - mainH
     local monW = gui.percentX(0.7)
     local sidepanelW = gui.width() - monW
@@ -100,9 +100,9 @@ function contexts.mainScreenGUI()
     end
 
     local botBWidth = gui.width() / 3
-    gui.newButton(1, mainH, botBWidth, botpanelH, "Monitor", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil)
-    gui.newButton(botBWidth, mainH, botBWidth, botpanelH, "Settings", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil)
-    gui.newButton(botBWidth*2, mainH, botBWidth, botpanelH, "Shutdown", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil)
+    gui.newButton(1, mainH+1, botBWidth, botpanelH, "Monitor", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil)
+    gui.newButton(botBWidth, mainH+1, botBWidth, botpanelH, "Settings", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil)
+    gui.newButton(botBWidth*2, mainH+1, botBWidth, botpanelH, "Shutdown", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, closeClient)
     gui.renderAll()
 end
 
