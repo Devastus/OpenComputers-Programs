@@ -196,7 +196,7 @@ end
 --------------------------------------------
 
 -- Draws a simple Label
-function API.newLabel(x, y, width, height, label, centered, fgColor, bgColor)
+function API.newLabel(x, y, width, height, label, fgColor, bgColor, centered)
     local state = {}
     state.text = label
     state.centered = centered
