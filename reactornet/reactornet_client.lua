@@ -91,9 +91,10 @@ function contexts.mainScreenGUI()
 
     powermonitor_id = gui.newChart(1, 1, monW, h, 0x00FF00, 0x000000, powerQueue.values, powerMax, "heavy")
     gui.newContainer(monW, 1, sidepanelW, h, 0xFFFFFF, 0x000000, "heavy")
-    for i=1, 3, 1 do
+    local maxReactorCount = math.floor((h-2) / 3)
+    for i=1, maxReactorCount, 1 do
         local buttonWidth = sidepanelW-2
-        local button_y = (i-1) * 3
+        local button_y = 2 + (i-1) * 3
         newReactorButton(monW+1, button_y, buttonWidth, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x22DD55, 0xDD5522, "light")
     end
     gui.renderAll()
