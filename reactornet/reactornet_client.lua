@@ -74,6 +74,7 @@ function contexts.mainScreenGUI()
     -- Draw a Power Chart of total energy numbers from monitors
     -- Draw a list of buttons for reactor controllers
     gui.clearAll()
+    local h = gui.height()
     local monW = gui.percentX(0.7)
     local sidepanelW = gui.width() - monW
     local powerMax = 100000
@@ -86,12 +87,12 @@ function contexts.mainScreenGUI()
     powerQueue:pushright(100000)
     -- FIXME: this is all just template designing stuff
 
-    powermonitor_id = gui.newChart(1, 1, monW, gui.height(), 0x00FF00, 0x000000, powerQueue.values, powerMax, "heavy")
-    --gui.newContainer(monW, 1, sidepanelW, gui.height(), 0xFFFFFF, 0x000000, "heavy")
+    powermonitor_id = gui.newChart(1, 1, monW, h, 0x00FF00, 0x000000, powerQueue.values, powerMax, "heavy")
+    gui.newContainer(monW, 1, sidepanelW, h, 0xFFFFFF, 0x000000, "heavy")
     -- for i=1, 3, 1 do
-    --     local width = monW-2
-    --     local y = (i-1) * 3
-    --     newReactorButton(monW+1, y, width, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x55CC77, 0xCC7755, "light")
+    --     local buttonWidth = monW-2
+    --     local button_y = (i-1) * 3
+    --     newReactorButton(monW+1, button_y, buttonWidth, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x55CC77, 0xCC7755, "light")
     -- end
     gui.renderAll()
 end
