@@ -4,7 +4,7 @@ local event = require("event")
 local gui = require("libcgui")
 local queue = require("libqueue")
 
-local updateInterval = 0.1
+local updateInterval = 0.005
 local contexts = {}
 local settings = {servers = {controller={}, monitor={}}}
 local powerQueue = queue.new(12)
@@ -76,7 +76,8 @@ function contexts.mainScreenGUI()
     -- Draw a Power Chart of total energy numbers from monitors
     -- Draw a list of buttons for reactor controllers
     gui.clearAll()
-    local h = gui.height()
+    local mainH = gui.percentY(0.8)
+    local botpanelH = gui.height() - mainH
     local monW = gui.percentX(0.7)
     local sidepanelW = gui.width() - monW
     local powerMax = 100000
@@ -89,14 +90,19 @@ function contexts.mainScreenGUI()
     powerQueue:pushright(100000)
     -- FIXME: this is all just template designing stuff
 
-    powermonitor_id = gui.newChart(1, 1, monW, h, 0x00FF00, 0x000000, powerQueue.values, powerMax, "heavy")
-    gui.newContainer(monW, 1, sidepanelW, h, 0xFFFFFF, 0x000000, "heavy")
-    local maxReactorCount = math.floor((h-2) / 3)
+    powermonitor_id = gui.newChart(1, 1, monW, mainH, 0x00FF00, 0x000000, powerQueue.values, powerMax, "heavy")
+    gui.newContainer(monW, 1, sidepanelW, mainH, 0xFFFFFF, 0x000000, "heavy")
+    local maxReactorCount = math.floor((mainH-2) / 3)
     for i=1, maxReactorCount, 1 do
         local buttonWidth = sidepanelW-2
         local button_y = 2 + (i-1) * 3
         newReactorButton(monW+1, button_y, buttonWidth, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x22CC55, 0xCC5522, "light")
     end
+
+    local botBWidth = gui.width() / 3
+    gui.newButton(1, mainH, botBWidth, botpanelH, "Monitor", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil)
+    gui.newButton(botBWidth, mainH, botBWidth, botpanelH, "Settings", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil)
+    gui.newButton(botBWidth*2, mainH, botBWidth, botpanelH, "Shutdown", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil)
     gui.renderAll()
 end
 
