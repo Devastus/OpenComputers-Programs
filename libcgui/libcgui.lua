@@ -56,7 +56,7 @@ function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, 
     comp.height = height
     comp.state = state
     comp.render = renderFunc
-    comp.callback = callbackFunc
+    comp.callback = callbackFunc or nil
     comp.visible = visible or true
     comp.focused = false
     comp.contains = function(self, x, y)
@@ -211,11 +211,11 @@ end
 -- Draws a rect
 function API.newContainer(x, y, width, height, fgColor, bgColor, frame)
     local state = {}
-    state.fgColor = fgColor
-    state.bgColor = bgColor
+    state.fgColor = fgColor or baseForegroundColor
+    state.bgColor = bgColor or baseBackgroundColor
     state.frame = frame
     local renderFunc = function(self)
-        API.drawRect(self.x, self.y, self.width, self.height, self.fgColor, self.bgColor, self.frame)
+        API.drawRect(self.x, self.y, self.width, self.height, self.state.fgColor, self.state.bgColor, self.state.frame)
     end
     return API.newComponent(x, y, width, height, state, renderFunc, nil)
 end
