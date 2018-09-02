@@ -87,7 +87,7 @@ function contexts.mainScreenGUI()
     for i=1, 3, 1 do
         local width = monW-2
         local y = (i-1) * 3
-        newReactorButton(monW+1, y, width, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x55CC77, 0xCC7755, "light")
+        newReactorButton(monW+1, y, width, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x55CC77, 0xCC7755, "light", nil)
     end
     gui.renderAll()
 end
