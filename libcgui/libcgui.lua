@@ -300,22 +300,23 @@ function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue,
         local oldBG = gpu.getBackground()
         local oldFG = gpu.getForeground()
         local segwidth = math.floor((self.width-2) / #values)
+        local chartH = self.height-2
         API.drawRect(self.x, self.y, self.width, self.height, baseForegroundColor, self.state.bgColor, self.state.frame)
         gpu.setForeground(self.state.fillColor, false)
         gpu.setBackground(self.state.bgColor, false)
         for i=1, #values, 1 do
             local seg = self.x+1+((i-1)*segwidth)
             if self.state.values[i] ~= nil and self.state.values[i] > 0 then
-                local v = clamp(self.state.values[i] / self.state.maxValue, 0, 1) * self.height
+                local v = clamp(self.state.values[i] / self.state.maxValue, 0, 1) * chartH
                 local vfloor = math.floor(v)
                 local frac = v - vfloor
-                gpu.fill(seg, self.y + (self.height-vfloor-1), segwidth, vfloor, asciiBox[3])
+                gpu.fill(seg, self.y + 1 + (chartH-vfloor), segwidth, vfloor, asciiBox[3])
                 if frac > 0.0 then
-                    local halfs = math.floor(frac / 0.5) + 1
-                    gpu.fill(seg, self.y + (self.height-vfloor-1), segwidth, 1, asciiBox[halfs])
+                    local halfs = 1 + math.floor(frac / 0.5)
+                    gpu.fill(seg, self.y + 1 + (chartH-vfloor-1), segwidth, 1, asciiBox[halfs])
                 end
             else
-                gpu.fill(seg, self.y, segwidth, self.height, " ")
+                gpu.fill(seg, self.y, segwidth, chartH, " ")
             end
         end
         gpu.setForeground(oldFG, false)

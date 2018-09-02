@@ -37,7 +37,7 @@ function contexts.mainScreenGUI()
     local sidepanelW = gui.width() - monW
     -- FIXME: this is all just template designing stuff
     local powerMax = 100000
-    local powervalues = {73500, 34600, 96500, 81200, 12300, 54000}
+    local powervalues = {73500, 34600, 96500, 81200, 63000, 12300, 54000, 100000}
     local powerchart = gui.newChart(1, 1, monW, gui.height(), 0x00FF00, 0x000000, powervalues, powerMax, "heavy")
     gui.render(powerchart)
     -- gui.drawRect(1, 1, monW, gui.height(), 0xFFFFFF, 0x000000, "heavy")
