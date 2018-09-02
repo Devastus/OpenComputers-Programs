@@ -87,7 +87,7 @@ function contexts.mainScreenGUI()
     -- FIXME: this is all just template designing stuff
 
     powermonitor_id = gui.newChart(1, 1, monW, gui.height(), 0x00FF00, 0x000000, powerQueue.values, powerMax, "heavy")
-    gui.newContainer(monW, 1, sidepanelW, gui.height(), 0xFFFFFF, 0x000000, "heavy")
+    --gui.newContainer(monW, 1, sidepanelW, gui.height(), 0xFFFFFF, 0x000000, "heavy")
     -- for i=1, 3, 1 do
     --     local width = monW-2
     --     local y = (i-1) * 3

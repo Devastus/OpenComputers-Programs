@@ -11,7 +11,7 @@ A very basic control panel & auto-controller for a single passively-cooled Extre
 A server/client-based Big Reactors / Extreme Reactors solution for multi-reactor & turbine complexes (totally WIP and not actually working)
 
 ### libcgui/
-A simple Component-based Graphical User Interface library
+An extendable Component-based Graphical User Interface library
 
 ### libtermui/
 A simple wrapper for some quick & dirty helper UI functions using 'term'
