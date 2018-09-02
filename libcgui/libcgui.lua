@@ -30,11 +30,21 @@ local function clamp(value,min,max) return math.min(math.max(value, min), max) e
 -- CORE --
 --------------------------------------------
 
-function API.init(foregroundColor, backgroundColor)
-    w, h = gpu.getResolution()
+function API.init(foregroundColor, backgroundColor, width, height)
+    if width ~= nil and height ~= nil then
+        API.setResolution(width, height)
+    else
+        w, h = gpu.getResolution()
+    end
     baseForegroundColor = foregroundColor or 0xFFFFFF
     baseBackgroundColor = backgroundColor or 0x000000
     API.clearAll()
+end
+
+function API.setResolution(width, height)
+    gpu.setResolution(width, height)
+    w = width
+    h = height
 end
 
 function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, visible)

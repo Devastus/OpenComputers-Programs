@@ -33,7 +33,11 @@ function contexts.mainScreenGUI()
     -- Draw a Power Chart of total energy numbers from monitors
     -- Draw a list of buttons for reactor controllers
     gui.clearAll()
-
+    local monW = gui.percentX(0.7)
+    local sidepanelW = gui.width() - monW
+    gui.drawRect(1, 1, monW, gui.height(), 0xFFFFFF, 0x000000, "heavy")
+    gui.drawRect(monW, 1, sidepanelW, gui.height(), 0xFFFFFF, 0x000000, "heavy")
+    gui.newLabel(1,1,monW,1,"Monitor",0xFFFFFF,0x000000,true)
     gui.renderAll()
 end
 
@@ -56,9 +60,9 @@ function contexts.launchScreenGUI()
     local cY = gui.percentY(0.5)
     gui.clearAll()
     gui.newLabel(cX-8, cY-9, 16, 3, "ReactorNet Client | Launch", true, 0xFFFFFF, 0x000000)
-    gui.newButton(cX-8, cY-6, 16, 3, "Start", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, "double", runClient)
-    gui.newButton(cX-8, cY-2, 16, 3, "Setup", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, "double", contexts.setupScreenGUI)
-    gui.newButton(cX-8, cY+2, 16, 3, "Exit", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, "double", closeClient)
+    gui.newButton(cX-8, cY-6, 16, 3, "Start", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, runClient)
+    gui.newButton(cX-8, cY-2, 16, 3, "Setup", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.setupScreenGUI)
+    gui.newButton(cX-8, cY+2, 16, 3, "Exit", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, closeClient)
     gui.renderAll()
 end
 
