@@ -4,7 +4,7 @@ local event = require("event")
 local gui = require("libcgui")
 local queue = require("libqueue")
 
-local updateInterval = 0.005
+local updateInterval = 0.033 --30 FPS
 local contexts = {}
 local settings = {servers = {controller={}, monitor={}}}
 local powerQueue = queue.new(12)
@@ -74,7 +74,7 @@ end
 
 function contexts.mainScreenGUI()
     -- Draw a Power Chart of total energy numbers from monitors
-    -- Draw a list of buttons for reactor controllers
+    -- Draw a list of toggles for reactor controllers
     gui.clearAll()
     local mainH = gui.percentY(0.9)
     local botpanelH = gui.height() - mainH
@@ -130,6 +130,13 @@ function contexts.settingsScreenGUI()
     gui.newLabel(cX-16, cY-6, 32, 1, "Network ID (1-12 Characters)", _, _, true)
     gui.newInputField(cX-8, cY-5, 16, settings.network_id, 0xFFFFFF, 0xCCCCCC, 0x666666, 0x333333, 12, function(id) settings.network_id = "client_"..id end)
 
+    -- Server list
+    gui.newLabel(cX-16, cY-3, 32, 1, "Available servers:", _, _, true)
+    local serv_container_id = gui.newContainer(cX-16, cY-2, 32, cY-4, 0xFFFFFF, 0x000000, "heavy")
+    local serv_container = gui.getComponent(serv_container_id)
+    gui.newToggle(0, 1, 32, 1, "Temp", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil, serv_container)
+    gui.newToggle(0, 2, 32, 1, "Temp", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil, serv_container)
+
     local mainH = gui.percentY(0.9)
     local botpanelH = gui.height() - mainH
     local botBWidth = gui.width() / 5
@@ -138,17 +145,6 @@ function contexts.settingsScreenGUI()
     gui.newButton(botBWidth*4, mainH+1, botBWidth, botpanelH, "Shutdown", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, closeClient)
     gui.renderAll()
 end
-
--- function contexts.launchScreenGUI()
---     local cX = gui.percentX(0.5)
---     local cY = gui.percentY(0.5)
---     gui.clearAll()
---     gui.newLabel(cX-8, cY-9, 16, 3, "ReactorNet Client | Launch", 0xFFFFFF, 0x000000, true)
---     gui.newButton(cX-8, cY-6, 16, 3, "Start", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.mainScreenGUI)
---     gui.newButton(cX-8, cY-2, 16, 3, "Setup", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.settingsScreenGUI)
---     gui.newButton(cX-8, cY+2, 16, 3, "Exit", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, closeClient)
---     gui.renderAll()
--- end
 
 -----------------------------------------------
 -- MAIN LOOP --

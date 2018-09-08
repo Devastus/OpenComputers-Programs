@@ -4,7 +4,7 @@ local gpu = component.gpu
 local keyboard = require("keyboard")
 
 local API = {}
-local components = {}
+local componentMap = {}
 local w,h = 0,0
 local baseForegroundColor = 0xFFFFFF
 local baseBackgroundColor = 0x000000
@@ -47,24 +47,54 @@ function API.setResolution(width, height)
     h = height
 end
 
-function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, visible)
+function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, visible, parent)
     local comp = {}
-    local id = #components+1
+    local id = #componentMap+1
     comp.x = x
     comp.y = y
     comp.width = width
     comp.height = height
     comp.state = state
-    comp.render = renderFunc
-    comp.callback = callbackFunc or nil
     comp.visible = visible or true
     comp.focused = false
+    comp.render = renderFunc
+    comp.callback = callbackFunc or nil
+    comp.parent = parent or nil
+    comp.children = {}
     comp.contains = function(self, x, y)
-        local xmax = self.x + self.width-1
-        local ymax = self.y + self.height-1
-        return x >= self.x and x <= xmax and y >= self.y and y <= ymax
+        local rx = self:relativeX()
+        local ry = self:relativeY()
+        local xmax = rx + self.width-1
+        local ymax = ry + self.height-1
+        return x >= rx and x <= xmax and y >= ry and y <= ymax
     end
-    components[id] = comp
+    comp.relativeX = function(self)
+        if self.parent ~= nil then
+            return self.parent:relativeX() + self.x
+        end
+        return self.x
+    end
+    comp.relativeY = function(self)
+        if self.parent ~= nil then
+            return self.parent:relativeY() + self.y
+        end
+        return self.y
+    end
+    comp.getChild = function(self, index)
+        if self.children[index] ~= nil then
+            return self.children[index]
+        end
+        return nil
+    end
+    comp.setState = function(self, key, value)
+        self.state[key] = value
+        self:render()
+    end
+    comp.getState = function(self, key)
+        return self.state[key]
+    end
+    componentMap[id] = comp
+    if parent ~= nil then table.insert(parent.children, comp) end
     return id
 end
 
@@ -76,25 +106,25 @@ end
 
 function API.clearAll()
     API.clearScreen()
-    components = {}
+    componentMap = {}
 end
 
 function API.renderAll()
     API.clearScreen()
-    for i = 1, #components, 1 do
-        components[i]:render()
+    for i = 1, #componentMap, 1 do
+        componentMap[i]:render()
     end
 end
 
 function API.render(componentID)
-    local comp = components[componentID]
+    local comp = componentMap[componentID]
     if comp ~= nil and comp.visible == true then comp:render() end
 end
 
 function API.click(x, y)
     local id = -1
-    for i = 1, #components, 1 do
-        local comp = components[i]
+    for i = 1, #componentMap, 1 do
+        local comp = componentMap[i]
         if comp ~= nil then
             if comp.visible then
                 if comp:contains(x, y) then
@@ -111,14 +141,30 @@ function API.click(x, y)
 end
 
 function API.setVisible(componentID, visible)
-    if components[componentID] ~= nil then
-        components[componentID].visible = visible
+    if componentMap[componentID] ~= nil then
+        componentMap[componentID].visible = visible
         API.renderAll()
     end
 end
 
 function API.getComponent(componentID)
-    return components[componentID]
+    return componentMap[componentID]
+end
+
+function API.getComponentState(componentID, key)
+    local comp = componentMap[componentID]
+    if comp ~= nil then
+        return comp:getState(key)
+    end
+    return nil
+end
+
+function API.setComponentState(componentID, key, value)
+    local comp = componentMap[componentID]
+    if comp ~= nil then
+        return comp:setState(key, value)
+    end
+    return nil
 end
 
 --------------------------------------------
@@ -196,32 +242,32 @@ end
 --------------------------------------------
 
 -- Draws a simple Label
-function API.newLabel(x, y, width, height, label, fgColor, bgColor, centered)
+function API.newLabel(x, y, width, height, label, fgColor, bgColor, centered, parent)
     local state = {}
     state.text = label
     state.centered = centered
     state.fgColor = fgColor or baseForegroundColor
     state.bgColor = bgColor or baseBackgroundColor
     local renderFunc = function(self)
-        API.drawText(self.x, self.y,  self.width, self.height, self.state.text, self.state.fgColor, self.state.bgColor, self.state.centered)
+        API.drawText(self:relativeX(), self:relativeY(), self.width, self.height, self.state.text, self.state.fgColor, self.state.bgColor, self.state.centered)
     end
-    return API.newComponent(x, y, width, height, state, renderFunc, nil)
+    return API.newComponent(x, y, width, height, state, renderFunc, nil, parent)
 end
 
 -- Draws a rect
-function API.newContainer(x, y, width, height, fgColor, bgColor, frame)
+function API.newContainer(x, y, width, height, fgColor, bgColor, frame, parent)
     local state = {}
     state.fgColor = fgColor or baseForegroundColor
     state.bgColor = bgColor or baseBackgroundColor
     state.frame = frame
     local renderFunc = function(self)
-        API.drawRect(self.x, self.y, self.width, self.height, self.state.fgColor, self.state.bgColor, self.state.frame)
+        API.drawRect(self:relativeX(), self:relativeY(), self.width, self.height, self.state.fgColor, self.state.bgColor, self.state.frame)
     end
-    return API.newComponent(x, y, width, height, state, renderFunc, nil)
+    return API.newComponent(x, y, width, height, state, renderFunc, nil, parent)
 end
 
 -- Draws a Button that can be pressed
-function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, frame, callbackFunc)
+function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, frame, callbackFunc, parent)
     local state = {}
     state.text = label
     state.fgOn = fgOn
@@ -231,12 +277,14 @@ function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
     state.frame = frame or nil
     state.active = false
     local renderFunc = function(self)
+        local rx = self:relativeX()
+        local ry = self:relativeY()
         if self.state.active then
-            API.drawRect(self.x, self.y, self.width, self.height, self.state.fgOn, self.state.bgOn, self.state.frame)
-            API.drawText(self.x, self.y, self.width, self.height, self.state.text, self.state.fgOn, self.state.bgOn, true)
+            API.drawRect(rx, ry, self.width, self.height, self.state.fgOn, self.state.bgOn, self.state.frame)
+            API.drawText(rx, ry, self.width, self.height, self.state.text, self.state.fgOn, self.state.bgOn, true)
         else
-            API.drawRect(self.x, self.y, self.width, self.height, self.state.fgOff, self.state.bgOff, self.state.frame)
-            API.drawText(self.x, self.y, self.width, self.height, self.state.text, self.state.fgOff, self.state.bgOff, true)
+            API.drawRect(rx, ry, self.width, self.height, self.state.fgOff, self.state.bgOff, self.state.frame)
+            API.drawText(rx, ry, self.width, self.height, self.state.text, self.state.fgOff, self.state.bgOff, true)
         end
     end
     local callback = function(self, x, y)
@@ -247,11 +295,11 @@ function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
         self:render()
         if callbackFunc ~= nil then callbackFunc() end
     end
-    return API.newComponent(x, y, width, height, state, renderFunc, callback)
+    return API.newComponent(x, y, width, height, state, renderFunc, callback, parent)
 end
 
 -- Draws a Button that will keep it's state (and toggle it upon press)
-function API.newToggle(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, frame, callbackFunc)
+function API.newToggle(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, frame, callbackFunc, parent)
     local state = {}
     state.text = label
     state.fgOn = fgOn
@@ -261,12 +309,14 @@ function API.newToggle(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
     state.frame = frame or nil
     state.active = false
     local renderFunc = function(self)
+        local rx = self:relativeX()
+        local ry = self:relativeY()
         if self.state.active then
-            API.drawRect(self.x, self.y, self.width, self.height, self.state.fgOn, self.state.bgOn, self.state.frame)
-            API.drawText(self.x, self.y, self.width, self.height, self.state.text, self.state.fgOn, self.state.bgOn, true)
+            API.drawRect(rx, ry, self.width, self.height, self.state.fgOn, self.state.bgOn, self.state.frame)
+            API.drawText(rx, ry, self.width, self.height, self.state.text, self.state.fgOn, self.state.bgOn, true)
         else
-            API.drawRect(self.x, self.y, self.width, self.height, self.state.fgOff, self.state.bgOff, self.state.frame)
-            API.drawText(self.x, self.y, self.width, self.height, self.state.text, self.state.fgOff, self.state.bgOff, true)
+            API.drawRect(rx, ry, self.width, self.height, self.state.fgOff, self.state.bgOff, self.state.frame)
+            API.drawText(rx, ry, self.width, self.height, self.state.text, self.state.fgOff, self.state.bgOff, true)
         end
     end
     local callback = function(self, x, y)
@@ -274,11 +324,11 @@ function API.newToggle(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
         self:render()
         if callbackFunc ~= nil then callbackFunc(self, x, y) end
     end
-    return API.newComponent(x, y, width, height, state, renderFunc, callback)
+    return API.newComponent(x, y, width, height, state, renderFunc, callback, parent)
 end
 
 -- Draws a Horizontal/Vertical bar that represents a percentage between value/maxValue
-function API.newValueBar(x, y, width, height, value, maxValue, fillColor, bgColor, horizontal, frame)
+function API.newValueBar(x, y, width, height, value, maxValue, fillColor, bgColor, horizontal, frame, parent)
     local state = {}
     state.value = value or 0
     state.maxValue = maxValue or 100
@@ -287,20 +337,22 @@ function API.newValueBar(x, y, width, height, value, maxValue, fillColor, bgColo
     state.frame = frame
     state.horizontal = horizontal
     local renderFunc = function(self)
-        API.drawRect(self.x, self.y, self.width, self.height, baseForegroundColor, self.state.bgColor, self.state.frame)
+        local rx = self:relativeX()
+        local ry = self:relativeY()
+        API.drawRect(rx, ry, self.width, self.height, baseForegroundColor, self.state.bgColor, self.state.frame)
         if self.state.horizontal then
             local valLength = self.width * (self.value / self.maxValue)
-            API.drawRect(self.x+1, self.y+1, valLength+1, self.height-2, baseForegroundColor, self.state.fillColor, nil)
+            API.drawRect(rx+1, ry+1, valLength+1, self.height-2, baseForegroundColor, self.state.fillColor, nil)
         else
             local valLength = self.height * (self.value / self.maxValue)
-            API.drawRect(self.x+1, self.y+self.height-valLength, self.width-2, valLength+1, baseForegroundColor, self.state.fillColor, nil)
+            API.drawRect(rx+1, ry+self.height-valLength, self.width-2, valLength+1, baseForegroundColor, self.state.fillColor, nil)
         end
     end
-    return API.newComponent(x, y, width, height, state, renderFunc, nil)
+    return API.newComponent(x, y, width, height, state, renderFunc, nil, parent)
 end
 
 -- Draws a Bar Chart of given values
-function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue, frame)
+function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue, frame, parent)
     local state = {}
     state.fillColor = fillColor
     state.bgColor = bgColor
@@ -308,37 +360,39 @@ function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue,
     state.values = values
     state.maxValue = maxValue
     local renderFunc = function(self)
+        local rx = self:relativeX()
+        local ry = self:relativeY()
         local asciiBox = {"▁", "▄", "█"}
         local oldBG = gpu.getBackground()
         local oldFG = gpu.getForeground()
         local segwidth = math.floor((self.width-2) / #values)
         local chartH = self.height-2
-        API.drawRect(self.x, self.y, self.width, self.height, baseForegroundColor, self.state.bgColor, self.state.frame)
+        API.drawRect(rx, ry, self.width, self.height, baseForegroundColor, self.state.bgColor, self.state.frame)
         gpu.setForeground(self.state.fillColor, false)
         gpu.setBackground(self.state.bgColor, false)
         for i=1, #values, 1 do
-            local seg = self.x+1+((i-1)*segwidth)
+            local seg = rx+1+((i-1)*segwidth)
             if self.state.values[i] ~= nil and self.state.values[i] > 0 then
                 local v = clamp(self.state.values[i] / self.state.maxValue, 0, 1) * chartH
                 local vfloor = math.floor(v)
                 local frac = v - vfloor
-                gpu.fill(seg, self.y + 1 + (chartH-vfloor), segwidth, vfloor, asciiBox[3])
+                gpu.fill(seg, ry + 1 + (chartH-vfloor), segwidth, vfloor, asciiBox[3])
                 if frac > 0.0 then
                     local halfs = 1 + math.floor(frac / 0.5)
-                    gpu.fill(seg, self.y + 1 + (chartH-vfloor-1), segwidth, 1, asciiBox[halfs])
+                    gpu.fill(seg, ry + 1 + (chartH-vfloor-1), segwidth, 1, asciiBox[halfs])
                 end
             else
-                gpu.fill(seg, self.y, segwidth, chartH, " ")
+                gpu.fill(seg, ry, segwidth, chartH, " ")
             end
         end
         gpu.setForeground(oldFG, false)
         gpu.setBackground(oldBG, false)
     end
-    return API.newComponent(x, y, width, height, state, renderFunc, nil)
+    return API.newComponent(x, y, width, height, state, renderFunc, nil, parent)
 end
 
 -- Draws a single-line Text Input Field that can take in keyboard input
-function API.newInputField(x, y, width, text, fgOn, fgOff, bgOn, bgOff, characterLimit, onChangeCallback)
+function API.newInputField(x, y, width, text, fgOn, fgOff, bgOn, bgOff, characterLimit, onChangeCallback, parent)
     local state = {}
     state.text = text or ""
     state.characterLimit = characterLimit
@@ -350,16 +404,18 @@ function API.newInputField(x, y, width, text, fgOn, fgOff, bgOn, bgOff, characte
     local renderFunc = function(self)
         -- Render a textbox that encapsulates text
         -- Upon being activated redraws constantly and displays an additional "cursor" appended to text
+        local rx = self:relativeX()
+        local ry = self:relativeY()
         if self.state.active then
-            API.drawRect(self.x, self.y, self.width, 1, self.state.fgOn, self.state.bgOn, nil)
+            API.drawRect(rx, ry, self.width, 1, self.state.fgOn, self.state.bgOn, nil)
             local widthDiff = math.max((#self.state.text+1) - self.width, 0)
             local shownText = string.sub(self.state.text.."|", 1+widthDiff)
-            API.drawText(self.x, self.y, self.width, 1, shownText, self.state.fgOn, self.state.bgOn, false)
+            API.drawText(rx, ry, self.width, 1, shownText, self.state.fgOn, self.state.bgOn, false)
         else
-            API.drawRect(self.x, self.y, self.width, 1, self.state.fgOff, self.state.bgOff, nil)
+            API.drawRect(rx, ry, self.width, 1, self.state.fgOff, self.state.bgOff, nil)
             local widthDiff = math.max(#self.state.text - self.width, 0)
             local shownText = string.sub(self.state.text, 1+widthDiff)
-            API.drawText(self.x, self.y, self.width, 1, shownText, self.state.fgOff, self.state.bgOff, false)
+            API.drawText(rx, ry, self.width, 1, shownText, self.state.fgOff, self.state.bgOff, false)
         end
     end
     local callbackFunc = function(self, x, y)
@@ -412,7 +468,7 @@ function API.newInputField(x, y, width, text, fgOn, fgOff, bgOn, bgOff, characte
             end
         end
     end
-    return API.newComponent(x, y, width, 1, state, renderFunc, callbackFunc)
+    return API.newComponent(x, y, width, 1, state, renderFunc, callbackFunc, parent)
 end
 
 return API
