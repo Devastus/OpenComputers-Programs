@@ -6,14 +6,14 @@ local queue = require("libqueue")
 
 local updateInterval = 0.002
 local contexts = {}
-local settings = {servers = {}}
+local settings = {servers = {controller = {}, monitor = {}}}
 local powerQueue = queue.new(12)
 
 local powermonitor_id = -1
 local serverList_id = -1
 
 local centerX, centerY = 0
-local serverList = {controller = {}, monitor = {}}
+local serverList = {}
 local updateRequestEventID = -1
 local monitorUpdateEventID = -1
 -----------------------------------------------
