@@ -136,7 +136,8 @@ function contexts.settingsScreenGUI()
     local serv_container = gui.getComponent(serv_container_id)
     gui.newToggle(0, 1, 32, 1, "Temp", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil, serv_container)
     gui.newToggle(0, 2, 32, 1, "Temp", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil, serv_container)
-    print(serv_container.children)
+    local children = tostring(serv_container.children)
+    gui.newLabel(0, 3, 32, 1, children, _, _, false, serv_container)
 
     local mainH = gui.percentY(0.9)
     local botpanelH = gui.height() - mainH
