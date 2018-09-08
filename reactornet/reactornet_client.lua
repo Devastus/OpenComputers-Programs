@@ -134,17 +134,19 @@ function contexts.settingsScreenGUI()
     gui.newLabel(cX-16, cY-3, 32, 1, "Available servers:", _, _, true)
     local serv_container_id = gui.newContainer(cX-16, cY-2, 32, cY-4, 0xFFFFFF, 0x000000, "heavy")
     local serv_container = gui.getComponent(serv_container_id)
-    gui.newToggle(0, 1, 32, 1, "Temp", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil, serv_container)
-    gui.newToggle(0, 2, 32, 1, "Temp", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil, serv_container)
-    local children = tostring(serv_container.children)
-    gui.newLabel(0, 3, 32, 1, children, _, _, false, serv_container)
+    local t1 = gui.newToggle(1, 1, 32, 1, "Temp", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil, serv_container)
+    local t2 = gui.newToggle(1, 2, 32, 1, "Temp", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil, serv_container)
+    gui.newLabel(1, 3, 32, 1, tostring(gui.getComponent(t1):relativeY()), _, _, false, serv_container)
+    gui.newLabel(1, 4, 32, 1, tostring(gui.getComponent(t2):relativeY()), _, _, false, serv_container)
+
 
     local mainH = gui.percentY(0.9)
     local botpanelH = gui.height() - mainH
-    local botBWidth = gui.width() / 5
-    gui.newButton(1, mainH+1, botBWidth, botpanelH, "Monitor", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.mainScreenGUI)
+    local botBWidth = gui.width() / 4
+    gui.newLabel(1, mainH+1, botBWidth, botpanelH, "ReactorNet", 0xFFFFFF, 0x000000, true)
+    gui.newButton(botBWidth, mainH+1, botBWidth, botpanelH, "Monitor", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.mainScreenGUI)
     gui.newButton(botBWidth*2, mainH+1, botBWidth, botpanelH, "Settings", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.settingsScreenGUI)
-    gui.newButton(botBWidth*4, mainH+1, botBWidth, botpanelH, "Shutdown", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, closeClient)
+    gui.newButton(botBWidth*3, mainH+1, botBWidth, botpanelH, "Shutdown", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, closeClient)
     gui.renderAll()
 end
 
