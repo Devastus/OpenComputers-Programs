@@ -348,7 +348,7 @@ function API.newLabel(x, y, width, height, label, fgColor, bgColor, centered, pa
     local renderFunc = function(self)
         API.drawText(self:relativeX(), self:relativeY(), self.width, self.height, self.state.text, self.state.fgColor, self.state.bgColor, self.state.centered)
     end
-    return Component.new(x, y, width, height, state, renderFunc, nil, true, parent)
+    return GUIComponent.new(x, y, width, height, state, renderFunc, nil, true, parent)
 end
 
 -- Draws a rect
@@ -360,7 +360,7 @@ function API.newContainer(x, y, width, height, fgColor, bgColor, frame, parent)
     local renderFunc = function(self)
         API.drawRect(self:relativeX(), self:relativeY(), self.width, self.height, self.state.fgColor, self.state.bgColor, self.state.frame)
     end
-    return Component.new(x, y, width, height, state, renderFunc, nil, true, parent)
+    return GUIComponent.new(x, y, width, height, state, renderFunc, nil, true, parent)
 end
 
 -- Draws a Button that can be pressed
@@ -392,7 +392,7 @@ function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
         self:render()
         if callbackFunc ~= nil then callbackFunc() end
     end
-    return Component.new(x, y, width, height, state, renderFunc, callback, true, parent)
+    return GUIComponent.new(x, y, width, height, state, renderFunc, callback, true, parent)
 end
 
 -- Draws a Button that will keep it's state (and toggle it upon press)
@@ -421,7 +421,7 @@ function API.newToggle(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
         self:render()
         if callbackFunc ~= nil then callbackFunc(self, x, y) end
     end
-    return Component.new(x, y, width, height, state, renderFunc, callback, true, parent)
+    return GUIComponent.new(x, y, width, height, state, renderFunc, callback, true, parent)
 end
 
 -- Draws a Horizontal/Vertical bar that represents a percentage between value/maxValue
@@ -445,7 +445,7 @@ function API.newValueBar(x, y, width, height, value, maxValue, fillColor, bgColo
             API.drawRect(rx+1, ry+self.height-valLength, self.width-2, valLength+1, baseForegroundColor, self.state.fillColor, nil)
         end
     end
-    return Component.new(x, y, width, height, state, renderFunc, nil, true, parent)
+    return GUIComponent.new(x, y, width, height, state, renderFunc, nil, true, parent)
 end
 
 -- Draws a Bar Chart of given values
@@ -485,7 +485,7 @@ function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue,
         gpu.setForeground(oldFG, false)
         gpu.setBackground(oldBG, false)
     end
-    return Component.new(x, y, width, height, state, renderFunc, nil, true, parent)
+    return GUIComponent.new(x, y, width, height, state, renderFunc, nil, true, parent)
 end
 
 -- Draws a single-line Text Input Field that can take in keyboard input
@@ -565,7 +565,7 @@ function API.newInputField(x, y, width, text, fgOn, fgOff, bgOn, bgOff, characte
             end
         end
     end
-    return Component.new(x, y, width, 1, state, renderFunc, callbackFunc, true, parent)
+    return GUIComponent.new(x, y, width, 1, state, renderFunc, callbackFunc, true, parent)
 end
 
 return API
