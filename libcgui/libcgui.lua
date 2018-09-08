@@ -66,7 +66,7 @@ end
 
 -- Render the component, recursively rendering the children if enabled
 function GUIComponent:render(renderChildren)
-    self:drawFunc()
+    self:draw()
     renderChildren = renderChildren or false
     if renderChildren == true and self.children ~= nil and #self.children > 0 then
         for comp in self.children do
@@ -100,12 +100,12 @@ function GUIComponent:contains(x, y)
     return x >= rx and x <= xmax and y >= ry and y <= ymax
 end
 
--- Set state values as a table
+-- Set state values as a table and re-render the component tree
 function GUIComponent:setState(state)
     for k,v in ipairs(state) do
         self.state[k] = v
     end
-    self:render(false)
+    self:render(true)
 end
 
 -- Get state values
