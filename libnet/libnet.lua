@@ -12,7 +12,7 @@ local function _writePayload(data, msgType)
     return payload 
 end
 
-local function _readPayload(address, payload)
+local function _readPayload(payload)
     local msg = {}
     local typeCharIndex = string.find(payload, '@')
     local dataCharIndex = string.find(payload, '&')
@@ -22,8 +22,8 @@ local function _readPayload(address, payload)
     return msg
 end
 
-local function _handleRecv(eventName, localNetworkCard, remoteAddress, port, distance, payload)
-    local message = _readPayload(remoteAddress, payload)
+local function _handleRecv(_, _, remoteAddress, port, distance, payload)
+    local message = _readPayload(payload)
     if message.header == driver.headerPrefix then
         if driver[message.type] ~= nil then
             driver[message.type](remoteAddress, message.data)

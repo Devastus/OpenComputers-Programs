@@ -63,7 +63,7 @@ local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bg
         self.state.active = not self.state.active
         self:render()
     end
-    return gui.newComponent(x, y, width, height, state, renderFunc, callbackFunc)
+    return GUIComponent.new(x, y, width, height, state, renderFunc, callbackFunc)
 end
 
 local function onMonitorUpdate()
@@ -128,7 +128,8 @@ end
 function contexts.settingsScreenGUI()
     -- Set a network ID for this client
     -- Gather all egilible RNet servers for communication
-    -- We need to separate monitors from controllers and toggle GUI features based on them
+    --net.connectEvent("fetchreply", )
+
     gui.clearAll()
     local cX = gui.percentX(0.5)
     local cY = gui.percentY(0.5)
@@ -138,7 +139,7 @@ function contexts.settingsScreenGUI()
 
     -- Server list
     gui.newLabel(cX-16, cY-3, 32, 1, "Available servers:", _, _, true)
-    local containerH = cY-4
+    local containerH = cY
     local serv_container_id = gui.newContainer(cX-16, cY-2, 32, containerH, 0xFFFFFF, 0x000000, "heavy")
     for i = 1, containerH-2, 1 do
         gui.newToggle(1, i, 30, 1, "Temp", 0xFFFFFF, 0x000000, 0x000000, 0xFFFFFF, nil, nil, serv_container_id)

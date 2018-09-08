@@ -27,7 +27,98 @@ function API.percentY(percent) return math.floor(h * percent) end
 local function clamp(value,min,max) return math.min(math.max(value, min), max) end
 
 --------------------------------------------
--- CORE --
+-- COMPONENT CLASS --
+--------------------------------------------
+
+GUIComponent = {}
+GUIComponent.__index = GUIComponent
+
+-- Component Constructor
+function GUIComponent.new(x, y, width, height, state, drawFunc, callbackFunc, visible, parent)
+    local self = setmetatable({}, GUIComponent)
+    self.x = x
+    self.y = y
+    self.width = width or 1
+    self.height = height or 1
+    self.state = state or {}
+    self.visible = visible or true
+    self.draw = drawFunc
+    self.callback = callbackFunc or nil
+    if type(parent) == "number" then
+        local p = componentMap[parent]
+        self.parent = p or nil
+        if p ~= nil then
+            if p.children == nil then p.children = {} end
+            table.insert(p.children, self)
+        end
+    else
+        self.parent = parent or nil
+        if parent ~= nil then
+            if parent.children == nil then parent.children = {} end
+            table.insert(parent.children, self)
+        end
+    end
+    self.children = nil
+    local id = #componentMap + 1
+    componentMap[id] = self
+    return id
+end
+
+-- Render the component, recursively rendering the children if enabled
+function GUIComponent:render(renderChildren)
+    self:drawFunc()
+    renderChildren = renderChildren or false
+    if renderChildren == true and self.children ~= nil and #self.children > 0 then
+        for comp in self.children do
+            comp:render(true)
+        end
+    end
+end
+
+-- Get a recursive X position based on parents
+function GUIComponent:relativeX()
+    if self.parent ~= nil then
+        return self.parent:relativeX() + self.x
+    end
+    return self.x
+end
+
+-- Get a recursive Y position based on parents
+function GUIComponent:relativeY()
+    if self.parent ~= nil then
+        return self.parent:relativeY() + self.y
+    end
+    return self.y
+end
+
+-- Check if Component Rect contains position
+function GUIComponent:contains(x, y)
+    local rx = self:relativeX()
+    local ry = self:relativeY()
+    local xmax = rx + self.width-1
+    local ymax = ry + self.height-1
+    return x >= rx and x <= xmax and y >= ry and y <= ymax
+end
+
+-- Set state values as a table
+function GUIComponent:setState(state)
+    for k,v in ipairs(state) do
+        self.state[k] = v
+    end
+    self:render(false)
+end
+
+-- Get state values
+function GUIComponent:getState(key)
+    if key == nil then
+        return self.state
+    else
+        return self.state[key]
+    end
+end
+
+--------------------------------------------
+-- CORE FUNCTIONS --
 --------------------------------------------
 
 function API.init(foregroundColor, backgroundColor, width, height)
@@ -47,62 +138,62 @@ function API.setResolution(width, height)
     h = height
 end
 
-function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, visible, parent)
-    local comp = {}
-    local id = #componentMap+1
-    comp.x = x
-    comp.y = y
-    comp.width = width
-    comp.height = height
-    comp.state = state
-    comp.visible = visible or true
-    comp.focused = false
-    comp.render = renderFunc
-    comp.callback = callbackFunc or nil
-    if type(parent) == "number" then
-        local p = componentMap[parent]
-        comp.parent = p or nil
-        if p ~= nil then table.insert(p.children, comp) end
-    else
-        comp.parent = parent or nil
-        if parent ~= nil then table.insert(parent.children, comp) end
-    end
-    comp.children = {}
-    comp.contains = function(self, x, y)
-        local rx = self:relativeX()
-        local ry = self:relativeY()
-        local xmax = rx + self.width-1
-        local ymax = ry + self.height-1
-        return x >= rx and x <= xmax and y >= ry and y <= ymax
-    end
-    comp.relativeX = function(self)
-        if self.parent ~= nil then
-            return self.parent:relativeX() + self.x
-        end
-        return self.x
-    end
-    comp.relativeY = function(self)
-        if self.parent ~= nil then
-            return self.parent:relativeY() + self.y
-        end
-        return self.y
-    end
-    comp.getChild = function(self, index)
-        if self.children[index] ~= nil then
-            return self.children[index]
-        end
-        return nil
-    end
-    comp.setState = function(self, key, value)
-        self.state[key] = value
-        self:render()
-    end
-    comp.getState = function(self, key)
-        return self.state[key]
-    end
-    componentMap[id] = comp
-    return id
-end
+-- function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, visible, parent)
+--     local comp = {}
+--     local id = #componentMap+1
+--     comp.x = x
+--     comp.y = y
+--     comp.width = width
+--     comp.height = height
+--     comp.state = state
+--     comp.visible = visible or true
+--     comp.focused = false
+--     comp.render = renderFunc
+--     comp.callback = callbackFunc or nil
+--     if type(parent) == "number" then
+--         local p = componentMap[parent]
+--         comp.parent = p or nil
+--         if p ~= nil then table.insert(p.children, comp) end
+--     else
+--         comp.parent = parent or nil
+--         if parent ~= nil then table.insert(parent.children, comp) end
+--     end
+--     comp.children = {}
+--     comp.contains = function(self, x, y)
+--         local rx = self:relativeX()
+--         local ry = self:relativeY()
+--         local xmax = rx + self.width-1
+--         local ymax = ry + self.height-1
+--         return x >= rx and x <= xmax and y >= ry and y <= ymax
+--     end
+--     comp.relativeX = function(self)
+--         if self.parent ~= nil then
+--             return self.parent:relativeX() + self.x
+--         end
+--         return self.x
+--     end
+--     comp.relativeY = function(self)
+--         if self.parent ~= nil then
+--             return self.parent:relativeY() + self.y
+--         end
+--         return self.y
+--     end
+--     comp.getChild = function(self, index)
+--         if self.children[index] ~= nil then
+--             return self.children[index]
+--         end
+--         return nil
+--     end
+--     comp.setState = function(self, key, value)
+--         self.state[key] = value
+--         self:render()
+--     end
+--     comp.getState = function(self, key)
+--         return self.state[key]
+--     end
+--     componentMap[id] = comp
+--     return id
+-- end
 
 function API.clearScreen()
     gpu.setForeground(baseForegroundColor, false)
@@ -122,9 +213,9 @@ function API.renderAll()
     end
 end
 
-function API.render(componentID)
+function API.render(componentID, renderChildren)
     local comp = componentMap[componentID]
-    if comp ~= nil and comp.visible == true then comp:render() end
+    if comp ~= nil and comp.visible == true then comp:render(renderChildren) end
 end
 
 function API.click(x, y)
@@ -257,7 +348,7 @@ function API.newLabel(x, y, width, height, label, fgColor, bgColor, centered, pa
     local renderFunc = function(self)
         API.drawText(self:relativeX(), self:relativeY(), self.width, self.height, self.state.text, self.state.fgColor, self.state.bgColor, self.state.centered)
     end
-    return API.newComponent(x, y, width, height, state, renderFunc, nil, true, parent)
+    return Component.new(x, y, width, height, state, renderFunc, nil, true, parent)
 end
 
 -- Draws a rect
@@ -269,7 +360,7 @@ function API.newContainer(x, y, width, height, fgColor, bgColor, frame, parent)
     local renderFunc = function(self)
         API.drawRect(self:relativeX(), self:relativeY(), self.width, self.height, self.state.fgColor, self.state.bgColor, self.state.frame)
     end
-    return API.newComponent(x, y, width, height, state, renderFunc, nil, true, parent)
+    return Component.new(x, y, width, height, state, renderFunc, nil, true, parent)
 end
 
 -- Draws a Button that can be pressed
@@ -301,7 +392,7 @@ function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
         self:render()
         if callbackFunc ~= nil then callbackFunc() end
     end
-    return API.newComponent(x, y, width, height, state, renderFunc, callback, true, parent)
+    return Component.new(x, y, width, height, state, renderFunc, callback, true, parent)
 end
 
 -- Draws a Button that will keep it's state (and toggle it upon press)
@@ -330,7 +421,7 @@ function API.newToggle(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
         self:render()
         if callbackFunc ~= nil then callbackFunc(self, x, y) end
     end
-    return API.newComponent(x, y, width, height, state, renderFunc, callback, true, parent)
+    return Component.new(x, y, width, height, state, renderFunc, callback, true, parent)
 end
 
 -- Draws a Horizontal/Vertical bar that represents a percentage between value/maxValue
@@ -354,7 +445,7 @@ function API.newValueBar(x, y, width, height, value, maxValue, fillColor, bgColo
             API.drawRect(rx+1, ry+self.height-valLength, self.width-2, valLength+1, baseForegroundColor, self.state.fillColor, nil)
         end
     end
-    return API.newComponent(x, y, width, height, state, renderFunc, nil, true, parent)
+    return Component.new(x, y, width, height, state, renderFunc, nil, true, parent)
 end
 
 -- Draws a Bar Chart of given values
@@ -394,7 +485,7 @@ function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue,
         gpu.setForeground(oldFG, false)
         gpu.setBackground(oldBG, false)
     end
-    return API.newComponent(x, y, width, height, state, renderFunc, nil, true, parent)
+    return Component.new(x, y, width, height, state, renderFunc, nil, true, parent)
 end
 
 -- Draws a single-line Text Input Field that can take in keyboard input
@@ -474,7 +565,7 @@ function API.newInputField(x, y, width, text, fgOn, fgOff, bgOn, bgOff, characte
             end
         end
     end
-    return API.newComponent(x, y, width, 1, state, renderFunc, callbackFunc, true, parent)
+    return Component.new(x, y, width, 1, state, renderFunc, callbackFunc, true, parent)
 end
 
 return API
