@@ -7,9 +7,14 @@ local API = {}
 local driver
 
 local function _writePayload(data, msgType)
-    local sdata = serialize(data)
-    local payload = driver.headerPrefix..'@'..msgType..'&'..sdata
-    return payload 
+    if data ~= nil then
+        local sdata = serialize(data)
+        local payload = driver.headerPrefix..'@'..msgType..'&'..sdata
+        return payload
+    else
+        local payload = driver.headerPrefix..'@'..msgType
+        return payload
+    end
 end
 
 local function _readPayload(payload)
@@ -48,8 +53,8 @@ function API.send(address, data, msgType)
     modem.send(address, driver.port, payload)
 end
 
-function API.broadcast(data)
-    local payload = _writePayload(data)
+function API.broadcast(data, msgType)
+    local payload = _writePayload(data, msgType)
     modem.broadcast(driver.port, payload)
 end
 

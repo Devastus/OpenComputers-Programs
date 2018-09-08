@@ -138,63 +138,6 @@ function API.setResolution(width, height)
     h = height
 end
 
--- function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, visible, parent)
---     local comp = {}
---     local id = #componentMap+1
---     comp.x = x
---     comp.y = y
---     comp.width = width
---     comp.height = height
---     comp.state = state
---     comp.visible = visible or true
---     comp.focused = false
---     comp.render = renderFunc
---     comp.callback = callbackFunc or nil
---     if type(parent) == "number" then
---         local p = componentMap[parent]
---         comp.parent = p or nil
---         if p ~= nil then table.insert(p.children, comp) end
---     else
---         comp.parent = parent or nil
---         if parent ~= nil then table.insert(parent.children, comp) end
---     end
---     comp.children = {}
---     comp.contains = function(self, x, y)
---         local rx = self:relativeX()
---         local ry = self:relativeY()
---         local xmax = rx + self.width-1
---         local ymax = ry + self.height-1
---         return x >= rx and x <= xmax and y >= ry and y <= ymax
---     end
---     comp.relativeX = function(self)
---         if self.parent ~= nil then
---             return self.parent:relativeX() + self.x
---         end
---         return self.x
---     end
---     comp.relativeY = function(self)
---         if self.parent ~= nil then
---             return self.parent:relativeY() + self.y
---         end
---         return self.y
---     end
---     comp.getChild = function(self, index)
---         if self.children[index] ~= nil then
---             return self.children[index]
---         end
---         return nil
---     end
---     comp.setState = function(self, key, value)
---         self.state[key] = value
---         self:render()
---     end
---     comp.getState = function(self, key)
---         return self.state[key]
---     end
---     componentMap[id] = comp
---     return id
--- end
-
 function API.clearScreen()
     gpu.setForeground(baseForegroundColor, false)
     gpu.setBackground(baseBackgroundColor, false)
@@ -209,7 +152,7 @@ end
 function API.renderAll()
     API.clearScreen()
     for i = 1, #componentMap, 1 do
-        componentMap[i]:render()
+        componentMap[i]:render(false)
     end
 end
 
@@ -246,22 +189,6 @@ end
 
 function API.getComponent(componentID)
     return componentMap[componentID]
-end
-
-function API.getComponentState(componentID, key)
-    local comp = componentMap[componentID]
-    if comp ~= nil then
-        return comp:getState(key)
-    end
-    return nil
-end
-
-function API.setComponentState(componentID, key, value)
-    local comp = componentMap[componentID]
-    if comp ~= nil then
-        return comp:setState(key, value)
-    end
-    return nil
 end
 
 --------------------------------------------

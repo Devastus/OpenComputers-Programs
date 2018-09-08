@@ -6,10 +6,16 @@ local queue = require("libqueue")
 
 local updateInterval = 0.002
 local contexts = {}
-local settings = {servers = {controller={}, monitor={}}}
+local settings = {servers = {}}
 local powerQueue = queue.new(12)
-local powermonitor_id = -1
 
+local powermonitor_id = -1
+local serverList_id = -1
+
+local centerX, centerY = 0
+local serverList = {controller = {}, monitor = {}}
+local updateRequestEventID = -1
+local monitorUpdateEventID = -1
 -----------------------------------------------
 -- METHODS --
 -----------------------------------------------
@@ -36,7 +42,7 @@ local function toggleReactor(reactor_id)
 
 end
 
-local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bgOn, bgOff, frame)
+local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bgOn, bgOff, frame, parent)
     local state = {}
     state.reactor_id = reactor_id or ""
     state.energyProduced = 0
@@ -63,20 +69,46 @@ local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bg
         self.state.active = not self.state.active
         self:render()
     end
-    return GUIComponent.new(x, y, width, height, state, renderFunc, callbackFunc)
+    return GUIComponent.new(x, y, width, height, state, renderFunc, callbackFunc, true, parent)
 end
 
-local function onMonitorUpdate()
-    local monitor_component = gui.getComponent(powermonitor_id)
-    monitor_component.values = powerQueue.values
-    gui.render(powermonitor_id)
+local function onPowerMonitorUpdate()
+    local totalValue = 0
+    local totalMax = 0
+    for mon in settings.servers.monitor do
+        totalValue = totalValue + mon.totalEnergy
+        totalMax = totalMax + mon.totalEnergyMax
+    end
+    powerQueue.pushright(totalValue)
+    gui.getComponent(powermonitor_id):setState({values = powerQueue.values, maxValue = totalMax})
+end
+
+local function onUpdateRequest()
+    net.broadcast(settings.network_id, "update")
+end
+
+local function onUpdateReply(remoteAddress, data)
+    if data.server_type ~= nil then
+        for k,v in pairs(data) do
+            settings.servers[data.server_type][remoteAddress][k] = v
+        end
+    end
+end
+
+local function onFetchServers(remoteAddress, data)
+    table.insert(serverList, {id = data.network_id, server_type=data.server_type, address = remoteAddress, selected = false})
+    local i = #serverList
+    local serverListComp = gui.getComponent(serverList_id)
+    local y = #serverListComp.children
+    gui.newToggle(1, 1+y, serverListComp.width, 1, serverList[i].id, 0xFFFFFF, 0x000000, 0x000000, 0xFFFFFF, nil, function() serverList[i].selected = not serverList[i].selected end, serverList_id)
+    gui.render(serverList_id, true)
 end
 
 function contexts.bottomPanel()
     local mainH = gui.percentY(0.9)
     local botpanelH = gui.height() - mainH
     local botBWidth = gui.width() / 4
-    gui.newLabel(1, mainH+1, botBWidth, botpanelH, "ReactorNet", 0xFFFFFF, 0x113366, true)
+    gui.newLabel(1, mainH+1, botBWidth, botpanelH, "|ReactorNet|", 0xFFFFFF, 0x113366, true)
     gui.newButton(botBWidth, mainH+1, botBWidth, botpanelH, "Monitor", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.mainScreenGUI)
     gui.newButton(botBWidth*2, mainH+1, botBWidth, botpanelH, "Settings", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, contexts.settingsScreenGUI)
     gui.newButton(botBWidth*3, mainH+1, botBWidth, botpanelH, "Shutdown", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, closeClient)
@@ -85,22 +117,14 @@ end
 function contexts.mainScreenGUI()
     -- Draw a Power Chart of total energy numbers from monitors
     -- Draw a list of toggles for reactor controllers
+    net.disconnectEvent("fetchreply")
+    updateRequestEventID = event.timer(2, onUpdateRequest, math.huge)
+    monitorUpdateEventID = event.timer(5, onPowerMonitorUpdate, math.huge)
     gui.clearAll()
     local mainH = gui.percentY(0.9)
     local botpanelH = gui.height() - mainH
     local monW = gui.percentX(0.7)
     local sidepanelW = gui.width() - monW
-
-    -- FIXME: this is all just template designing stuff
-    local powerMax = 100000
-    powerQueue:pushright(73500)
-    powerQueue:pushright(34600)
-    powerQueue:pushright(96500)
-    powerQueue:pushright(81200)
-    powerQueue:pushright(63000)
-    powerQueue:pushright(12300)
-    powerQueue:pushright(100000)
-
 
     -- Draw power monitor, or a "debug message" if no monitors are available
     if #settings["servers"]["monitor"] > 0 then
@@ -111,42 +135,42 @@ function contexts.mainScreenGUI()
     end
 
     -- Draw reactor toggles, or a "debug message" if no reactors are available
-    gui.newContainer(monW, 1, sidepanelW, mainH, 0xFFFFFF, 0x000000, "heavy")
+    local reactorContainer_id = gui.newContainer(monW, 1, sidepanelW, mainH, 0xFFFFFF, 0x000000, "heavy")
     if #settings["servers"]["controller"] > 0 then
         local maxReactorCount = math.floor((mainH-2) / 3)
         for i=1, maxReactorCount, 1 do
             local buttonWidth = sidepanelW-2
             local button_y = 2 + (i-1) * 3
-            newReactorButton(monW+1, button_y, buttonWidth, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x22CC55, 0xCC5522, "light")
+            newReactorButton(monW+1, button_y, buttonWidth, 3, "Reactor "..tostring(i), 0xFFFFFF, 0xCCCCCC, 0x22CC55, 0xCC5522, "light", reactorContainer_id)
         end
     end
 
     contexts.bottomPanel()
     gui.renderAll()
+
+    net.connectEvent("updatereply", onUpdateReply)
 end
 
 function contexts.settingsScreenGUI()
     -- Set a network ID for this client
     -- Gather all egilible RNet servers for communication
-    --net.connectEvent("fetchreply", )
-
+    net.disconnectEvent("updatereply")
+    event.cancel(updateRequestEventID)
+    event.cancel(monitorUpdateEventID)
     gui.clearAll()
-    local cX = gui.percentX(0.5)
-    local cY = gui.percentY(0.5)
-    gui.newLabel(cX-16, cY-9, 32, 1, "ReactorNet Client | Setup", _, _, true)
-    gui.newLabel(cX-16, cY-6, 32, 1, "Network ID (1-12 Characters)", _, _, true)
-    gui.newInputField(cX-8, cY-5, 16, settings.network_id, 0xFFFFFF, 0xCCCCCC, 0x666666, 0x333333, 12, function(id) settings.network_id = "client_"..id end)
+    gui.newLabel(centerX-16, 1, 32, 1, "ReactorNet Client | Setup", _, _, true)
+    gui.newLabel(centerX-16, 3, 32, 1, "Network ID (1-12 Characters)", _, _, true)
+    gui.newInputField(centerX-8, 4, 16, settings.network_id, 0xFFFFFF, 0xCCCCCC, 0x666666, 0x333333, 12, function(id) settings.network_id = "client_"..id end)
 
-    -- Server list
-    gui.newLabel(cX-16, cY-3, 32, 1, "Available servers:", _, _, true)
-    local containerH = cY
-    local serv_container_id = gui.newContainer(cX-16, cY-2, 32, containerH, 0xFFFFFF, 0x000000, "heavy")
-    for i = 1, containerH-2, 1 do
-        gui.newToggle(1, i, 30, 1, "Temp", 0xFFFFFF, 0x000000, 0x000000, 0xFFFFFF, nil, nil, serv_container_id)
-    end
+    gui.newLabel(centerX-16, 6, 32, 1, "Available servers:", _, _, true)
+    local containerH = centerY
+    serverList_id = gui.newContainer(centerX-16, 7, 32, containerH, 0xFFFFFF, 0x000000, "heavy")
 
     contexts.bottomPanel()
     gui.renderAll()
+
+    net.connectEvent("fetchreply", onFetchServers)
+    net.broadcast(nil, "fetch")
 end
 
 -----------------------------------------------
@@ -154,6 +178,8 @@ end
 -----------------------------------------------
 
 gui.init(0xFFFFFF, 0x000000, 80, 25)
+centerX = gui.percentX(0.5)
+centerY = gui.percentY(0.5)
 net.open(1337, "RNet")
 contexts.mainScreenGUI()
 while event.pull(updateInterval, "interrupted") == nil do

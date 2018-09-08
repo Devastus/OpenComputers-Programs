@@ -92,8 +92,37 @@ local function setTurbines(functionName, args)
 end
 
 --Displays long numbers with commas
-function fancyNumber(n)
+local function fancyNumber(n)
     return tostring(math.floor(n)):reverse():gsub("(%d%d%d)", "%1,"):gsub("%D$",""):reverse()
+end
+
+local function onFetchRequest(remoteAddress, data)
+    net.send(remoteAddress, {settings.network_id, settings.server_type}, "fetchreply")
+end
+
+local function onUpdateRequest(remoteAddress, data)
+    local pack = {}
+    if settings.server_type == "controller" then
+        pack = {
+            network_id = settings.network_id,
+            server_type = settings.server_type,
+            active = reactorInfo.active,
+            fuelAmount = reactorInfo.fuelAmount,
+            fuelAmountMax = reactorInfo.fuelAmountMax,
+            averageRotorSpeed = turbinesInfo.averageRotorSpeed,
+            totalEnergyProduced = turbinesInfo.totalEnergyProduced
+        }
+    else
+        pack = {
+            network_id = settings.network_id,
+            server_type = settings.server_type,
+            totalEnergy = monitorInfo.totalEnergy,
+            totalEnergyMax = monitorInfo.totalEnergyMax,
+            input = monitorInfo.input,
+            output = monitorInfo.output
+        }
+    end
+    net.send(remoteAddress, pack, "updatereply")
 end
 
 local function setupServer()
@@ -262,6 +291,8 @@ end
 
 local function closeServer()
     event.cancel(updateTimerID)
+    net.disconnectEvent("fetch")
+    net.disconnectEvent("update")
     termUI.clear()
     termUI.write(1,1, "ReactorNet Server | Closing...")
     net.close()
@@ -271,6 +302,8 @@ end
 
 local function runServer()
     termUI.clear()
+    net.connectEvent("fetch", onFetchRequest)
+    net.connectEvent("update", onUpdateRequest)
     if settings.server_type == "controller" then
         setActive(true)
         updateControl()
