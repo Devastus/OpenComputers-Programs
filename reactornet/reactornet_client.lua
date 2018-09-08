@@ -84,7 +84,12 @@ local function onPowerMonitorUpdate()
 end
 
 local function onUpdateRequest()
-    net.broadcast(settings.network_id, "update")
+    for address,_ in pairs(settings.servers.monitor) do
+        net.send(address, settings.network_id, "update")
+    end
+    for address,_ in pairs(settings.servers.controller) do
+        net.send(address, settings.network_id, "update")
+    end
 end
 
 local function onUpdateReply(remoteAddress, data)
