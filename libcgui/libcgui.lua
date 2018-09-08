@@ -59,12 +59,13 @@ function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, 
     comp.focused = false
     comp.render = renderFunc
     comp.callback = callbackFunc or nil
-    if type(parent) == "table" then
-        comp.parent = parent
-    elseif type(parent) == "number" then
-        comp.parent = API.getComponent(parent)
+    if type(parent) == "number" then
+        local p = componentMap[parent]
+        comp.parent = p or nil
+        if p ~= nil then table.insert(p.children, comp) end
     else
-        comp.parent = nil
+        comp.parent = parent or nil
+        if parent ~= nil then table.insert(parent.children, comp) end
     end
     comp.children = {}
     comp.contains = function(self, x, y)
@@ -100,7 +101,6 @@ function API.newComponent(x, y, width, height, state, renderFunc, callbackFunc, 
         return self.state[key]
     end
     componentMap[id] = comp
-    if parent ~= nil then table.insert(parent.children, comp) end
     return id
 end
 
