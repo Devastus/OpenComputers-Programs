@@ -138,8 +138,9 @@ function contexts.settingsScreenGUI()
 
     -- Server list
     gui.newLabel(cX-16, cY-3, 32, 1, "Available servers:", _, _, true)
-    local serv_container_id = gui.newContainer(cX-16, cY-2, 32, cY-4, 0xFFFFFF, 0x000000, "heavy")
-    for i = 1, cY-4-2, 1 do
+    local containerH = cY-4
+    local serv_container_id = gui.newContainer(cX-16, cY-2, 32, containerH, 0xFFFFFF, 0x000000, "heavy")
+    for i = 1, containerH-2, 1 do
         gui.newToggle(1, i, 30, 1, "Temp", 0xFFFFFF, 0x000000, 0x000000, 0xFFFFFF, nil, nil, serv_container_id)
     end
 
