@@ -4,7 +4,7 @@ local event = require("event")
 local gui = require("libcgui")
 local queue = require("libqueue")
 
-local updateInterval = 0.033 --30 FPS
+local updateInterval = 0.002
 local contexts = {}
 local settings = {servers = {controller={}, monitor={}}}
 local powerQueue = queue.new(12)
@@ -139,10 +139,9 @@ function contexts.settingsScreenGUI()
     -- Server list
     gui.newLabel(cX-16, cY-3, 32, 1, "Available servers:", _, _, true)
     local serv_container_id = gui.newContainer(cX-16, cY-2, 32, cY-4, 0xFFFFFF, 0x000000, "heavy")
-    for i = 1, cY-4, 1 do
+    for i = 1, cY-4-2, 1 do
         gui.newToggle(1, i, 30, 1, "Temp", 0xFFFFFF, 0x000000, 0x000000, 0xFFFFFF, nil, nil, serv_container_id)
     end
-
 
     contexts.bottomPanel()
     gui.renderAll()
