@@ -139,13 +139,10 @@ function contexts.settingsScreenGUI()
     -- Server list
     gui.newLabel(cX-16, cY-3, 32, 1, "Available servers:", _, _, true)
     local serv_container_id = gui.newContainer(cX-16, cY-2, 32, cY-4, 0xFFFFFF, 0x000000, "heavy")
-    local serv_container = gui.getComponent(serv_container_id)
-    local t1_id = gui.newToggle(1, 1, 32, 1, "Temp", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil, serv_container_id)
-    local t1 = gui.getComponent(t1_id)
-    local t2_id = gui.newToggle(1, 2, 32, 1, "Temp", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, nil, serv_container)
-    local t2 = gui.getComponent(t2_id)
-    gui.newLabel(1, 3, 32, 1, tostring(t1.parent)..tostring(t1:relativeY()), _, _, false, serv_container_id)
-    gui.newLabel(1, 4, 32, 1, tostring(t2.parent)..tostring(t2:relativeY()), _, _, false, serv_container)
+    for i = 1, cY-4, 1 do
+        gui.newToggle(1, i, 30, 1, "Temp", 0xFFFFFF, 0x000000, 0x000000, 0xFFFFFF, nil, nil, serv_container_id)
+    end
+
 
     contexts.bottomPanel()
     gui.renderAll()
