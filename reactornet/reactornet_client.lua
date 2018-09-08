@@ -104,6 +104,14 @@ local function onFetchServers(remoteAddress, data)
     gui.render(serverList_id, true)
 end
 
+local function saveSelectedServers()
+    for serv in serverList do
+        if serv.selected then
+            settings.servers[serv.server_type][serv.address] = {network_id = serv.network_id}
+        end
+    end
+end
+
 function contexts.bottomPanel()
     local mainH = gui.percentY(0.9)
     local botpanelH = gui.height() - mainH
@@ -165,6 +173,7 @@ function contexts.settingsScreenGUI()
     gui.newLabel(centerX-16, 6, 32, 1, "Available servers:", _, _, true)
     local containerH = centerY
     serverList_id = gui.newContainer(centerX-16, 7, 32, containerH, 0xFFFFFF, 0x000000, "heavy")
+    gui.newButton(centerX-8, containerH+7, 16, "Save Selections", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, saveSelectedServers)
 
     contexts.bottomPanel()
     gui.renderAll()
