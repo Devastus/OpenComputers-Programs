@@ -7,12 +7,13 @@ local TYPE = {"server", "client"}
 local settings = {}
 
 local function onRequest(remoteAddress, data)
+    termui.write(1,2,"Request: "..tostring(data))
     local upper = string.upper(data)
     net.send(remoteAddress, upper, "reply")
 end
 
 local function onReply(remoteAddress, data)
-    termui.write(1,2,data)
+    termui.write(1,2,"Reply: "..tostring(data))
 end
 
 -- Select program mode
