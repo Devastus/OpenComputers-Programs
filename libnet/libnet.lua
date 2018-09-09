@@ -31,11 +31,12 @@ end
 
 local function _handleRecv(_, _, remoteAddress, port, distance, payload)
     local message = _readPayload(payload)
-    if message.header == driver.headerPrefix then
-        if driver[message.type] ~= nil then
-            driver[message.type](remoteAddress, message.data)
-        end
-    end
+    driver[message.type](remoteAddress, message.data)
+    -- if message.header == driver.headerPrefix then
+    --     if driver[message.type] ~= nil then
+    --         driver[message.type](remoteAddress, message.data)
+    --     end
+    -- end
 end
 
 ----------------------------------------------------
@@ -65,17 +66,17 @@ function API.broadcast(data, msgType)
 end
 
 function API.open(port, headerPrefix)
+    modem.open(port)
     driver = {}
     driver.port = port
     driver.headerPrefix = headerPrefix
-    modem.open(driver.port)
-    return event.listen("modem_message", _handleRecv)
+    event.listen("modem_message", _handleRecv)
 end
 
 function API.close()
-    modem.close()
+    modem.close(driver.port)
     driver = nil
-    return event.ignore("modem_message", _handleRecv)
+    event.ignore("modem_message", _handleRecv)
 end
 
 return API
