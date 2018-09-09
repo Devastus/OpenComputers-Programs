@@ -30,12 +30,12 @@ local function clamp(value,min,max) return math.min(math.max(value, min), max) e
 -- COMPONENT CLASS --
 --------------------------------------------
 
-GUIComponent = {}
-GUIComponent.__index = GUIComponent
+API.Component = {}
+API.Component.__index = API.Component
 
 -- Component Constructor
-function GUIComponent.new(x, y, width, height, state, drawFunc, callbackFunc, visible, parent)
-    local self = setmetatable({}, GUIComponent)
+function API.Component.new(x, y, width, height, state, drawFunc, callbackFunc, visible, parent)
+    local self = setmetatable({}, API.Component)
     self.x = x
     self.y = y
     self.width = width or 1
@@ -65,7 +65,7 @@ function GUIComponent.new(x, y, width, height, state, drawFunc, callbackFunc, vi
 end
 
 -- Render the component, recursively rendering the children if enabled
-function GUIComponent:render(renderChildren)
+function API.Component:render(renderChildren)
     self:draw()
     renderChildren = renderChildren or false
     if renderChildren == true and self.children ~= nil and #self.children > 0 then
@@ -76,7 +76,7 @@ function GUIComponent:render(renderChildren)
 end
 
 -- Get a recursive X position based on parents
-function GUIComponent:relativeX()
+function API.Component:relativeX()
     if self.parent ~= nil then
         return self.parent:relativeX() + self.x
     end
@@ -84,7 +84,7 @@ function GUIComponent:relativeX()
 end
 
 -- Get a recursive Y position based on parents
-function GUIComponent:relativeY()
+function API.Component:relativeY()
     if self.parent ~= nil then
         return self.parent:relativeY() + self.y
     end
@@ -92,7 +92,7 @@ function GUIComponent:relativeY()
 end
 
 -- Check if Component Rect contains position
-function GUIComponent:contains(x, y)
+function API.Component:contains(x, y)
     local rx = self:relativeX()
     local ry = self:relativeY()
     local xmax = rx + self.width-1
@@ -101,7 +101,7 @@ function GUIComponent:contains(x, y)
 end
 
 -- Set state values as a table and re-render the component tree
-function GUIComponent:setState(state)
+function API.Component:setState(state)
     for k,v in ipairs(state) do
         self.state[k] = v
     end
@@ -109,7 +109,7 @@ function GUIComponent:setState(state)
 end
 
 -- Get state values
-function GUIComponent:getState(key)
+function API.Component:getState(key)
     if key == nil then
         return self.state
     else
@@ -121,6 +121,7 @@ end
 -- CORE FUNCTIONS --
 --------------------------------------------
 
+-- Initialize base properties of the GUI
 function API.init(foregroundColor, backgroundColor, width, height)
     if width ~= nil and height ~= nil then
         API.setResolution(width, height)
@@ -132,23 +133,27 @@ function API.init(foregroundColor, backgroundColor, width, height)
     API.clearAll()
 end
 
+-- Set the screen resolution
 function API.setResolution(width, height)
     gpu.setResolution(width, height)
     w = width
     h = height
 end
 
+-- Clear the screen of content
 function API.clearScreen()
     gpu.setForeground(baseForegroundColor, false)
     gpu.setBackground(baseBackgroundColor, false)
     gpu.fill(1,1,w,h," ")
 end
 
+-- Clear everything, deleting components
 function API.clearAll()
     API.clearScreen()
     componentMap = {}
 end
 
+-- Render all components separately
 function API.renderAll()
     API.clearScreen()
     for i = 1, #componentMap, 1 do
@@ -156,11 +161,13 @@ function API.renderAll()
     end
 end
 
+-- Render a component, optionally as a recursive tree
 function API.render(componentID, renderChildren)
     local comp = componentMap[componentID]
     if comp ~= nil and comp.visible == true then comp:render(renderChildren) end
 end
 
+-- Check if a Component contains the click position, launch a callback if it exists
 function API.click(x, y)
     local id = -1
     for i = 1, #componentMap, 1 do
@@ -169,10 +176,10 @@ function API.click(x, y)
             if comp.visible then
                 if comp:contains(x, y) then
                     if comp.callback ~= nil then comp:callback(x, y) end
-                    comp.focused = true
+                    --comp.focused = true
                     id = i
-                else
-                    comp.focused = false
+                --else
+                    --comp.focused = false
                 end
             end
         end
@@ -180,6 +187,7 @@ function API.click(x, y)
     return id
 end
 
+-- Set a Component's visibility
 function API.setVisible(componentID, visible)
     if componentMap[componentID] ~= nil then
         componentMap[componentID].visible = visible
@@ -187,6 +195,7 @@ function API.setVisible(componentID, visible)
     end
 end
 
+-- Get a Component from the map
 function API.getComponent(componentID)
     return componentMap[componentID]
 end
@@ -265,7 +274,7 @@ end
 -- DEFAULT COMPONENTS --
 --------------------------------------------
 
--- Draws a simple Label
+-- Create a simple Label
 function API.newLabel(x, y, width, height, label, fgColor, bgColor, centered, parent)
     local state = {}
     state.text = label
@@ -275,10 +284,10 @@ function API.newLabel(x, y, width, height, label, fgColor, bgColor, centered, pa
     local renderFunc = function(self)
         API.drawText(self:relativeX(), self:relativeY(), self.width, self.height, self.state.text, self.state.fgColor, self.state.bgColor, self.state.centered)
     end
-    return GUIComponent.new(x, y, width, height, state, renderFunc, nil, true, parent)
+    return API.Component.new(x, y, width, height, state, renderFunc, nil, true, parent)
 end
 
--- Draws a rect
+-- Create a Container rect
 function API.newContainer(x, y, width, height, fgColor, bgColor, frame, parent)
     local state = {}
     state.fgColor = fgColor or baseForegroundColor
@@ -287,10 +296,10 @@ function API.newContainer(x, y, width, height, fgColor, bgColor, frame, parent)
     local renderFunc = function(self)
         API.drawRect(self:relativeX(), self:relativeY(), self.width, self.height, self.state.fgColor, self.state.bgColor, self.state.frame)
     end
-    return GUIComponent.new(x, y, width, height, state, renderFunc, nil, true, parent)
+    return API.Component.new(x, y, width, height, state, renderFunc, nil, true, parent)
 end
 
--- Draws a Button that can be pressed
+-- Create a Button that can be pressed
 function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, frame, callbackFunc, parent)
     local state = {}
     state.text = label
@@ -319,10 +328,10 @@ function API.newButton(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
         self:render()
         if callbackFunc ~= nil then callbackFunc() end
     end
-    return GUIComponent.new(x, y, width, height, state, renderFunc, callback, true, parent)
+    return API.Component.new(x, y, width, height, state, renderFunc, callback, true, parent)
 end
 
--- Draws a Button that will keep it's state (and toggle it upon press)
+-- Create a Button that will keep it's state (and toggle it upon press)
 function API.newToggle(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, frame, callbackFunc, parent)
     local state = {}
     state.text = label
@@ -348,10 +357,10 @@ function API.newToggle(x, y, width, height, label, fgOff, fgOn, bgOff, bgOn, fra
         self:render()
         if callbackFunc ~= nil then callbackFunc(self, x, y) end
     end
-    return GUIComponent.new(x, y, width, height, state, renderFunc, callback, true, parent)
+    return API.Component.new(x, y, width, height, state, renderFunc, callback, true, parent)
 end
 
--- Draws a Horizontal/Vertical bar that represents a percentage between value/maxValue
+-- Create a Horizontal/Vertical bar that represents a percentage between value/maxValue
 function API.newValueBar(x, y, width, height, value, maxValue, fillColor, bgColor, horizontal, frame, parent)
     local state = {}
     state.value = value or 0
@@ -372,10 +381,10 @@ function API.newValueBar(x, y, width, height, value, maxValue, fillColor, bgColo
             API.drawRect(rx+1, ry+self.height-valLength, self.width-2, valLength+1, baseForegroundColor, self.state.fillColor, nil)
         end
     end
-    return GUIComponent.new(x, y, width, height, state, renderFunc, nil, true, parent)
+    return API.Component.new(x, y, width, height, state, renderFunc, nil, true, parent)
 end
 
--- Draws a Bar Chart of given values
+-- Create a Bar Chart of given values
 function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue, frame, parent)
     local state = {}
     state.fillColor = fillColor
@@ -412,10 +421,10 @@ function API.newChart(x, y, width, height, fillColor, bgColor, values, maxValue,
         gpu.setForeground(oldFG, false)
         gpu.setBackground(oldBG, false)
     end
-    return GUIComponent.new(x, y, width, height, state, renderFunc, nil, true, parent)
+    return API.Component.new(x, y, width, height, state, renderFunc, nil, true, parent)
 end
 
--- Draws a single-line Text Input Field that can take in keyboard input
+-- Create a single-line Text Input Field that can take in keyboard input
 function API.newInputField(x, y, width, text, fgOn, fgOff, bgOn, bgOff, characterLimit, onChangeCallback, parent)
     local state = {}
     state.text = text or ""
@@ -492,7 +501,7 @@ function API.newInputField(x, y, width, text, fgOn, fgOff, bgOn, bgOff, characte
             end
         end
     end
-    return GUIComponent.new(x, y, width, 1, state, renderFunc, callbackFunc, true, parent)
+    return API.Component.new(x, y, width, 1, state, renderFunc, callbackFunc, true, parent)
 end
 
 return API

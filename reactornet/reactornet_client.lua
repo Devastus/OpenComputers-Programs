@@ -69,7 +69,7 @@ local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bg
         self.state.active = not self.state.active
         self:render()
     end
-    return GUIComponent.new(x, y, width, height, state, renderFunc, callbackFunc, true, parent)
+    return gui.Component.new(x, y, width, height, state, renderFunc, callbackFunc, true, parent)
 end
 
 local function onPowerMonitorUpdate()
@@ -111,7 +111,7 @@ end
 
 local function saveSelectedServers()
     for serv in serverList do
-        if serv.selected then
+        if serv.selected == true then
             settings.servers[serv.server_type][serv.address] = {network_id = serv.network_id}
         end
     end
