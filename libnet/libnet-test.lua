@@ -26,7 +26,7 @@ net.open(3000, "test")
 if settings.type == "server" then
     net.connectEvent("request", onRequest)
 else
-    net.connectEvent("reply", onRequest)
+    net.connectEvent("reply", onReply)
 end
 
 termui.clear()
