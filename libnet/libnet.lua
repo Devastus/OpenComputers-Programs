@@ -10,6 +10,17 @@ local driver
 --- INTERNAL ---
 ----------------------------------------------------
 
+local function _split(message, separator)
+    if separator ~= nil then
+        local fields = {}
+        local pattern = string.format("([^%s]+)", separator)
+        message:gsub(pattern, function(c) fields[#fields+1] = c end)
+        return fields
+    else
+        io.stderr:write("libnet: separator is nil!")
+    end
+end
+
 local function _writePayload(data, msgType)
     if data ~= nil then
         local sdata = serialization.serialize(data)
@@ -21,7 +32,7 @@ end
 
 local function _readPayload(payload)
     local msg = {}
-    local data = string.match(payload, '([^#])')
+    local data = _split(payload, "#")
     msg.header = data[1]
     msg.type = data[2]
     msg.data = data[3] or nil
@@ -44,12 +55,16 @@ end
 function API.connectEvent(msgType, callbackFunc)
     if driver ~= nil and msgType ~= nil and callbackFunc ~= nil then
         driver[msgType] = callbackFunc
+    else
+        io.stderr:write("libnet: invalid event registration!")
     end
 end
 
 function API.disconnectEvent(msgType)
     if driver ~= nil and msgType ~= nil then
         driver[msgType] = nil
+    else
+        io.stderr:write("libnet: event or driver doesn't exist!")
     end
 end
 
@@ -68,13 +83,13 @@ function API.open(port, headerPrefix)
     driver = {}
     driver.port = port
     driver.headerPrefix = headerPrefix
-    event.listen("modem_message", _handleRecv)
+    return event.listen("modem_message", _handleRecv)
 end
 
 function API.close()
     modem.close(driver.port)
     driver = nil
-    event.ignore("modem_message", _handleRecv)
+    return event.ignore("modem_message", _handleRecv)
 end
 
 return API
