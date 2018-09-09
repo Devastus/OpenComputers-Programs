@@ -8,7 +8,7 @@ local settings = {}
 
 local function onRequest(remoteAddress, data)
     termui.write(1,2,"Request: "..tostring(data))
-    local upper = string.upper(data)
+    local upper = string.upper(tostring(data))
     net.send(remoteAddress, upper, "reply")
 end
 
