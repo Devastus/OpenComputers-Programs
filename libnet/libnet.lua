@@ -12,7 +12,7 @@ local driver
 
 local function _writePayload(data, msgType)
     if data ~= nil then
-        local sdata = serialize(data)
+        local sdata = serialization.serialize(data)
         return driver.headerPrefix..'@'..msgType..'&'..sdata
     else
         return driver.headerPrefix..'@'..msgType
@@ -25,7 +25,7 @@ local function _readPayload(payload)
     local dataCharIndex = string.find(payload, '&')
     msg.header = string.sub(payload, 1, typeCharIndex[1]-1)
     msg.type = string.sub(payload, typeCharIndex[1]+1, dataCharIndex[1]-1)
-    msg.data = unserialize(string.sub(payload, dataCharIndex[1]+1))
+    msg.data = serialization.unserialize(string.sub(payload, dataCharIndex[1]+1))
     return msg
 end
 
