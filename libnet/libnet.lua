@@ -35,7 +35,7 @@ local function _readPayload(payload)
     local data = _split(payload, "#")
     msg.header = data[1]
     msg.type = data[2]
-    msg.data = data[3] or nil
+    msg.data = serialization.unserialize(data[3]) or nil
     return msg
 end
 

@@ -66,14 +66,13 @@ local function listAvailableComponents()
     return componentList
 end
 
-local function connectComponent(component)
+local function connectComponent(comp)
     if settings.components == nil then
         settings.components = {}
     end
-    if component ~= nil then
-        local address = component[1]
-        local type = component[2]
-        local type = component[2]
+    if comp ~= nil then
+        local address = comp[1]
+        local type = comp[2]
         if settings.components[type] == nil then
             settings.components[type] = {}
         end
@@ -84,8 +83,6 @@ local function connectComponent(component)
 end
 
 local function setTurbines(functionName, args)
-    -- print(arg)
-    -- for a in arg do print(a) end
     for i,v in ipairs(settings.components["br_turbine"]) do
         component.invoke(v, functionName, table.unpack(args))
     end
@@ -362,9 +359,9 @@ while event.pull(0.05, "interrupted") == nil do
     termUI.write(1, 1, "ReactorNet Server | Launch \n")
     termUI.write(1, 2, settings.network_id)
     local option = termUI.selectOptions(2, 3, {"Start", "Setup", "Exit"})
-    if option == 1 then 
+    if option == 1 then
         return runServer()
-    elseif option == 2 then 
+    elseif option == 2 then
         setupServer()
     else
         net.close()

@@ -140,6 +140,7 @@ function contexts.mainScreenGUI()
     -- Draw a Power Chart of total energy numbers from monitors
     -- Draw a list of toggles for reactor controllers
     net.disconnectEvent("fetchreply")
+    net.connectEvent("updatereply", onUpdateReply)
     updateRequestEventID = event.timer(2, onUpdateRequest, math.huge)
     monitorUpdateEventID = event.timer(5, onPowerMonitorUpdate, math.huge)
     gui.clearAll()
@@ -169,14 +170,13 @@ function contexts.mainScreenGUI()
 
     contexts.bottomPanel()
     gui.renderAll()
-
-    net.connectEvent("updatereply", onUpdateReply)
 end
 
 function contexts.settingsScreenGUI()
     -- Set a network ID for this client
     -- Gather all egilible RNet servers for communication
     net.disconnectEvent("updatereply")
+    net.connectEvent("fetchreply", onFetchServers)
     event.cancel(updateRequestEventID)
     event.cancel(monitorUpdateEventID)
     gui.clearAll()
@@ -191,8 +191,6 @@ function contexts.settingsScreenGUI()
 
     contexts.bottomPanel()
     gui.renderAll()
-
-    net.connectEvent("fetchreply", onFetchServers)
     net.broadcast(settings.network_id, "fetch")
 end
 
