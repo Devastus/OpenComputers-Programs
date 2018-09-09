@@ -140,7 +140,7 @@ function contexts.mainScreenGUI()
     local sidepanelW = gui.width() - monW
 
     -- Draw power monitor, or a "debug message" if no monitors are available
-    if #settings["servers"]["monitor"] > 0 then
+    if #settings.servers.monitor > 0 then
         powermonitor_id = gui.newChart(1, 1, monW, mainH, 0x00FF00, 0x000000, powerQueue.values, powerMax, "heavy")
     else
         gui.newContainer(1, 1, monW, mainH, 0xFFFFFF, 0x000000, "heavy")
@@ -149,7 +149,7 @@ function contexts.mainScreenGUI()
 
     -- Draw reactor toggles, or a "debug message" if no reactors are available
     local reactorContainer_id = gui.newContainer(monW, 1, sidepanelW, mainH, 0xFFFFFF, 0x000000, "heavy")
-    if #settings["servers"]["controller"] > 0 then
+    if #settings.servers.controller > 0 then
         local maxReactorCount = math.floor((mainH-2) / 3)
         for i=1, maxReactorCount, 1 do
             local buttonWidth = sidepanelW-2
@@ -178,7 +178,7 @@ function contexts.settingsScreenGUI()
     gui.newLabel(centerX-16, 6, 32, 1, "Available servers:", _, _, true)
     local containerH = centerY
     serverList_id = gui.newContainer(centerX-16, 7, 32, containerH, 0xFFFFFF, 0x000000, "heavy")
-    gui.newButton(centerX-8, containerH+7, 16, "Save Selections", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, saveSelectedServers)
+    gui.newButton(centerX-8, containerH+7, 16, 1, "Save Selections", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, saveSelectedServers)
 
     contexts.bottomPanel()
     gui.renderAll()
