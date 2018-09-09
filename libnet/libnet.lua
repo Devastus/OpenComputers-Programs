@@ -13,30 +13,28 @@ local driver
 local function _writePayload(data, msgType)
     if data ~= nil then
         local sdata = serialization.serialize(data)
-        return driver.headerPrefix..'@'..msgType..'&'..sdata
+        return driver.headerPrefix..'#'..msgType..'#'..sdata
     else
-        return driver.headerPrefix..'@'..msgType
+        return driver.headerPrefix..'#'..msgType
     end
 end
 
 local function _readPayload(payload)
     local msg = {}
-    local typeCharIndex = string.find(payload, '@')
-    local dataCharIndex = string.find(payload, '&')
-    msg.header = string.sub(payload, 1, typeCharIndex[1]-1)
-    msg.type = string.sub(payload, typeCharIndex[1]+1, dataCharIndex[1]-1)
-    msg.data = serialization.unserialize(string.sub(payload, dataCharIndex[1]+1))
+    local data = string.match(payload, '([^#])')
+    msg.header = data[1]
+    msg.type = data[2]
+    msg.data = data[3] or nil
     return msg
 end
 
 local function _handleRecv(_, _, remoteAddress, port, distance, payload)
     local message = _readPayload(payload)
-    driver[message.type](remoteAddress, message.data)
-    -- if message.header == driver.headerPrefix then
-    --     if driver[message.type] ~= nil then
-    --         driver[message.type](remoteAddress, message.data)
-    --     end
-    -- end
+    if message.header == driver.headerPrefix then
+        if driver[message.type] ~= nil then
+            driver[message.type](remoteAddress, message.data)
+        end
+    end
 end
 
 ----------------------------------------------------
