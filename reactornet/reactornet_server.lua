@@ -96,11 +96,11 @@ local function fancyNumber(n)
     return tostring(math.floor(n)):reverse():gsub("(%d%d%d)", "%1,"):gsub("%D$",""):reverse()
 end
 
-local function onFetchRequest(remoteAddress, data)
+local function onFetchRequest(remoteAddress, _)
     net.send(remoteAddress, {settings.network_id, settings.server_type}, "fetchreply")
 end
 
-local function onUpdateRequest(remoteAddress, data)
+local function onUpdateRequest(remoteAddress, _)
     local pack = {}
     if settings.server_type == "controller" then
         pack = {
@@ -291,11 +291,9 @@ end
 
 local function closeServer()
     event.cancel(updateTimerID)
-    net.disconnectEvent("fetch")
-    net.disconnectEvent("update")
+    net.close()
     termUI.clear()
     termUI.write(1,1, "ReactorNet Server | Closing...")
-    net.close()
     os.sleep(1)
     os.exit()
 end
@@ -355,7 +353,7 @@ else
     if termUI.isAvailable() == false then
         return runServer()
     end
-end 
+end
 
 -- Present the launch screen
 net.open(1337, "RNet")
@@ -368,7 +366,7 @@ while event.pull(0.05, "interrupted") == nil do
         return runServer()
     elseif option == 2 then 
         setupServer()
-    else 
+    else
         net.close()
         os.exit()
     end

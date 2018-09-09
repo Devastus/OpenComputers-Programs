@@ -16,6 +16,7 @@ local centerX, centerY = 0
 local serverList = {}
 local updateRequestEventID = -1
 local monitorUpdateEventID = -1
+
 -----------------------------------------------
 -- METHODS --
 -----------------------------------------------
@@ -72,6 +73,18 @@ local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bg
     return gui.Component.new(x, y, width, height, state, renderFunc, callbackFunc, true, parent)
 end
 
+local function saveSelectedServers()
+    for serv in serverList do
+        if serv.selected == true then
+            settings.servers[serv.server_type][serv.address] = {network_id = serv.network_id}
+        end
+    end
+end
+
+----------------------------------------------------
+--- EVENTS ---
+----------------------------------------------------
+
 local function onPowerMonitorUpdate()
     local totalValue = 0
     local totalMax = 0
@@ -109,13 +122,9 @@ local function onFetchServers(remoteAddress, data)
     gui.render(serverList_id, true)
 end
 
-local function saveSelectedServers()
-    for serv in serverList do
-        if serv.selected == true then
-            settings.servers[serv.server_type][serv.address] = {network_id = serv.network_id}
-        end
-    end
-end
+----------------------------------------------------
+--- CONTEXTS ---
+----------------------------------------------------
 
 function contexts.bottomPanel()
     local mainH = gui.percentY(0.9)
@@ -184,7 +193,7 @@ function contexts.settingsScreenGUI()
     gui.renderAll()
 
     net.connectEvent("fetchreply", onFetchServers)
-    net.broadcast(nil, "fetch")
+    net.broadcast(settings.network_id, "fetch")
 end
 
 -----------------------------------------------

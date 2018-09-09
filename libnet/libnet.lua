@@ -6,14 +6,16 @@ local modem = component.modem
 local API = {}
 local driver
 
+----------------------------------------------------
+--- INTERNAL ---
+----------------------------------------------------
+
 local function _writePayload(data, msgType)
     if data ~= nil then
         local sdata = serialize(data)
-        local payload = driver.headerPrefix..'@'..msgType..'&'..sdata
-        return payload
+        return driver.headerPrefix..'@'..msgType..'&'..sdata
     else
-        local payload = driver.headerPrefix..'@'..msgType
-        return payload
+        return driver.headerPrefix..'@'..msgType
     end
 end
 
@@ -35,6 +37,10 @@ local function _handleRecv(_, _, remoteAddress, port, distance, payload)
         end
     end
 end
+
+----------------------------------------------------
+--- PUBLIC ---
+----------------------------------------------------
 
 function API.connectEvent(msgType, callbackFunc)
     if driver ~= nil and msgType ~= nil and callbackFunc ~= nil then
