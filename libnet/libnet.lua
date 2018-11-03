@@ -22,20 +22,32 @@ local function _split(message, separator)
 end
 
 local function _writePayload(data, msgType)
+    local msg = ""
+    if driver.header ~= nil then msg = driver.header.."#" end
+    msg = msg..msgType
     if data ~= nil then
         local sdata = serialization.serialize(data)
-        return driver.headerPrefix..'#'..msgType..'#'..sdata
-    else
-        return driver.headerPrefix..'#'..msgType
+        msg = msg.."#"..sdata
     end
+    return msg
 end
 
 local function _readPayload(payload)
     local msg = {}
     local data = _split(payload, "#")
-    msg.header = data[1]
-    msg.type = data[2]
-    msg.data = serialization.unserialize(data[3]) or nil
+    if #data == 1 then
+        msg.header = nil
+        msg.type = data[1]
+        msg.data = nil
+    elseif #data == 2 then
+        msg.header = nil
+        msg.type = data[1]
+        msg.data = serialization.unserialize(data[2]) or nil
+    else
+        msg.header = data[1]
+        msg.type = data[2]
+        msg.data = serialization.unserialize(data[3]) or nil
+    end
     return msg
 end
 
@@ -78,11 +90,10 @@ function API.broadcast(data, msgType)
     modem.broadcast(driver.port, payload)
 end
 
-function API.open(port, headerPrefix)
+function API.open(port)
     modem.open(port)
     driver = {}
     driver.port = port
-    driver.headerPrefix = headerPrefix
     return event.listen("modem_message", _handleRecv)
 end
 
@@ -90,6 +101,10 @@ function API.close()
     modem.close(driver.port)
     driver = nil
     return event.ignore("modem_message", _handleRecv)
+end
+
+function API.setHeader(header)
+    driver.header = header or nil
 end
 
 return API
