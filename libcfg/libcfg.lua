@@ -14,7 +14,11 @@ function CFG.read(filepath, default)
     end
     local sdata = file:read("*a")
     file:close()
-    return serialization.unserialize(sdata) or nil
+    if sdata == nil or string.len(sdata) <= 0 then
+        return default or nil
+    else
+        return serialization.unserialize(sdata) or default or nil
+    end
 end
 
 function CFG.write(filepath, data)

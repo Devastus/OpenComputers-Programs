@@ -83,9 +83,7 @@ local function __readCfg(filepath, default)
     end
     local sdata = file:read("*a")
     file:close()
-    if sdata == nil then
-        return default or nil
-    elseif string.len(sdata) <= 0 then
+    if sdata == nil or string.len(sdata) <= 0 then
         return default or nil
     else
         return serialization.unserialize(sdata) or default or nil

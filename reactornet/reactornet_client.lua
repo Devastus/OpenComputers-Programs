@@ -139,8 +139,8 @@ end
 function contexts.mainScreenGUI()
     -- Draw a Power Chart of total energy numbers from monitors
     -- Draw a list of toggles for reactor controllers
-    net.disconnectEvent("fetchreply")
-    net.connectEvent("updatereply", onUpdateReply)
+    net.disconnectEvent("fetch")
+    net.connectEvent("update", onUpdateReply)
     updateRequestEventID = event.timer(2, onUpdateRequest, math.huge)
     monitorUpdateEventID = event.timer(5, onPowerMonitorUpdate, math.huge)
     gui.clearAll()
