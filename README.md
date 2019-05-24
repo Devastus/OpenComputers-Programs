@@ -19,6 +19,9 @@ A simple wrapper for some quick & dirty helper UI functions using 'term'
 ### libmath/
 Utility math functions
 
+### libstring/
+Utility string functions
+
 ### libqueue/
 Simple bi-directional queue wrapper for tables
 

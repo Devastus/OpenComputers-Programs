@@ -94,7 +94,7 @@ local function fancyNumber(n)
 end
 
 local function onFetchRequest(remoteAddress, _)
-    net.send(remoteAddress, {settings.network_id, settings.server_type}, "fetchreply")
+    net.send(remoteAddress, {settings.network_id, settings.server_type}, "fetch")
 end
 
 local function onUpdateRequest(remoteAddress, _)
@@ -119,7 +119,16 @@ local function onUpdateRequest(remoteAddress, _)
             output = monitorInfo.output
         }
     end
-    net.send(remoteAddress, pack, "updatereply")
+    net.send(remoteAddress, pack, "update")
+end
+
+local function onChangeSettingRequest(remoteAddress, data)
+    local success = true
+    if success == true then
+        net.send(remoteAddress, {success: true}, "changesetting")
+    else
+        net.send(remoteAddress, {message: "Bad request"}, "error")
+    end
 end
 
 local function setupServer()
@@ -353,7 +362,7 @@ else
 end
 
 -- Present the launch screen
-net.open(1337, "RNet")
+net.open(1337)
 while event.pull(0.05, "interrupted") == nil do
     termUI.clear()
     termUI.write(1, 1, "ReactorNet Server | Launch \n")

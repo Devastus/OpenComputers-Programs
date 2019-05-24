@@ -175,8 +175,8 @@ end
 function contexts.settingsScreenGUI()
     -- Set a network ID for this client
     -- Gather all egilible RNet servers for communication
-    net.disconnectEvent("updatereply")
-    net.connectEvent("fetchreply", onFetchServers)
+    net.disconnectEvent("update")
+    net.connectEvent("fetch", onFetchServers)
     event.cancel(updateRequestEventID)
     event.cancel(monitorUpdateEventID)
     gui.clearAll()
@@ -201,12 +201,13 @@ end
 gui.init(0xFFFFFF, 0x000000, 80, 25)
 centerX = gui.percentX(0.5)
 centerY = gui.percentY(0.5)
-net.open(1337, "RNet")
+net.open(1337)
 contexts.mainScreenGUI()
 while event.pull(updateInterval, "interrupted") == nil do
-    local _, _, x, y = event.pull(updateInterval, "touch")
-    if x and y then
-        gui.click(x, y)
-    end
+    gui.update(updateInterval)
+    -- local _, _, x, y = event.pull(updateInterval, "touch")
+    -- if x and y then
+    --     gui.click(x, y)
+    -- end
 end
 closeClient()

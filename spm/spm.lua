@@ -263,20 +263,31 @@ local function addRepository(repositoryUrl)
     end
 end
 
-local function removeRepository(repositoryUrl)
-    -- Look for url in settings, if found delete it
+local function removeRepository(identifier)
+    -- Look for url or index in settings, if found delete it
     local settings = __readCfg(SETTINGS, nil)
     if settings then
         for i,v in ipairs(settings["repos"]) do
-            if repositoryUrl == v then
-                found = true
-                table.remove(settings["repos"], i)
-                print("spm: Removed repository '"..repositoryUrl.."'")
-                __writeCfg(SETTINGS, settings)
-                return
+            if type(identifier) == "string" then
+                if identifier == v then
+                    found = true
+                    table.remove(settings["repos"], i)
+                    print("spm: Removed repository '"..identifier.."'")
+                    __writeCfg(SETTINGS, settings)
+                    return
+                end
+            elseif type(identifier) == "number" then
+                if identifier == i then
+                    found = true
+                    local repoUrl = settings["repos"][i]
+                    table.remove(settings["repos"], i)
+                    print("spm: Removed repository '"..repoUrl.."'")
+                    __writeCfg(SETTINGS, settings)
+                    return
+                end
             end
         end
-        io.stderr:write("spm-error: Repository '"..repositoryUrl.."' not found\n")
+        io.stderr:write("spm-error: Repository '"..identifier.."' not found\n")
     end
 end
 

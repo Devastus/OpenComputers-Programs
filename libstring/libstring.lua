@@ -8,3 +8,7 @@ function string:split(separator)
         io.stderr:write("string:split(): separator is nil!")
     end
 end
+
+function number:toFancyNumber(n)
+    return tostring(math.floor(n)):reverse():gsub("(%d%d%d)", "%1,"):gsub("%D$",""):reverse()
+end
