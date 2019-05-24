@@ -190,7 +190,7 @@ end
 function API.update(updateInterval)
     local _, _, x, y = event.pull(updateInterval or 0.01, "touch")
     if x and y then
-        gui.click(x, y)
+        API.click(x, y)
     end
 end
 
