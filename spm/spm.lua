@@ -77,17 +77,12 @@ local function __readCfg(filepath, default)
         if default ~= nil then
             return default
         else
-            io.stderr:write("spm-error: Cannot read file at path " .. filepath .. ": " .. emsg .. "\n")
-            return nil
+            error("[Error] spm: Cannot read file at path " .. filepath .. ": " .. emsg .. "\n")
         end
     end
-    local sdata = file:read("*a")
+    local data = serialization.unserialize(file:read("*a"))
     file:close()
-    if sdata == nil or string.len(sdata) <= 0 then
-        return default or nil
-    else
-        return serialization.unserialize(sdata) or default or nil
-    end
+    return data or default or nil
 end
 
 local function __writeCfg(filepath, data)
@@ -96,11 +91,9 @@ local function __writeCfg(filepath, data)
     end
     local file, emsg = io.open(filepath, "wb")
     if not file then
-        io.stderr:write("spm-error: Cannot write file to path " .. filepath .. ": " .. emsg .. "\n")
-        return
+        error("[Error] spm: Cannot write file to path " .. filepath .. ": " .. emsg .. "\n")
     end
-    local sdata = serialization.serialize(data)
-    file:write(sdata)
+    file:write(serialization.serialize(data))
     file:close()
 end
 

@@ -11,9 +11,9 @@ function CFG.read(filepath, default)
             error("[Error] libcfg.read(): Cannot read file at path " .. filepath .. ": " .. emsg .. "\n")
         end
     end
-    local sdata = serialization.unserialize(file:read("*a"))
+    local data = serialization.unserialize(file:read("*a"))
     file:close()
-    return sdata or default or nil
+    return data or default or nil
 end
 
 function CFG.write(filepath, data)
