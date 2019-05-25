@@ -8,14 +8,14 @@ local settings = {}
 
 local function onRequest(remoteAddress, data)
     termui.clearLine(2)
-    termui.write(1,2,"Request: "..tostring(data))
+    termui.set(1,2,"Request: "..tostring(data))
     local upper = string.upper(tostring(data))
     net.send(remoteAddress, upper, "reply")
 end
 
 local function onReply(remoteAddress, data)
     termui.clearLine(2)
-    termui.write(1,2,"Reply: "..tostring(data))
+    termui.set(1,2,"Reply: "..tostring(data))
 end
 
 -- Select program mode
@@ -44,3 +44,4 @@ while event.pull(0.01, "interrupted") == nil do
     end
 end
 net.close()
+os.exit()

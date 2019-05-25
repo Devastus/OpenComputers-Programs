@@ -86,6 +86,13 @@ function API.write(x, y, msg, msgtype)
     term.write(msg)
 end
 
+function API.set(x, y, msg, msgtype)
+    msgtype = msgtype or "normal"
+    gpu.setForeground(colors[msgtype][1])
+    gpu.setBackground(colors[msgtype][2])
+    gpu.set(x, y, msg)
+end
+
 function API.read(x, y, wrap, msgtype)
     msgtype = msgtype or "normal"
     gpu.setForeground(colors[msgtype][1])
@@ -100,6 +107,7 @@ function API.clearLine(y)
     gpu.setBackground(colors[msgtype][2])
     local w, h = gpu.getResolution()
     gpu.fill(1, y, w, 1, " ")
+    term.setCursor(1, y)
 end
 
 function API.clear()

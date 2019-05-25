@@ -14,7 +14,10 @@ A server/client-based Big Reactors / Extreme Reactors solution for multi-reactor
 An extendable Component-based Graphical User Interface library
 
 ### libtermui/
-A simple wrapper for some quick & dirty helper UI functions using 'term'
+A simple wrapper for some quick & dirty UI functions using 'term'
+
+### libcfg/
+A tiny library for reading and writing cfg files
 
 ### libmath/
 Utility math functions
@@ -26,4 +29,10 @@ Utility string functions
 Simple bi-directional queue wrapper for tables
 
 ### libnet/
-Simple event-driven network messaging wrapper library
+Very simple event-driven network messaging wrapper library
+
+### libsdb/
+sdb (stands for Simple Database) - NoSQL filesystem database library that uses cfg notation for it's data
+
+### sdb/
+Network daemon for Simple Database library
