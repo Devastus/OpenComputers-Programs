@@ -29,7 +29,7 @@ local updateTimerID = 0
 -----------------------------------------------
 
 local function loadSettings()
-    settings = cfg.read(SETTINGS_PATH, {headless=false, targetRotorSpeed=1800, steamPerTurbine=2000})
+    settings = cfg.read(SETTINGS_PATH)
     return settings ~= nil
 end
 
