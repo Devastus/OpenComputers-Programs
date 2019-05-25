@@ -2,6 +2,7 @@ local component = require("component")
 local net = require("libnet")
 local event = require("event")
 local gui = require("libcgui")
+local tbl = require("libtbl")
 local queue = require("libqueue")
 
 local updateInterval = 0.01
@@ -10,6 +11,7 @@ local settings = {servers = {controller = {}, monitor = {}}}
 local powerQueue = queue.new(12)
 
 local powermonitor_id = -1
+local reactorToggleIds = {}
 local serverList_id = -1
 local settingsDebug_id = -1
 
@@ -118,8 +120,15 @@ local function onUpdateReply(remoteAddress, data)
         for k,v in pairs(data) do
             settings.servers[data.server_type][remoteAddress][k] = v
         end
+        if data.server_type == "controller" then
+            for i,v in ipairs(serverList) do
+                if serverList[i].address == remoteAddress then
+                    gui.getComponent(reactorToggleIds[i]):setState({active=data.active})
+                end
+            end
+        end
     end
-    gui.renderAll()
+    -- gui.renderAll()
 end
 
 local function onFetchServers(remoteAddress, data)
@@ -129,9 +138,10 @@ local function onFetchServers(remoteAddress, data)
     local i = #serverList
     local serverListComp = gui.getComponent(serverList_id)
     local y = #serverListComp.children
-    gui.newToggle(1, 1+y, serverListComp.width, 1, serverList[i].id, 0xFFFFFF, 0x000000, 0x000000, 0xFFFFFF, nil, function() serverList[i].selected = not serverList[i].selected end, serverList_id)
+    local reactorToggle_id = gui.newToggle(1, 1+y, serverListComp.width, 1, serverList[i].id, 0xFFFFFF, 0x000000, 0x000000, 0xFFFFFF, nil, function() serverList[i].selected = not serverList[i].selected end, serverList_id)
+    table.insert(reactorToggleIds, reactorToggle_id)
     -- gui.render(serverList_id, true)
-    gui.renderAll()
+    -- gui.renderAll()
 end
 
 ----------------------------------------------------

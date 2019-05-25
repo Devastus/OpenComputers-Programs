@@ -25,6 +25,9 @@ Utility math functions
 ### libstring/
 Utility string functions
 
+### libtbl/
+Utility table functions
+
 ### libqueue/
 Simple bi-directional queue wrapper for tables
 

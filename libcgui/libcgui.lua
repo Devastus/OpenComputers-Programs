@@ -102,7 +102,7 @@ end
 
 -- Set state values as a table and re-render the component tree
 function API.Component:setState(state)
-    for k,v in ipairs(state) do
+    for k,v in pairs(state) do
         self.state[k] = v
     end
     self:render(true)
