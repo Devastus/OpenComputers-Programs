@@ -5,12 +5,14 @@ local termui = require("libtermui")
 
 local TYPE = {"server", "client"}
 local settings = {}
+local replies = 0
 
 local function onRequest(remoteAddress, data)
     termui.clearLine(2)
     termui.set(1,2,"Request: "..tostring(data))
     local upper = string.upper(tostring(data))
-    net.send(remoteAddress, upper, "reply")
+    replies = replies + 1
+    net.send(remoteAddress, {message=upper, numberOfReplies=replies}, "reply")
 end
 
 local function onReply(remoteAddress, data)
