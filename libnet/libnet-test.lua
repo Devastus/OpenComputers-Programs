@@ -17,7 +17,7 @@ end
 
 local function onReply(remoteAddress, data)
     termui.clearLine(2)
-    termui.set(1,2,"Reply: "..tostring(data))
+    termui.set(1,2,"Reply: "..data.message..", replies: "..data.numberOfReplies)
 end
 
 -- Select program mode
