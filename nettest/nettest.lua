@@ -36,7 +36,7 @@ local function renderMessage(remoteAddress, name, message)
 end
 
 local function sendMessage()
-    net.broadcast(message, {name=name, message=message})
+    net.broadcast({name=name, message=message}, "msg")
     gui.getComponent(input_id):setState({text=""})
 end
 
@@ -49,7 +49,7 @@ local function onReply(remoteAddress, data)
     renderMessage(remoteAddress, data.name, data.message)
 end
 
-net.open(1337)
+net.open(3000)
 net.connectEvent("msg", onMessage)
 net.connectEvent("reply", onReply)
 
