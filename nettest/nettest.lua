@@ -25,13 +25,12 @@ local function renderMessage(remoteAddress, name, message)
         local len = #messageComps
         local parent = gui.getComponent(container_id)
         messageComps[remoteAddress] = {
-            id = gui.newLabel(1, 1+len, parent.width, 1, name..": "..message, _, _)
+            id = gui.newLabel(1, 1+len, parent.width, 1, name..": "..message, _, _, false, container_id)
         }
         parent:render(true)
     else
         local comp = gui.getComponent(messageComps[remoteAddress].id)
         comp:setState({text=name..": "..message})
-        comp:render()
     end
 end
 
