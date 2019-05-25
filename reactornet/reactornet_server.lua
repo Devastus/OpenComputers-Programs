@@ -97,7 +97,7 @@ local function fancyNumber(n)
 end
 
 local function onFetchRequest(remoteAddress, _)
-    net.send(remoteAddress, {settings.network_id, settings.server_type}, "fetch")
+    net.send(remoteAddress, {network_id = settings.network_id, server_type = settings.server_type}, "fetch")
 end
 
 local function onUpdateRequest(remoteAddress, _)
@@ -128,9 +128,9 @@ end
 local function onChangeSettingRequest(remoteAddress, data)
     local success = true
     if success == true then
-        net.send(remoteAddress, {success: true}, "changesetting")
+        net.send(remoteAddress, {success = true}, "changesetting")
     else
-        net.send(remoteAddress, {message: "Bad request"}, "error")
+        net.send(remoteAddress, {message = "Bad request"}, "error")
     end
 end
 
