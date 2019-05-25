@@ -187,11 +187,23 @@ function API.click(x, y)
     return id
 end
 
-function API.update(updateInterval)
-    local _, _, x, y = event.pull(updateInterval or 0.01, "touch")
-    if x and y then
-        API.click(x, y)
+function API.update(updateInterval, updateFunc)
+    local interrupted = false
+    while interrupted == false do
+        local ev, p1, p2, p3, p4, p5 = event.pull(updateInterval or 0.01)
+        if ev == "interrupted" then
+            interrupted = true
+        elseif ev == "touch" then
+            if p2 and p3 then
+                API.click(p2, p3)
+            end
+        end
+        if (updateFunc ~= nil) updateFunc()
     end
+    -- local _, _, x, y = event.pull(updateInterval or 0.01, "touch")
+    -- if x and y then
+    --     API.click(x, y)
+    -- end
 end
 
 -- Set a Component's visibility

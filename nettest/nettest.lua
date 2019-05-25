@@ -57,8 +57,8 @@ centerX = gui.percentX(0.5)
 centerY = gui.percentY(0.5)
 
 context()
-while event.pull(0.01, "interrupted") == nil do
-    gui.update(0.01)
-end
+gui.update(0.01)
+-- while event.pull(0.01, "interrupted") == nil do
+-- end
 net.close()
 gui.clearAll()
