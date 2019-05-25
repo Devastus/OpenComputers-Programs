@@ -11,6 +11,7 @@ local powerQueue = queue.new(12)
 
 local powermonitor_id = -1
 local serverList_id = -1
+local settingsDebug_id = -1
 
 local centerX, centerY = 0
 local serverList = {}
@@ -27,6 +28,11 @@ local function runClient()
     -- Possibly buttons to activate/deactivate reactors individually if controllers are accessible
     -- If both are accessible, auto-control activation/deactivation of reactors based on total energy in battery
     
+    net.open(1337)
+    net.connectEvent("fetch", onFetchServers)
+    gui.init(0xFFFFFF, 0x000000, 80, 25)
+    centerX = gui.percentX(0.5)
+    centerY = gui.percentY(0.5)
     gui.clearAll()
     contexts.mainScreenGUI()
     gui.renderAll()
@@ -35,6 +41,8 @@ end
 local function closeClient()
     -- Cleanup the program and shutdown
     net.close()
+    event.cancel(updateRequestEventID)
+    event.cancel(monitorUpdateEventID)
     gui.clearAll()
     os.exit()
 end
@@ -111,10 +119,12 @@ local function onUpdateReply(remoteAddress, data)
             settings.servers[data.server_type][remoteAddress][k] = v
         end
     end
+    gui.renderAll()
 end
 
 local function onFetchServers(remoteAddress, data)
-    gui.newLabel(centerX-16, 2, 32, 1, "Response from "..remoteAddress, _, _, true) --DEBUG
+    --DEBUG
+    gui.getComponent(settingsDebug_id):setState({text = "Response from "...remoteAddress})
     table.insert(serverList, {id = data.network_id, server_type=data.server_type, address = remoteAddress, selected = false})
     local i = #serverList
     local serverListComp = gui.getComponent(serverList_id)
@@ -183,6 +193,7 @@ function contexts.settingsScreenGUI()
     event.cancel(monitorUpdateEventID)
     gui.clearAll()
     gui.newLabel(centerX-16, 1, 32, 1, "ReactorNet Client | Setup", _, _, true)
+    settingsDebug_id = gui.newLabel(centerX-16, 2, 32, 1, "No response", 0xFFFFFF, 0x000000, true) 
     gui.newLabel(centerX-16, 3, 32, 1, "Network ID (1-12 Characters)", _, _, true)
     gui.newInputField(centerX-8, 4, 16, settings.network_id, 0xFFFFFF, 0xCCCCCC, 0x666666, 0x333333, 12, function(id) settings.network_id = "client_"..id end)
 
