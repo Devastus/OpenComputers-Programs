@@ -10,7 +10,7 @@ local messageComps = {}
 local name = ""
 local message = ""
 
-local context()
+local function context()
     gui.newLabel(1, 1, gui.width(), 1, "Nettest", _, _, true)
     gui.newLabel(centerX-16, 3, 32, 1, "Name (1-12 Characters)", _, _, true)
     gui.newInputField(centerX-8, 4, 16, 1, name, 0xFFFFFF, 0xCCCCCC, 0x666666, 0x333333, 12, function(id) name = id end)
@@ -19,7 +19,7 @@ local context()
     gui.newButton(centerX-8, gui.height()-2, 16, 1, "Send", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, sendMessage)
 end
 
-local renderMessage(remoteAddress, name, message)
+local function renderMessage(remoteAddress, name, message)
     if messageComps[remoteAddress] == nil then
         local len = #messageComps
         local parent = gui.getComponent(container_id)
@@ -34,17 +34,17 @@ local renderMessage(remoteAddress, name, message)
     end
 end
 
-local sendMessage()
+local function sendMessage()
     net.broadcast(message, {name=name, message=message})
     gui.getComponent(input_id):setState({text=""})
 end
 
-local onMessage(remoteAddress, data)
+local function onMessage(remoteAddress, data)
     renderMessage(remoteAddress, data.name, data.message)
     net.send(remoteAddress, {name=name, message="Message succesfully received"}, "reply")
 end
 
-local onReply(remoteAddress, data)
+local function onReply(remoteAddress, data)
     renderMessage(remoteAddress, data.name, data.message)
 end
 
