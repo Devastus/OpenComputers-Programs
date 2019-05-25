@@ -17,6 +17,7 @@ local function context()
     container_id = gui.newContainer(2, 5, gui.width()-2, 10, _, _, "heavy")
     input_id = gui.newInputField(centerX-8, gui.height()-3, 16, 1, message, 0xFFFFFF, 0xCCCCCC, 0x666666, 0x333333, 16, function(msg) message = msg end)
     gui.newButton(centerX-8, gui.height()-2, 16, 1, "Send", 0xCCCCCC, 0xFFFFFF, 0x115599, 0x3399CC, nil, sendMessage)
+    gui.renderAll()
 end
 
 local function renderMessage(remoteAddress, name, message)
