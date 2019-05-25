@@ -17,7 +17,7 @@ local function _split(message, separator)
         message:gsub(pattern, function(c) fields[#fields+1] = c end)
         return fields
     else
-        io.stderr:write("[Error] libnet._split(): separator is nil!")
+        error("[Error] libnet._split(): separator is nil!")
     end
 end
 
@@ -68,7 +68,7 @@ function API.connectEvent(msgType, callbackFunc)
     if driver ~= nil and msgType ~= nil and callbackFunc ~= nil then
         driver[msgType] = callbackFunc
     else
-        io.stderr:write("[Error] libnet.connectEvent(): invalid event registration!")
+        error("[Error] libnet.connectEvent(): invalid event registration!")
     end
 end
 
@@ -76,7 +76,7 @@ function API.disconnectEvent(msgType)
     if driver ~= nil and msgType ~= nil then
         driver[msgType] = nil
     else
-        io.stderr:write("[Error] libnet.disconnectEvent(): event or driver doesn't exist!")
+        error("[Error] libnet.disconnectEvent(): event or driver doesn't exist!")
     end
 end
 
@@ -92,8 +92,7 @@ end
 
 function API.open(port)
     modem.open(port)
-    driver = {}
-    driver.port = port
+    driver = {port = port}
     return event.listen("modem_message", _handleRecv)
 end
 

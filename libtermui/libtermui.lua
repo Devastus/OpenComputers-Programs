@@ -11,6 +11,7 @@ local colors = {
 }
 
 local API = {}
+function API.resolution() return gpu.getResolution() end
 
 local function mod(value, max)
     return (value + max) % max
@@ -91,6 +92,14 @@ function API.read(x, y, wrap, msgtype)
     gpu.setBackground(colors[msgtype][2])
     term.setCursor(x, y)
     return io.read("*line")
+end
+
+function API.clearLine(y)
+    msgtype = msgtype or "normal"
+    gpu.setForeground(colors[msgtype][1])
+    gpu.setBackground(colors[msgtype][2])
+    local w, h = gpu.getResolution()
+    gpu.fill(1, y, w, 1, "")
 end
 
 function API.clear()

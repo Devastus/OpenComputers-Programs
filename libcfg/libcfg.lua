@@ -8,17 +8,12 @@ function CFG.read(filepath, default)
         if default ~= nil then
             return default
         else
-            io.stderr:write("[Error] libcfg.read(): Cannot read file at path " .. filepath .. ": " .. emsg .. "\n")
-            return nil
+            error("[Error] libcfg.read(): Cannot read file at path " .. filepath .. ": " .. emsg .. "\n")
         end
     end
-    local sdata = file:read("*a")
+    local sdata = serialization.unserialize(file:read("*a"))
     file:close()
-    if sdata == nil or string.len(sdata) <= 0 then
-        return default or nil
-    else
-        return serialization.unserialize(sdata) or default or nil
-    end
+    return sdata or default or nil
 end
 
 function CFG.write(filepath, data)
@@ -27,11 +22,9 @@ function CFG.write(filepath, data)
     end
     local file, emsg = io.open(filepath, "wb")
     if not file then
-        io.stderr:write("[Error] libcfg.write(): Cannot write file to path " .. filepath .. ": " .. emsg .. "\n")
-        return
+        error("[Error] libcfg.write(): Cannot write file to path " .. filepath .. ": " .. emsg .. "\n")
     end
-    local sdata = serialization.serialize(data)
-    file:write(sdata)
+    file:write(serialization.serialize(data))
     file:close()
 end
 
