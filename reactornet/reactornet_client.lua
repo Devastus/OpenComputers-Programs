@@ -124,7 +124,7 @@ end
 
 local function onFetchServers(remoteAddress, data)
     --DEBUG
-    gui.getComponent(settingsDebug_id):setState({text = "Response from "...remoteAddress})
+    gui.getComponent(settingsDebug_id):setState({text = "Response from "..remoteAddress})
     table.insert(serverList, {id = data.network_id, server_type=data.server_type, address = remoteAddress, selected = false})
     local i = #serverList
     local serverListComp = gui.getComponent(serverList_id)
