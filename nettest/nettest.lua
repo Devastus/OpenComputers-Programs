@@ -53,7 +53,7 @@ net.open(1337)
 net.connectEvent("msg", onMessage)
 net.connectEvent("reply", onReply)
 
-gui.init(0xFFFFFF, 0x000000, 80, 25)
+gui.init(0xFFFFFF, 0x000000)
 centerX = gui.percentX(0.5)
 centerY = gui.percentY(0.5)
 
