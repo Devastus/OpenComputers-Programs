@@ -4,7 +4,7 @@ local event = require("event")
 local gui = require("libcgui")
 local queue = require("libqueue")
 
-local updateInterval = 0.002
+local updateInterval = 0.01
 local contexts = {}
 local settings = {servers = {controller = {}, monitor = {}}}
 local powerQueue = queue.new(12)
@@ -118,6 +118,7 @@ local function onFetchServers(remoteAddress, data)
     local i = #serverList
     local serverListComp = gui.getComponent(serverList_id)
     local y = #serverListComp.children
+    gui.newLabel(1, 2, gui.width(), 1, "Response: "..data.network_id..", "..data.server_type, 0xFFFFFF, 0x000000, true)
     gui.newToggle(1, 1+y, serverListComp.width, 1, serverList[i].id, 0xFFFFFF, 0x000000, 0x000000, 0xFFFFFF, nil, function() serverList[i].selected = not serverList[i].selected end, serverList_id)
     -- gui.render(serverList_id, true)
     gui.renderAll()
@@ -199,16 +200,12 @@ end
 -- MAIN LOOP --
 -----------------------------------------------
 
+net.open(1337)
 gui.init(0xFFFFFF, 0x000000, 80, 25)
 centerX = gui.percentX(0.5)
 centerY = gui.percentY(0.5)
-net.open(1337)
 contexts.mainScreenGUI()
 while event.pull(updateInterval, "interrupted") == nil do
     gui.update(updateInterval)
-    -- local _, _, x, y = event.pull(updateInterval, "touch")
-    -- if x and y then
-    --     gui.click(x, y)
-    -- end
 end
 closeClient()
