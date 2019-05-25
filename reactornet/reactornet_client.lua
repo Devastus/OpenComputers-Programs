@@ -11,7 +11,6 @@ local settings = {servers = {controller = {}, monitor = {}}}
 local powerQueue = queue.new(12)
 
 local powermonitor_id = -1
-local reactorToggleIds = {}
 local serverList_id = -1
 local settingsDebug_id = -1
 
@@ -35,9 +34,7 @@ local function runClient()
     gui.init(0xFFFFFF, 0x000000, 80, 25)
     centerX = gui.percentX(0.5)
     centerY = gui.percentY(0.5)
-    gui.clearAll()
     contexts.mainScreenGUI()
-    gui.renderAll()
 end
 
 local function closeClient()
@@ -84,7 +81,7 @@ local function newReactorButton(x, y, width, height, reactor_id, fgOn, fgOff, bg
 end
 
 local function saveSelectedServers()
-    for serv in serverList do
+    for k,serv in pairs(serverList) do
         if serv.selected == true then
             settings.servers[serv.server_type][serv.address] = {network_id = serv.network_id}
         end
@@ -134,14 +131,12 @@ end
 local function onFetchServers(remoteAddress, data)
     --DEBUG
     gui.getComponent(settingsDebug_id):setState({text = "Response from "..remoteAddress})
-    table.insert(serverList, {id = data.network_id, server_type=data.server_type, address = remoteAddress, selected = false})
-    local i = #serverList
+    local i = #serverList+1
     local serverListComp = gui.getComponent(serverList_id)
     local y = #serverListComp.children
-    local reactorToggle_id = gui.newToggle(1, 1+y, serverListComp.width, 1, serverList[i].id, 0xFFFFFF, 0x000000, 0x000000, 0xFFFFFF, nil, function() serverList[i].selected = not serverList[i].selected end, serverList_id)
-    table.insert(reactorToggleIds, reactorToggle_id)
-    -- gui.render(serverList_id, true)
-    -- gui.renderAll()
+    local serverToggle_id = gui.newToggle(1, 1+y, serverListComp.width, 1, data.network_id, 0xFFFFFF, 0x000000, 0x000000, 0xFFFFFF, nil, function() serverList[i].selected = not serverList[i].selected end, serverList_id)
+    table.insert(serverList, {id = data.network_id, server_type=data.server_type, address = remoteAddress, selected = false, comp = serverToggle_id})
+    gui.render(serverToggle_id)
 end
 
 ----------------------------------------------------
@@ -198,12 +193,12 @@ function contexts.settingsScreenGUI()
     -- Set a network ID for this client
     -- Gather all egilible RNet servers for communication
     net.disconnectEvent("update")
-    
+    serverList = {}
     event.cancel(updateRequestEventID)
     event.cancel(monitorUpdateEventID)
     gui.clearAll()
     gui.newLabel(centerX-16, 1, 32, 1, "ReactorNet Client | Setup", _, _, true)
-    settingsDebug_id = gui.newLabel(centerX-16, 2, 32, 1, "No response", 0xFFFFFF, 0x000000, true) 
+    settingsDebug_id = gui.newLabel(centerX-16, 2, 32, 1, "No response", _, _, true) 
     gui.newLabel(centerX-16, 3, 32, 1, "Network ID (1-12 Characters)", _, _, true)
     gui.newInputField(centerX-8, 4, 16, settings.network_id, 0xFFFFFF, 0xCCCCCC, 0x666666, 0x333333, 12, function(id) settings.network_id = "client_"..id end)
 
