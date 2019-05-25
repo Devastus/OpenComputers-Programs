@@ -99,7 +99,7 @@ function API.clearLine(y)
     gpu.setForeground(colors[msgtype][1])
     gpu.setBackground(colors[msgtype][2])
     local w, h = gpu.getResolution()
-    gpu.fill(1, y, w, 1, "")
+    gpu.fill(1, y, w, 1, " ")
 end
 
 function API.clear()
