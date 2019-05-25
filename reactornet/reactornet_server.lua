@@ -77,6 +77,7 @@ local function fancyNumber(n)
 end
 
 local function onFetchRequest(remoteAddress, _)
+    termUI.write(1, 9, "Fetch request from "..remoteAddress)
     net.send(remoteAddress, {network_id = settings.network_id, server_type = settings.server_type}, "fetch")
 end
 
