@@ -114,7 +114,7 @@ local function onUpdateReply(remoteAddress, data)
 end
 
 local function onFetchServers(remoteAddress, data)
-    gui.newLabel(1, 2, gui.width(), 1, "Response: "..data.network_id..", "..data.server_type, _, _, true) --DEBUG
+    gui.newLabel(centerX-16, 2, 32, 1, "Response from "..remoteAddress, _, _, true) --DEBUG
     table.insert(serverList, {id = data.network_id, server_type=data.server_type, address = remoteAddress, selected = false})
     local i = #serverList
     local serverListComp = gui.getComponent(serverList_id)
