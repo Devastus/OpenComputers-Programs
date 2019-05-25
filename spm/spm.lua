@@ -73,16 +73,14 @@ end
 
 local function __readCfg(filepath, default)
     local file, emsg = io.open(filepath, "rb")
-    if not file then
-        if default ~= nil then
-            return default
-        else
-            error("[Error] spm: Cannot read file at path " .. filepath .. ": " .. emsg .. "\n")
-        end
+    if file then
+        local data = serialization.unserialize(file:read("*a"))
+        file:close()
+        return data or default or nil
+    else
+        io.stderr:write("[Error] spm: Cannot read file at path " .. filepath .. ": " .. emsg .. "\n")
+        return default or nil
     end
-    local data = serialization.unserialize(file:read("*a"))
-    file:close()
-    return data or default or nil
 end
 
 local function __writeCfg(filepath, data)
@@ -90,11 +88,12 @@ local function __writeCfg(filepath, data)
         fs.makeDirectory(fs.path(filepath))
     end
     local file, emsg = io.open(filepath, "wb")
-    if not file then
+    if file then
+        file:write(serialization.serialize(data))
+        file:close()
+    else
         error("[Error] spm: Cannot write file to path " .. filepath .. ": " .. emsg .. "\n")
     end
-    file:write(serialization.serialize(data))
-    file:close()
 end
 
 local function __tryFindRepo(repositoryUrl, packageName)

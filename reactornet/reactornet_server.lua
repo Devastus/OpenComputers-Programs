@@ -29,31 +29,11 @@ local updateTimerID = 0
 -----------------------------------------------
 
 local function loadSettings()
-    -- local file, emsg = io.open(SETTINGS_PATH, "rb")
-    -- if not file then
-    --     io.stderr:write("Error: Cannot read settings from path " .. SETTINGS_PATH .. ": " .. emsg)
-    --     settings = {headless=false, targetRotorSpeed=1800, steamPerTurbine=2000}
-    --     return false
-    -- end
-    -- local sdata = file:read("*a")
-    -- file:close()
-    -- settings = serialization.unserialize(sdata)
     settings = cfg.read(SETTINGS_PATH, {headless=false, targetRotorSpeed=1800, steamPerTurbine=2000})
     return settings ~= nil
 end
 
 local function saveSettings()
-    -- if not fs.exists(SETTINGS_PATH) then
-    --     fs.makeDirectory(fs.path(SETTINGS_PATH))
-    -- end
-    -- local file, emsg = io.open(SETTINGS_PATH, "wb")
-    -- if not file then
-    --     io.stderr:write("Error: Cannot save settings to path " .. SETTINGS_PATH .. ": " .. emsg)
-    --     return
-    -- end
-    -- local sdata = serialization.serialize(settings)
-    -- file:write(sdata)
-    -- file:close()
     cfg.write(SETTINGS_PATH, settings)
 end
 

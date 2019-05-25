@@ -119,7 +119,8 @@ local function onFetchServers(remoteAddress, data)
     local serverListComp = gui.getComponent(serverList_id)
     local y = #serverListComp.children
     gui.newToggle(1, 1+y, serverListComp.width, 1, serverList[i].id, 0xFFFFFF, 0x000000, 0x000000, 0xFFFFFF, nil, function() serverList[i].selected = not serverList[i].selected end, serverList_id)
-    gui.render(serverList_id, true)
+    -- gui.render(serverList_id, true)
+    gui.renderAll()
 end
 
 ----------------------------------------------------
