@@ -114,11 +114,11 @@ local function onUpdateReply(remoteAddress, data)
 end
 
 local function onFetchServers(remoteAddress, data)
+    gui.newLabel(1, 2, gui.width(), 1, "Response: "..data.network_id..", "..data.server_type, _, _, true) --DEBUG
     table.insert(serverList, {id = data.network_id, server_type=data.server_type, address = remoteAddress, selected = false})
     local i = #serverList
     local serverListComp = gui.getComponent(serverList_id)
     local y = #serverListComp.children
-    gui.newLabel(1, 2, gui.width(), 1, "Response: "..data.network_id..", "..data.server_type, 0xFFFFFF, 0x000000, true)
     gui.newToggle(1, 1+y, serverListComp.width, 1, serverList[i].id, 0xFFFFFF, 0x000000, 0x000000, 0xFFFFFF, nil, function() serverList[i].selected = not serverList[i].selected end, serverList_id)
     -- gui.render(serverList_id, true)
     gui.renderAll()
@@ -141,7 +141,7 @@ end
 function contexts.mainScreenGUI()
     -- Draw a Power Chart of total energy numbers from monitors
     -- Draw a list of toggles for reactor controllers
-    net.disconnectEvent("fetch")
+    -- net.disconnectEvent("fetch")
     net.connectEvent("update", onUpdateReply)
     updateRequestEventID = event.timer(2, onUpdateRequest, math.huge)
     monitorUpdateEventID = event.timer(5, onPowerMonitorUpdate, math.huge)
@@ -178,7 +178,7 @@ function contexts.settingsScreenGUI()
     -- Set a network ID for this client
     -- Gather all egilible RNet servers for communication
     net.disconnectEvent("update")
-    net.connectEvent("fetch", onFetchServers)
+    
     event.cancel(updateRequestEventID)
     event.cancel(monitorUpdateEventID)
     gui.clearAll()
@@ -201,6 +201,7 @@ end
 -----------------------------------------------
 
 net.open(1337)
+net.connectEvent("fetch", onFetchServers)
 gui.init(0xFFFFFF, 0x000000, 80, 25)
 centerX = gui.percentX(0.5)
 centerY = gui.percentY(0.5)
