@@ -198,7 +198,7 @@ function API.update(updateInterval, updateFunc)
                 API.click(p2, p3)
             end
         end
-        if (updateFunc ~= nil) updateFunc()
+        if updateFunc ~= nil then updateFunc() end
     end
     -- local _, _, x, y = event.pull(updateInterval or 0.01, "touch")
     -- if x and y then
